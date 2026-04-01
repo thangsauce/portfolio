@@ -14,11 +14,11 @@ CREATE TABLE portfolio_projects (
   created_at timestamptz DEFAULT now()
 );
 
--- Skills (tech stack items + IT support skills)
+-- Skills (IT skills list)
 CREATE TABLE skills (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text NOT NULL,
-  category text, -- 'frontend' | 'backend' | 'database' | 'tools' | 'it_support'
+  category text, -- legacy column; not required after migration 003
   icon_url text,
   order_index int DEFAULT 0
 );

@@ -87,6 +87,30 @@ export type Database = {
         }
         Relationships: []
       }
+      stacks: {
+        Row: {
+          id: string
+          name: string
+          category: string | null
+          icon_url: string | null
+          order_index: number
+        }
+        Insert: {
+          id?: string
+          name: string
+          category?: string | null
+          icon_url?: string | null
+          order_index?: number
+        }
+        Update: {
+          id?: string
+          name?: string
+          category?: string | null
+          icon_url?: string | null
+          order_index?: number
+        }
+        Relationships: []
+      }
       certifications: {
         Row: {
           id: string

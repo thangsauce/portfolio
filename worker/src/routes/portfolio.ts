@@ -29,9 +29,18 @@ portfolio.get('/projects/:slug', async (c) => {
 portfolio.get('/skills', async (c) => {
   const { data, error } = await getSupabase(c.env)
     .from('skills')
-    .select('id, name, category, icon_url, order_index')
+    .select('id, name, order_index')
     .order('order_index')
   if (error) return c.json({ error: 'Failed to fetch skills' }, 500)
+  return c.json(data)
+})
+
+portfolio.get('/stacks', async (c) => {
+  const { data, error } = await getSupabase(c.env)
+    .from('stacks')
+    .select('id, name, category, icon_url, order_index')
+    .order('order_index')
+  if (error) return c.json({ error: 'Failed to fetch stacks' }, 500)
   return c.json(data)
 })
 

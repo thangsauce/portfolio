@@ -16,8 +16,8 @@ export const SOCIAL_LINKS = [
     { name: 'linkedin', url: 'https://linkedin.com/in/thang-le-it' },
 ];
 
-// MY_STACK moved to API: GET /api/portfolio/skills (categories: frontend, backend, database, tools)
-// IT_SKILLS moved to API: GET /api/portfolio/skills (category: it_support)
+// MY_STACK moved to API: GET /api/portfolio/stacks
+// IT_SKILLS moved to API: GET /api/portfolio/skills
 // CERTIFICATIONS moved to API: GET /api/portfolio/certifications
 // MY_EXPERIENCE moved to API: GET /api/portfolio/experiences
 

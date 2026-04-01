@@ -8,7 +8,7 @@ import { apiFetch } from '@/lib/api';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-type Skill = { id: string; name: string; category: string }
+type Skill = { id: string; name: string }
 
 const ITSkills = () => {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -16,7 +16,7 @@ const ITSkills = () => {
 
     useEffect(() => {
         apiFetch<Skill[]>('/api/portfolio/skills')
-            .then((data) => setSkills(data.filter((s) => s.category === 'it_support')))
+            .then(setSkills)
             .catch(() => {});
     }, []);
 

@@ -1,8 +1,8 @@
 -- Seed data migrated from frontend/lib/data.ts
 -- Run AFTER applying migrations 001 and 002
 
--- ── Skills: Tech Stack (MY_STACK) ─────────────────────────────────────────────
-INSERT INTO skills (name, category, icon_url, order_index) VALUES
+-- ── Stacks: Tech Stack (MY_STACK) ─────────────────────────────────────────────
+INSERT INTO stacks (name, category, icon_url, order_index) VALUES
   -- Frontend
   ('JavaScript',   'frontend',  '/logo/js.png',         0),
   ('TypeScript',   'frontend',  '/logo/ts.png',         1),
@@ -24,12 +24,12 @@ INSERT INTO skills (name, category, icon_url, order_index) VALUES
   ('Linux',        'tools',     '/logo/linux.png',      2);
 
 -- ── Skills: IT Support (IT_SKILLS) ────────────────────────────────────────────
-INSERT INTO skills (name, category, order_index) VALUES
-  ('Troubleshooting hardware and software issues (PCs, laptops, printers, etc.)',           'it_support', 0),
-  ('Basic networking knowledge (Wi-Fi configuration, setup, troubleshooting, etc.)',        'it_support', 1),
-  ('Proficiency in Windows OS, Mac OS, and Linux OS',                                       'it_support', 2),
-  ('Experience with Microsoft Office Suite and Google Workspace',                           'it_support', 3),
-  ('Excellent verbal and written communication skills for customer support',                 'it_support', 4);
+INSERT INTO skills (name, order_index) VALUES
+  ('Troubleshooting hardware and software issues (PCs, laptops, printers, etc.)',           0),
+  ('Basic networking knowledge (Wi-Fi configuration, setup, troubleshooting, etc.)',        1),
+  ('Proficiency in Windows OS, Mac OS, and Linux OS',                                       2),
+  ('Experience with Microsoft Office Suite and Google Workspace',                            3),
+  ('Excellent verbal and written communication skills for customer support',                 4);
 
 -- ── Certifications ─────────────────────────────────────────────────────────────
 INSERT INTO certifications (name, issuer, issue_date, credential_id, url, order_index) VALUES

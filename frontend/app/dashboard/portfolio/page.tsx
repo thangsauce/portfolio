@@ -4,12 +4,14 @@ import { useState, useEffect, useCallback } from 'react'
 import { apiPrivate } from '@/lib/api'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
-type Project    = { id: string; title: string; slug: string; description: string | null; tech_stack: string[]; images: object | null; featured: boolean; order_index: number }
-type Skill      = { id: string; name: string; category: string; icon_url: string | null; order_index: number }
+type ProjectImages = { thumbnail?: string; long?: string; gallery?: string[] }
+type Project    = { id: string; title: string; slug: string; description: string | null; tech_stack: string[] | string | null; images: ProjectImages | null; featured: boolean; order_index: number }
+type Stack      = { id: string; name: string; category: string | null; icon_url: string | null; order_index: number }
+type Skill      = { id: string; name: string; order_index: number }
 type Cert       = { id: string; name: string; issuer: string | null; issue_date: string | null; credential_id: string | null; url: string | null }
 type Experience = { id: string; company: string; role: string; start_date: string | null; end_date: string | null; description: string[] | null; order_index: number }
 type ResumeInfo = { url: string; hasCustom: boolean }
-type Tab        = 'projects' | 'skills' | 'certs' | 'experiences' | 'resume'
+type Tab        = 'projects' | 'stacks' | 'skills' | 'certs' | 'experiences' | 'resume'
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 const sv = { width: 13, height: 13, viewBox: '0 0 16 16', fill: 'none', stroke: 'currentColor', strokeWidth: '1.5', strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, style: { display: 'block' as const } }
@@ -42,8 +44,29 @@ function Fld({ label, children }: { label: string; children: React.ReactNode }) 
 }
 
 // ─── Slug helper ──────────────────────────────────────────────────────────────
-function toSlug(s: string) {
+  function toSlug(s: string) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+}
+
+function parseCsvUrls(csv: string) {
+  return csv.split(',').map((s) => s.trim()).filter(Boolean)
+}
+
+const SKILL_CATEGORIES = ['frontend', 'backend', 'database', 'tools', 'it_support'] as const
+
+function normalizeSkillCategory(value: string) {
+  const normalized = value.toLowerCase().trim().replace(/[\s-]+/g, '_')
+  if (!normalized) return ''
+  if (normalized === 'it' || normalized === 'itsupport' || normalized === 'it_skills') return 'it_support'
+  if (normalized === 'front_end' || normalized === 'frontend_dev' || normalized === 'web') return 'frontend'
+  if (normalized === 'back_end' || normalized === 'backend_dev') return 'backend'
+  return normalized
+}
+
+function toTechStackArray(value: Project['tech_stack']): string[] {
+  if (Array.isArray(value)) return value.filter(Boolean)
+  if (typeof value === 'string') return value.split(',').map((s) => s.trim()).filter(Boolean)
+  return []
 }
 
 // ─── Main page ────────────────────────────────────────────────────────────────
@@ -59,6 +82,7 @@ export default function PortfolioPage() {
 
   // ── Data ──────────────────────────────────────────────────────────────────
   const [projects,    setProjects]    = useState<Project[]>([])
+  const [stacks,      setStacks]      = useState<Stack[]>([])
   const [skills,      setSkills]      = useState<Skill[]>([])
   const [certs,       setCerts]       = useState<Cert[]>([])
   const [experiences, setExperiences] = useState<Experience[]>([])
@@ -66,8 +90,19 @@ export default function PortfolioPage() {
   const [resumeFile, setResumeFile]   = useState<File | null>(null)
 
   // ── Form state per tab ────────────────────────────────────────────────────
-  const [pf, setPf] = useState({ title: '', slug: '', description: '', tech_stack: '', order_index: '0', featured: false })
-  const [sf, setSf] = useState({ name: '', category: '', icon_url: '', order_index: '0' })
+  const [pf, setPf] = useState({
+    title: '',
+    slug: '',
+    description: '',
+    tech_stack: '',
+    image_thumbnail: '',
+    image_long: '',
+    image_gallery: '',
+    order_index: '0',
+    featured: false,
+  })
+  const [stf, setStf] = useState({ name: '', category: '', icon_url: '', order_index: '0' })
+  const [sf, setSf] = useState({ name: '', order_index: '0' })
   const [cf, setCf] = useState({ name: '', issuer: '', issue_date: '', credential_id: '', url: '' })
   const [ef, setEf] = useState({ company: '', role: '', start_date: '', end_date: '', description: '', order_index: '0' })
 
@@ -76,7 +111,14 @@ export default function PortfolioPage() {
     setLoading(true)
     try {
       if (tab === 'projects')    setProjects(await apiPrivate<Project[]>('/portfolio/projects'))
-      if (tab === 'skills')      setSkills(await apiPrivate<Skill[]>('/portfolio/skills'))
+      if (tab === 'stacks') {
+        const loaded = await apiPrivate<Stack[]>('/portfolio/stacks')
+        setStacks(loaded.map((s) => ({ ...s, category: normalizeSkillCategory(s.category ?? '') })))
+      }
+      if (tab === 'skills') {
+        const loaded = await apiPrivate<Skill[]>('/portfolio/skills')
+        setSkills(loaded)
+      }
       if (tab === 'certs')       setCerts(await apiPrivate<Cert[]>('/portfolio/certifications'))
       if (tab === 'experiences') setExperiences(await apiPrivate<Experience[]>('/portfolio/experiences'))
       if (tab === 'resume')      setResumeInfo(await apiPrivate<ResumeInfo>('/portfolio/resume'))
@@ -96,8 +138,19 @@ export default function PortfolioPage() {
   }
 
   function resetForms() {
-    setPf({ title: '', slug: '', description: '', tech_stack: '', order_index: '0', featured: false })
-    setSf({ name: '', category: '', icon_url: '', order_index: '0' })
+    setPf({
+      title: '',
+      slug: '',
+      description: '',
+      tech_stack: '',
+      image_thumbnail: '',
+      image_long: '',
+      image_gallery: '',
+      order_index: '0',
+      featured: false,
+    })
+    setStf({ name: '', category: '', icon_url: '', order_index: '0' })
+    setSf({ name: '', order_index: '0' })
     setCf({ name: '', issuer: '', issue_date: '', credential_id: '', url: '' })
     setEf({ company: '', role: '', start_date: '', end_date: '', description: '', order_index: '0' })
   }
@@ -108,14 +161,28 @@ export default function PortfolioPage() {
     setPanelOpen(true)
   }
 
-  function openEdit(item: Project | Skill | Cert | Experience) {
+  function openEdit(item: Project | Stack | Skill | Cert | Experience) {
     setEditingId(item.id)
     if (tab === 'projects') {
       const p = item as Project
-      setPf({ title: p.title, slug: p.slug, description: p.description ?? '', tech_stack: (p.tech_stack ?? []).join(', '), order_index: String(p.order_index), featured: p.featured })
+      const images = p.images ?? {}
+      setPf({
+        title: p.title,
+        slug: p.slug,
+        description: p.description ?? '',
+        tech_stack: toTechStackArray(p.tech_stack).join(', '),
+        image_thumbnail: images.thumbnail ?? '',
+        image_long: images.long ?? '',
+        image_gallery: (images.gallery ?? []).join(', '),
+        order_index: String(p.order_index),
+        featured: p.featured,
+      })
+    } else if (tab === 'stacks') {
+      const s = item as Stack
+      setStf({ name: s.name, category: normalizeSkillCategory(s.category ?? ''), icon_url: s.icon_url ?? '', order_index: String(s.order_index) })
     } else if (tab === 'skills') {
       const s = item as Skill
-      setSf({ name: s.name, category: s.category, icon_url: s.icon_url ?? '', order_index: String(s.order_index) })
+      setSf({ name: s.name, order_index: String(s.order_index) })
     } else if (tab === 'certs') {
       const c = item as Cert
       setCf({ name: c.name, issuer: c.issuer ?? '', issue_date: c.issue_date ?? '', credential_id: c.credential_id ?? '', url: c.url ?? '' })
@@ -138,13 +205,39 @@ export default function PortfolioPage() {
       const method = editingId ? 'PUT' : 'POST'
 
       if (tab === 'projects') {
-        const body = { title: pf.title, slug: pf.slug, description: pf.description || null, tech_stack: pf.tech_stack.split(',').map(s => s.trim()).filter(Boolean), order_index: parseInt(pf.order_index) || 0, featured: pf.featured }
+        const body = {
+          title: pf.title,
+          slug: pf.slug,
+          description: pf.description || null,
+          tech_stack: pf.tech_stack.split(',').map(s => s.trim()).filter(Boolean),
+          images: {
+            thumbnail: pf.image_thumbnail.trim(),
+            long: pf.image_long.trim(),
+            gallery: pf.image_gallery.split(',').map(s => s.trim()).filter(Boolean),
+          },
+          order_index: parseInt(pf.order_index) || 0,
+          featured: pf.featured,
+        }
         const path = editingId ? `/portfolio/projects/${editingId}` : '/portfolio/projects'
         const r = await apiPrivate<Project>(path, { method, body: JSON.stringify(body) })
         setProjects(prev => editingId ? prev.map(p => p.id === editingId ? r : p) : [...prev, r])
 
+      } else if (tab === 'stacks') {
+        const body = {
+          name: stf.name,
+          category: normalizeSkillCategory(stf.category),
+          icon_url: stf.icon_url || null,
+          order_index: parseInt(stf.order_index) || 0,
+        }
+        const path = editingId ? `/portfolio/stacks/${editingId}` : '/portfolio/stacks'
+        const r = await apiPrivate<Stack>(path, { method, body: JSON.stringify(body) })
+        setStacks(prev => editingId ? prev.map(s => s.id === editingId ? r : s) : [...prev, r])
+
       } else if (tab === 'skills') {
-        const body = { name: sf.name, category: sf.category, icon_url: sf.icon_url || null, order_index: parseInt(sf.order_index) || 0 }
+        const body = {
+          name: sf.name,
+          order_index: parseInt(sf.order_index) || 0,
+        }
         const path = editingId ? `/portfolio/skills/${editingId}` : '/portfolio/skills'
         const r = await apiPrivate<Skill>(path, { method, body: JSON.stringify(body) })
         setSkills(prev => editingId ? prev.map(s => s.id === editingId ? r : s) : [...prev, r])
@@ -177,6 +270,7 @@ export default function PortfolioPage() {
       const ep = tab === 'certs' ? 'certifications' : tab
       await apiPrivate(`/portfolio/${ep}/${id}`, { method: 'DELETE' })
       if (tab === 'projects')    setProjects(prev => prev.filter(p => p.id !== id))
+      if (tab === 'stacks')      setStacks(prev => prev.filter(s => s.id !== id))
       if (tab === 'skills')      setSkills(prev => prev.filter(s => s.id !== id))
       if (tab === 'certs')       setCerts(prev => prev.filter(c => c.id !== id))
       if (tab === 'experiences') setExperiences(prev => prev.filter(e => e.id !== id))
@@ -239,6 +333,68 @@ export default function PortfolioPage() {
           <input style={iSt} value={pf.tech_stack} placeholder="React, TypeScript, Tailwind CSS"
             onChange={e => setPf(p => ({ ...p, tech_stack: e.target.value }))} />
         </Fld>
+        <Fld label="image_thumbnail (url/path)">
+          <input style={iSt} value={pf.image_thumbnail} placeholder="/projects/thumbnail/portfolio-thumbnail.jpg"
+            onChange={e => setPf(p => ({ ...p, image_thumbnail: e.target.value }))} />
+        </Fld>
+        <Fld label="image_long (url/path)">
+          <input style={iSt} value={pf.image_long} placeholder="/projects/long/portfolio-long.jpg"
+            onChange={e => setPf(p => ({ ...p, image_long: e.target.value }))} />
+        </Fld>
+        <Fld label="image_gallery (comma-separated)">
+          <input style={iSt} value={pf.image_gallery} placeholder="/projects/images/p1.jpg, /projects/images/p2.jpg"
+            onChange={e => setPf(p => ({ ...p, image_gallery: e.target.value }))} />
+        </Fld>
+        {(pf.image_thumbnail || pf.image_long || pf.image_gallery) && (
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ fontSize: 9, letterSpacing: '0.3em', color: 'hsl(158 64% 36%)', textTransform: 'uppercase', marginBottom: 8 }}>
+              &gt; image_preview
+            </div>
+            <div style={{ display: 'grid', gap: 8 }}>
+              {pf.image_thumbnail && (
+                <div>
+                  <div style={{ fontSize: 9, letterSpacing: '0.12em', color: 'hsl(0 0% 36%)', marginBottom: 4 }}>
+                    thumbnail (recommended 1200x800, ratio 3:2)
+                  </div>
+                  <img
+                    src={pf.image_thumbnail}
+                    alt="Thumbnail preview"
+                    style={{ width: '100%', maxHeight: 120, objectFit: 'cover', border: '1px solid hsl(0 0% 20%)', borderRadius: 6 }}
+                  />
+                </div>
+              )}
+              {pf.image_long && (
+                <div>
+                  <div style={{ fontSize: 9, letterSpacing: '0.12em', color: 'hsl(0 0% 36%)', marginBottom: 4 }}>
+                    long (recommended 900x1200, ratio 3:4 portrait)
+                  </div>
+                  <img
+                    src={pf.image_long}
+                    alt="Long image preview"
+                    style={{ width: '100%', maxHeight: 120, objectFit: 'cover', border: '1px solid hsl(0 0% 20%)', borderRadius: 6 }}
+                  />
+                </div>
+              )}
+              {parseCsvUrls(pf.image_gallery).length > 0 && (
+                <div>
+                  <div style={{ fontSize: 9, letterSpacing: '0.12em', color: 'hsl(0 0% 36%)', marginBottom: 4 }}>
+                    gallery (recommended 1500x800, ratio 15:8)
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 6 }}>
+                    {parseCsvUrls(pf.image_gallery).slice(0, 6).map((url) => (
+                      <img
+                        key={url}
+                        src={url}
+                        alt="Gallery preview"
+                        style={{ width: '100%', height: 64, objectFit: 'cover', border: '1px solid hsl(0 0% 20%)', borderRadius: 4 }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
         <Fld label="order_index">
           <input style={iSt} type="number" value={pf.order_index}
             onChange={e => setPf(p => ({ ...p, order_index: e.target.value }))} />
@@ -253,24 +409,37 @@ export default function PortfolioPage() {
       </>
     )
 
-    if (tab === 'skills') return (
+    if (tab === 'stacks') return (
       <>
         <Fld label="name">
-          <input style={iSt} value={sf.name} placeholder="Skill name"
-            onChange={e => setSf(p => ({ ...p, name: e.target.value }))} />
+          <input style={iSt} value={stf.name} placeholder="Stack item name"
+            onChange={e => setStf(p => ({ ...p, name: e.target.value }))} />
         </Fld>
         <Fld label="category">
-          <select style={{ ...iSt, appearance: 'none' }} value={sf.category}
-            onChange={e => setSf(p => ({ ...p, category: e.target.value }))}>
+          <select style={{ ...iSt, appearance: 'none' }} value={stf.category}
+            onChange={e => setStf(p => ({ ...p, category: e.target.value }))}>
             <option value="">-- select category --</option>
-            {['frontend', 'backend', 'database', 'tools', 'it_support'].map(c => (
+            {SKILL_CATEGORIES.filter((c) => c !== 'it_support').map(c => (
               <option key={c} value={c}>{c}</option>
             ))}
           </select>
         </Fld>
         <Fld label="icon_url">
-          <input style={iSt} value={sf.icon_url} placeholder="/logo/react.png"
-            onChange={e => setSf(p => ({ ...p, icon_url: e.target.value }))} />
+          <input style={iSt} value={stf.icon_url} placeholder="/logo/react.png"
+            onChange={e => setStf(p => ({ ...p, icon_url: e.target.value }))} />
+        </Fld>
+        <Fld label="order_index">
+          <input style={iSt} type="number" value={stf.order_index}
+            onChange={e => setStf(p => ({ ...p, order_index: e.target.value }))} />
+        </Fld>
+      </>
+    )
+
+    if (tab === 'skills') return (
+      <>
+        <Fld label="name">
+          <input style={iSt} value={sf.name} placeholder="Skill name"
+            onChange={e => setSf(p => ({ ...p, name: e.target.value }))} />
         </Fld>
         <Fld label="order_index">
           <input style={iSt} type="number" value={sf.order_index}
@@ -336,7 +505,7 @@ export default function PortfolioPage() {
   }
 
   // ── Table data ────────────────────────────────────────────────────────────
-  type Row = { id: string; item: Project | Skill | Cert | Experience; cells: React.ReactNode[] }
+  type Row = { id: string; item: Project | Stack | Skill | Cert | Experience; cells: React.ReactNode[] }
 
   function buildRows(): { headers: string[]; rows: Row[] } {
     if (tab === 'resume') return { headers: [], rows: [] }
@@ -346,18 +515,26 @@ export default function PortfolioPage() {
       rows: projects.map(p => ({ id: p.id, item: p, cells: [
         <span style={{ color: 'hsl(0 0% 76%)' }}>{p.title}</span>,
         <span style={{ fontFamily: 'monospace', fontSize: 10, color: 'hsl(0 0% 38%)' }}>{p.slug}</span>,
-        <span style={{ fontSize: 10, color: 'hsl(0 0% 38%)' }}>{(p.tech_stack ?? []).slice(0, 2).join(', ')}{(p.tech_stack?.length ?? 0) > 2 ? ' …' : ''}</span>,
+        <span style={{ fontSize: 10, color: 'hsl(0 0% 38%)' }}>{toTechStackArray(p.tech_stack).slice(0, 2).join(', ')}{toTechStackArray(p.tech_stack).length > 2 ? ' …' : ''}</span>,
         <span style={{ color: p.featured ? 'hsl(158 64% 45%)' : 'hsl(0 0% 26%)', fontSize: 10, letterSpacing: '0.15em' }}>{p.featured ? 'yes' : 'no'}</span>,
         <span style={{ color: 'hsl(0 0% 35%)' }}>{p.order_index}</span>,
       ]})),
     }
 
-    if (tab === 'skills') return {
+    if (tab === 'stacks') return {
       headers: ['// name', '// category', '// icon', '// order'],
+      rows: stacks.map(s => ({ id: s.id, item: s, cells: [
+        <span style={{ color: 'hsl(0 0% 76%)' }}>{s.name}</span>,
+        <span style={{ color: 'hsl(193 80% 45%)', fontSize: 10, letterSpacing: '0.12em' }}>{normalizeSkillCategory(s.category ?? '') || '—'}</span>,
+        <span style={{ fontSize: 10, color: s.icon_url ? 'hsl(158 64% 42%)' : 'hsl(0 0% 25%)' }}>{s.icon_url ? '✓ set' : '—'}</span>,
+        <span style={{ color: 'hsl(0 0% 35%)' }}>{s.order_index}</span>,
+      ]})),
+    }
+
+    if (tab === 'skills') return {
+      headers: ['// name', '// order'],
       rows: skills.map(s => ({ id: s.id, item: s, cells: [
         <span style={{ color: 'hsl(0 0% 76%)' }}>{s.name}</span>,
-        <span style={{ color: 'hsl(193 80% 45%)', fontSize: 10, letterSpacing: '0.12em' }}>{s.category}</span>,
-        <span style={{ fontSize: 10, color: s.icon_url ? 'hsl(158 64% 42%)' : 'hsl(0 0% 25%)' }}>{s.icon_url ? '✓ set' : '—'}</span>,
         <span style={{ color: 'hsl(0 0% 35%)' }}>{s.order_index}</span>,
       ]})),
     }
@@ -386,12 +563,13 @@ export default function PortfolioPage() {
   const { headers, rows } = buildRows()
   const counts: Record<Tab, number> = {
     projects: projects.length,
+    stacks: stacks.length,
     skills: skills.length,
     certs: certs.length,
     experiences: experiences.length,
     resume: 1,
   }
-  const TABS: Tab[] = ['projects', 'skills', 'certs', 'experiences', 'resume']
+  const TABS: Tab[] = ['projects', 'stacks', 'skills', 'certs', 'experiences', 'resume']
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (

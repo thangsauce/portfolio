@@ -12,10 +12,10 @@ export default function Home() {
         <div className="page-">
             <Banner />
             <AboutMe />
+            <ProjectList />
             <ITSkills />
             <Certifications />
             <Experiences />
-            <ProjectList />
             <Skills />
             <ContactSection />
         </div>

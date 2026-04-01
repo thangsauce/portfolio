@@ -13,13 +13,29 @@ type Skill = { id: string; name: string; category: string; icon_url: string | nu
 type Category = 'frontend' | 'backend' | 'database' | 'tools'
 const CATEGORY_ORDER: Category[] = ['frontend', 'backend', 'database', 'tools']
 
+function normalizeSkillCategory(value: string): string {
+    const normalized = value.toLowerCase().trim().replace(/[\s-]+/g, '_');
+    if (!normalized) return '';
+    if (normalized === 'front_end' || normalized === 'frontend_dev' || normalized === 'web') return 'frontend';
+    if (normalized === 'back_end' || normalized === 'backend_dev') return 'backend';
+    if (normalized === 'itsupport' || normalized === 'it_skills' || normalized === 'it') return 'it_support';
+    return normalized;
+}
+
 const Skills = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [skills, setSkills] = useState<Skill[]>([]);
 
     useEffect(() => {
-        apiFetch<Skill[]>('/api/portfolio/skills')
-            .then(setSkills)
+        apiFetch<Skill[]>('/api/portfolio/stacks')
+            .then((data) =>
+                setSkills(
+                    data.map((item) => ({
+                        ...item,
+                        category: normalizeSkillCategory(item.category),
+                    })),
+                ),
+            )
             .catch(() => {});
     }, []);
 

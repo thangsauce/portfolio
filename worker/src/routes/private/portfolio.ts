@@ -59,6 +59,11 @@ r.delete('/projects/:id', async (c) => {
 
 const skillSchema = z.object({
   name: z.string().min(1),
+  order_index: z.number().int().default(0),
+})
+
+const stackSchema = z.object({
+  name: z.string().min(1),
   category: z.string().optional(),
   icon_url: z.string().optional(),
   order_index: z.number().int().default(0),
@@ -88,6 +93,36 @@ r.put('/skills/:id', zValidator('json', skillSchema.partial()), async (c) => {
 r.delete('/skills/:id', async (c) => {
   const { error } = await getSupabase(c.env)
     .from('skills').delete().eq('id', c.req.param('id'))
+  if (error) return c.json({ error: error.message }, 500)
+  return c.json({ ok: true })
+})
+
+// ── Stacks ────────────────────────────────────────────────────────────────────
+
+r.get('/stacks', async (c) => {
+  const { data, error } = await getSupabase(c.env)
+    .from('stacks').select('*').order('order_index')
+  if (error) return c.json({ error: error.message }, 500)
+  return c.json(data)
+})
+
+r.post('/stacks', zValidator('json', stackSchema), async (c) => {
+  const { data, error } = await getSupabase(c.env)
+    .from('stacks').insert(c.req.valid('json')).select().single()
+  if (error) return c.json({ error: error.message }, 500)
+  return c.json(data, 201)
+})
+
+r.put('/stacks/:id', zValidator('json', stackSchema.partial()), async (c) => {
+  const { data, error } = await getSupabase(c.env)
+    .from('stacks').update(c.req.valid('json')).eq('id', c.req.param('id')).select().single()
+  if (error || !data) return c.json({ error: error?.message ?? 'Not found' }, error ? 500 : 404)
+  return c.json(data)
+})
+
+r.delete('/stacks/:id', async (c) => {
+  const { error } = await getSupabase(c.env)
+    .from('stacks').delete().eq('id', c.req.param('id'))
   if (error) return c.json({ error: error.message }, 500)
   return c.json({ ok: true })
 })
