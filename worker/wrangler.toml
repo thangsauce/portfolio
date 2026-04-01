@@ -1,0 +1,8 @@
+name = "thangle-api"
+main = "src/index.ts"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ENVIRONMENT = "production"
+# SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are set via: wrangler secret put
