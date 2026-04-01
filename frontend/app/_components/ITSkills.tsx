@@ -23,6 +23,17 @@ const ITSkills = () => {
     useGSAP(
         () => {
             if (skills.length === 0) return;
+            const isHorizontalMode = window.innerWidth >= 1024 && !!document.querySelector('.horizontal-mode');
+            if (isHorizontalMode) {
+                gsap.from('.it-skill-item', {
+                    opacity: 0,
+                    x: -30,
+                    stagger: 0.15,
+                    ease: 'power2.out',
+                    duration: 0.8,
+                });
+                return;
+            }
             gsap.from('.it-skill-item', {
                 opacity: 0,
                 x: -30,
@@ -39,6 +50,8 @@ const ITSkills = () => {
 
     useGSAP(
         () => {
+            const isHorizontalMode = window.innerWidth >= 1024 && !!document.querySelector('.horizontal-mode');
+            if (isHorizontalMode) return;
             gsap.to(containerRef.current, {
                 y: -150,
                 opacity: 0,

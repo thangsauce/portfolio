@@ -11,6 +11,17 @@ const AboutMe = () => {
 
     useGSAP(
         () => {
+            const isHorizontalMode = window.innerWidth >= 1024 && !!document.querySelector('.horizontal-mode');
+            if (isHorizontalMode) {
+                gsap.from('.slide-up-and-fade', {
+                    y: 80,
+                    opacity: 0,
+                    stagger: 0.05,
+                    ease: 'power2.out',
+                    duration: 0.9,
+                });
+                return;
+            }
             const tl = gsap.timeline({
                 scrollTrigger: {
                     id: 'about-me-in',
@@ -32,6 +43,8 @@ const AboutMe = () => {
 
     useGSAP(
         () => {
+            const isHorizontalMode = window.innerWidth >= 1024 && !!document.querySelector('.horizontal-mode');
+            if (isHorizontalMode) return;
             const tl = gsap.timeline({
                 scrollTrigger: {
                     id: 'about-me-out',

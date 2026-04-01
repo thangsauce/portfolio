@@ -37,6 +37,17 @@ const Experiences = () => {
     useGSAP(
         () => {
             if (experiences.length === 0) return;
+            const isHorizontalMode = window.innerWidth >= 1024 && !!document.querySelector('.horizontal-mode');
+            if (isHorizontalMode) {
+                gsap.from('.experience-item', {
+                    y: 50,
+                    opacity: 0,
+                    stagger: 0.2,
+                    ease: 'power2.out',
+                    duration: 0.9,
+                });
+                return;
+            }
             const tl = gsap.timeline({
                 scrollTrigger: {
                     trigger: containerRef.current,
@@ -53,6 +64,8 @@ const Experiences = () => {
 
     useGSAP(
         () => {
+            const isHorizontalMode = window.innerWidth >= 1024 && !!document.querySelector('.horizontal-mode');
+            if (isHorizontalMode) return;
             const tl = gsap.timeline({
                 scrollTrigger: {
                     trigger: containerRef.current,

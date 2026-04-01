@@ -109,6 +109,11 @@ const ProjectList = () => {
     useGSAP(
         () => {
             if (projects.length === 0) return;
+            const isHorizontalMode = window.innerWidth >= 1024 && !!document.querySelector('.horizontal-mode');
+            if (isHorizontalMode) {
+                gsap.from(containerRef.current, { y: 80, opacity: 0, duration: 0.9, ease: 'power2.out' });
+                return;
+            }
             const tl = gsap.timeline({
                 scrollTrigger: {
                     trigger: containerRef.current,

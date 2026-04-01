@@ -43,6 +43,17 @@ const Skills = () => {
         () => {
             const slideUpEl = containerRef.current?.querySelectorAll('.slide-up');
             if (!slideUpEl?.length) return;
+            const isHorizontalMode = window.innerWidth >= 1024 && !!document.querySelector('.horizontal-mode');
+            if (isHorizontalMode) {
+                gsap.from('.slide-up', {
+                    opacity: 0,
+                    y: 40,
+                    ease: 'power2.out',
+                    stagger: 0.08,
+                    duration: 0.8,
+                });
+                return;
+            }
             gsap.from('.slide-up', {
                 opacity: 0,
                 y: 40,

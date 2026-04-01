@@ -81,6 +81,16 @@ export function ContactSection() {
 
     useGSAP(
         () => {
+            const isHorizontalMode = window.innerWidth >= 1024 && !!document.querySelector('.horizontal-mode');
+            if (isHorizontalMode) {
+                gsap.from(containerRef.current, {
+                    opacity: 0,
+                    y: 60,
+                    ease: 'power2.out',
+                    duration: 0.9,
+                });
+                return;
+            }
             gsap.from(containerRef.current, {
                 opacity: 0,
                 y: 60,
