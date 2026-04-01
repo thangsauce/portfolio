@@ -56,7 +56,7 @@ const ITSkills = () => {
     if (skills.length === 0) return null;
 
     return (
-        <section className="py-12" id="it-skills" ref={containerRef}>
+        <section className="pt-0 pb-12 -mt-10 md:-mt-14" id="it-skills" ref={containerRef}>
             <div className="container">
                 <SectionTitle title="IT Skills" />
 

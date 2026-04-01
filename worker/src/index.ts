@@ -30,6 +30,17 @@ app.use('*', cors({
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 }))
 
+app.onError((err, c) => {
+  console.error('Worker unhandled error:', err)
+  return c.json(
+    {
+      error: err?.message || 'Internal Server Error',
+      name: err?.name || 'Error',
+    },
+    500,
+  )
+})
+
 app.get('/health', (c) => c.json({ ok: true }))
 
 app.route('/api/portfolio', portfolio)
