@@ -101,20 +101,15 @@ const Navbar = () => {
             const root = document.querySelector('.horizontal-mode') as HTMLElement | null;
             const track = root?.firstElementChild as HTMLElement | null;
             const panel = target.closest('.horizontal-panel') as HTMLElement | null;
-            const panels = root
-                ? Array.from(root.querySelectorAll('.horizontal-panel')) as HTMLElement[]
-                : [];
-
-            if (!root || !track || !panel || panels.length === 0) {
+            if (!root || !track || !panel) {
                 setTimeout(() => lenis?.scrollTo(hash), 120);
                 return;
             }
 
-            const panelIndex = panels.indexOf(panel);
-            const maxIndex = Math.max(1, panels.length - 1);
             const horizontalDistance = Math.max(0, track.scrollWidth - window.innerWidth);
             const rootTop = root.getBoundingClientRect().top + window.scrollY;
-            const targetY = rootTop + (horizontalDistance * panelIndex) / maxIndex;
+            const panelOffset = Math.max(0, Math.min(horizontalDistance, panel.offsetLeft));
+            const targetY = rootTop + panelOffset;
             setTimeout(() => scrollToY(targetY), 120);
             return;
         }
