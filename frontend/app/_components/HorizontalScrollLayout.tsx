@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
@@ -16,6 +16,12 @@ const HorizontalScrollLayout = ({ children }: Props) => {
     const trackRef = useRef<HTMLDivElement>(null);
     const panels = useMemo(() => React.Children.toArray(children), [children]);
 
+    useEffect(() => {
+        if (window.innerWidth >= 768) {
+            window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+        }
+    }, []);
+
     useGSAP(
         () => {
             const root = rootRef.current;
@@ -23,7 +29,8 @@ const HorizontalScrollLayout = ({ children }: Props) => {
             if (!root || !track) return;
 
             const mm = gsap.matchMedia();
-            mm.add('(min-width: 1024px)', () => {
+            mm.add('(min-width: 768px)', () => {
+                gsap.set(track, { x: 0 });
                 const horizontalDistance = () =>
                     Math.max(0, track.scrollWidth - window.innerWidth);
 
@@ -43,55 +50,39 @@ const HorizontalScrollLayout = ({ children }: Props) => {
                     },
                 });
 
-                const panelElements = gsap.utils.toArray<HTMLElement>('.horizontal-panel');
-                panelElements.forEach((panel) => {
+                const parallaxTweens: gsap.core.Tween[] = [];
+                const panelEls = gsap.utils.toArray<HTMLElement>(
+                    track.querySelectorAll('.horizontal-panel'),
+                );
+
+                panelEls.forEach((panel) => {
                     const content = panel.querySelector<HTMLElement>('.horizontal-panel-content');
                     if (!content) return;
-                    gsap.set(content, { autoAlpha: 1, y: 0 });
+                    const target = content.querySelector<HTMLElement>('.container') ?? content;
 
-                    ScrollTrigger.create({
-                        trigger: panel,
-                        containerAnimation: tween,
-                        start: 'left center',
-                        end: 'right center',
-                        onEnter: () => {
-                            gsap.fromTo(
-                                content,
-                                { autoAlpha: 0, y: 150 },
-                                { autoAlpha: 1, y: 0, duration: 0.75, ease: 'power2.out', overwrite: true },
-                            );
+                    const parallaxTween = gsap.fromTo(
+                        target,
+                        { xPercent: -12 },
+                        {
+                            xPercent: 12,
+                            ease: 'none',
+                            scrollTrigger: {
+                                trigger: panel,
+                                containerAnimation: tween,
+                                start: 'left right',
+                                end: 'right left',
+                                scrub: 1,
+                                invalidateOnRefresh: true,
+                            },
                         },
-                        onEnterBack: () => {
-                            gsap.fromTo(
-                                content,
-                                { autoAlpha: 0, y: 150 },
-                                { autoAlpha: 1, y: 0, duration: 0.75, ease: 'power2.out', overwrite: true },
-                            );
-                        },
-                        onLeave: () => {
-                            gsap.to(content, {
-                                autoAlpha: 0,
-                                y: -150,
-                                duration: 0.6,
-                                ease: 'power2.in',
-                                overwrite: true,
-                            });
-                        },
-                        onLeaveBack: () => {
-                            gsap.to(content, {
-                                autoAlpha: 0,
-                                y: -150,
-                                duration: 0.6,
-                                ease: 'power2.in',
-                                overwrite: true,
-                            });
-                        },
-                    });
+                    );
+                    parallaxTweens.push(parallaxTween);
                 });
 
                 return () => {
-                    ScrollTrigger.getAll().forEach((st) => {
-                        if (st.vars.containerAnimation === tween) st.kill();
+                    parallaxTweens.forEach((pt) => {
+                        pt.scrollTrigger?.kill();
+                        pt.kill();
                     });
                     tween.scrollTrigger?.kill();
                     tween.kill();
@@ -104,14 +95,14 @@ const HorizontalScrollLayout = ({ children }: Props) => {
     );
 
     return (
-        <div ref={rootRef} className="horizontal-mode relative lg:overflow-hidden">
-            <div ref={trackRef} className="flex flex-col lg:w-max lg:flex-row">
+        <div ref={rootRef} className="horizontal-mode relative md:overflow-hidden">
+            <div ref={trackRef} className="flex flex-col md:w-max md:flex-row">
                 {panels.map((panel, idx) => (
                     <div
                         key={idx}
-                        className="horizontal-panel w-full shrink-0 lg:w-screen lg:min-h-[100svh]"
+                        className="horizontal-panel w-full shrink-0 md:w-screen md:min-h-[100svh]"
                     >
-                        <div className={`horizontal-panel-content ${idx === 0 ? '' : 'lg:pt-24 xl:pt-32'}`}>
+                        <div className={`horizontal-panel-content md:will-change-transform ${idx === 0 ? '' : 'md:pt-20 md:pl-20 lg:pt-24 lg:pl-28 xl:pt-32 xl:pl-36'}`}>
                             {panel}
                         </div>
                     </div>

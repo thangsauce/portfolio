@@ -8,6 +8,9 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 const AboutMe = () => {
     const container = React.useRef<HTMLDivElement>(null);
+    const dragonRef = React.useRef<HTMLDivElement>(null);
+    const planeTrackRef = React.useRef<HTMLDivElement>(null);
+    const planeRef = React.useRef<HTMLDivElement>(null);
 
     useGSAP(
         () => {
@@ -64,19 +67,94 @@ const AboutMe = () => {
         { scope: container },
     );
 
+    useGSAP(
+        () => {
+            const section = container.current;
+            const dragon = dragonRef.current;
+            if (!section || !dragon || window.innerWidth < 768) return;
+
+            const quickX = gsap.quickTo(dragon, 'x', { duration: 0.45, ease: 'power3.out' });
+            const quickY = gsap.quickTo(dragon, 'y', { duration: 0.45, ease: 'power3.out' });
+            const quickR = gsap.quickTo(dragon, 'rotate', { duration: 0.45, ease: 'power3.out' });
+
+            const onMove = (e: MouseEvent) => {
+                const rect = section.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                const targetX = gsap.utils.clamp(-120, 120, x * 0.2);
+                const targetY = gsap.utils.clamp(-80, 80, y * 0.18);
+                quickX(targetX);
+                quickY(targetY);
+                quickR(gsap.utils.clamp(-8, 8, x * 0.02));
+            };
+
+            const onLeave = () => {
+                quickX(0);
+                quickY(0);
+                quickR(0);
+            };
+
+            section.addEventListener('mousemove', onMove);
+            section.addEventListener('mouseleave', onLeave);
+
+            return () => {
+                section.removeEventListener('mousemove', onMove);
+                section.removeEventListener('mouseleave', onLeave);
+            };
+        },
+        { scope: container },
+    );
+
+    useGSAP(
+        () => {
+            const track = planeTrackRef.current;
+            const plane = planeRef.current;
+            if (!track || !plane) return;
+
+            const flightTween = gsap.fromTo(
+                plane,
+                { x: -70 },
+                {
+                    x: () => track.offsetWidth + 70,
+                    duration: 8.5,
+                    ease: 'none',
+                    repeat: -1,
+                    repeatDelay: 0.25,
+                    repeatRefresh: true,
+                },
+            );
+
+            const bobTween = gsap.to(plane, {
+                y: -5,
+                rotate: 2,
+                duration: 0.9,
+                ease: 'sine.inOut',
+                yoyo: true,
+                repeat: -1,
+            });
+
+            return () => {
+                flightTween.kill();
+                bobTween.kill();
+            };
+        },
+        { scope: container },
+    );
+
     return (
         <section className="pb-section" id="about-me">
             <div className="container" ref={container}>
-                <h2 className="text-xl md:text-3xl font-thin mb-20 slide-up-and-fade">
-                    With projects like web platforms and security monitoring
-                    tools, I&apos;m constantly picking up new technologies and
-                    sharpening my problem-solving skills. My goal is to keep
-                    growing as a professional and contribute to meaningful
-                    technology projects through my commitment and continuous
-                    learning.
-                </h2>
-                <div className="grid md:grid-cols-12 mt-9">
-                    <div className="md:col-span-5">
+                <p className="slide-up-and-fade text-sm uppercase tracking-widest text-muted-foreground/60">
+                    About Me
+                </p>
+                <div className="grid md:grid-cols-12 gap-y-10 md:gap-x-8 lg:gap-x-12 mt-6 md:mt-10 items-start">
+                    <div className="md:col-span-5 space-y-6">
+                        <p className="text-lg md:text-2xl font-light leading-relaxed slide-up-and-fade">
+                            With projects like web platforms and security
+                            monitoring tools, I&apos;m constantly picking up new
+                            technologies and sharpening my problem-solving
+                            skills.
+                        </p>
                         <div className="slide-up-and-fade flex gap-6 items-center">
                             <a
                                 href="https://github.com/thangsauce"
@@ -102,14 +180,90 @@ const AboutMe = () => {
                             </a>
                         </div>
                     </div>
-                    <div className="md:col-span-7">
-                        <div className="text-lg text-muted-foreground max-w-[450px]">
+
+                    <div className="md:col-span-2 flex justify-center">
+                        <div
+                            ref={dragonRef}
+                            className="slide-up-and-fade pointer-events-none select-none relative h-28 w-28 md:h-36 md:w-36"
+                            aria-hidden="true"
+                        >
+                            <div className="absolute inset-0 rounded-full bg-primary/15 blur-2xl" />
+                            <svg
+                                viewBox="0 0 120 120"
+                                className="relative h-full w-full text-primary drop-shadow-[0_0_18px_rgba(106,191,86,0.45)]"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path d="M22 68C22 46 39 30 60 30C79 30 94 43 96 62C98 82 83 95 63 95H43" stroke="currentColor" strokeWidth="7" strokeLinecap="round"/>
+                                <path d="M43 95L55 83" stroke="currentColor" strokeWidth="7" strokeLinecap="round"/>
+                                <path d="M43 95L56 106" stroke="currentColor" strokeWidth="7" strokeLinecap="round"/>
+                                <path d="M74 27L68 14" stroke="currentColor" strokeWidth="6" strokeLinecap="round"/>
+                                <path d="M88 33L99 23" stroke="currentColor" strokeWidth="6" strokeLinecap="round"/>
+                                <circle cx="78" cy="54" r="4.5" fill="currentColor"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div className="md:col-span-5">
+                        <div className="text-lg text-muted-foreground max-w-[520px] space-y-6">
+                            <p className="slide-up-and-fade text-lg md:text-2xl font-light leading-relaxed text-foreground/95">
+                                My goal is to keep growing as a professional
+                                and contribute to meaningful technology projects
+                                through my commitment and continuous learning.
+                            </p>
+                            <div>
                             <p className="slide-up-and-fade text-sm uppercase tracking-widest text-muted-foreground/60">
                                 Languages
                             </p>
                             <p className="mt-1 slide-up-and-fade">
                                 English &middot; Vietnamese
                             </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="slide-up-and-fade mt-10 md:mt-14">
+                    <div className="relative overflow-hidden rounded-2xl border border-border/70 bg-background/20 backdrop-blur-sm h-52 md:h-60">
+                        <div className="absolute inset-0 opacity-80">
+                            <svg
+                                viewBox="0 0 800 280"
+                                className="h-full w-full text-foreground/20"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                                aria-hidden="true"
+                            >
+                                <path d="M0 45H800M0 95H800M0 145H800M0 195H800M0 245H800" stroke="currentColor" strokeWidth="1" />
+                                <path d="M80 0V280M180 0V280M280 0V280M380 0V280M480 0V280M580 0V280M680 0V280" stroke="currentColor" strokeWidth="1" />
+                                <path d="M20 225C120 190 180 210 260 170C340 130 420 155 490 126C570 93 658 106 780 52" stroke="currentColor" strokeOpacity="0.5" strokeWidth="9" strokeLinecap="round" />
+                                <path d="M25 70C150 120 210 100 320 145C430 190 560 175 780 235" stroke="currentColor" strokeOpacity="0.35" strokeWidth="8" strokeLinecap="round" />
+                                <circle cx="520" cy="138" r="12" fill="currentColor" />
+                                <circle cx="520" cy="138" r="22" stroke="currentColor" strokeOpacity="0.5" strokeWidth="2" />
+                            </svg>
+                        </div>
+                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/75 via-background/20 to-transparent" />
+
+                        <div className="absolute left-4 top-4 rounded-full border border-border/70 bg-background/70 px-3 py-1 text-xs sm:text-sm uppercase tracking-widest text-muted-foreground/85">
+                            Orlando, FL
+                        </div>
+
+                        <div
+                            ref={planeTrackRef}
+                            className="pointer-events-none absolute left-0 right-0 bottom-2 h-12"
+                            aria-hidden="true"
+                        >
+                            <div className="absolute left-3 right-3 top-6 border-t border-dashed border-primary/55" />
+                            <div ref={planeRef} className="absolute top-1 left-0 text-primary drop-shadow-[0_0_8px_rgba(106,191,86,0.45)]">
+                                <svg
+                                    width="30"
+                                    height="30"
+                                    viewBox="0 0 24 24"
+                                    fill="currentColor"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path d="M2.5 13.2L10 12l1.8-8c.2-.8 1.3-.8 1.6 0L15.2 12l6.3 1.2c.7.1.7 1.1 0 1.3L15.2 16l-1.8 4.1c-.3.8-1.4.8-1.7 0L10 16l-7.5-1.5c-.7-.1-.7-1.1 0-1.3z" />
+                                </svg>
+                            </div>
                         </div>
                     </div>
                 </div>

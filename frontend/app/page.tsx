@@ -18,16 +18,16 @@ export default function Home() {
                 <AboutMe />
             </div>
             <div className="page-">
-                <ProjectList />
+                <Experiences />
             </div>
             <div className="page-">
-                <ITSkills />
+                <ProjectList />
             </div>
             <div className="page-">
                 <Certifications />
             </div>
             <div className="page-">
-                <Experiences />
+                <ITSkills />
             </div>
             <div className="page-">
                 <Skills />

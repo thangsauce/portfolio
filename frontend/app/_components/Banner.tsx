@@ -15,6 +15,17 @@ const Banner = () => {
     const containerRef = React.useRef<HTMLDivElement>(null);
     const lenis = useLenis();
     const [resumeUrl, setResumeUrl] = React.useState('/resume.pdf');
+    const titleRef = React.useRef<HTMLHeadingElement>(null);
+
+    const renderAnimatedWord = (word: string, className?: string) => (
+        <span className={className}>
+            {word.split('').map((char, idx) => (
+                <span key={`${word}-${idx}`} className="hero-letter inline-block will-change-transform">
+                    {char}
+                </span>
+            ))}
+        </span>
+    );
 
     React.useEffect(() => {
         let mounted = true;
@@ -33,6 +44,8 @@ const Banner = () => {
     // move the content a little up on scroll
     useGSAP(
         () => {
+            const isHorizontalMode = window.innerWidth >= 1024 && !!document.querySelector('.horizontal-mode');
+            if (isHorizontalMode) return;
             const tl = gsap.timeline({
                 scrollTrigger: {
                     trigger: containerRef.current,
@@ -51,25 +64,64 @@ const Banner = () => {
         { scope: containerRef },
     );
 
+    useGSAP(
+        () => {
+            const title = titleRef.current;
+            if (!title) return;
+
+            // Delay start so it plays after initial page/preloader reveal.
+            const tl = gsap.timeline({ defaults: { ease: 'power3.out' }, delay: 1.1 });
+
+            tl.set('.hero-letter', { transformOrigin: '50% 100%' })
+                .fromTo(
+                    '.hero-letter',
+                    { yPercent: 130, opacity: 0, rotateX: -70, filter: 'blur(8px)' },
+                    {
+                        yPercent: 0,
+                        opacity: 1,
+                        rotateX: 0,
+                        filter: 'blur(0px)',
+                        duration: 1.2,
+                        stagger: { each: 0.045, from: 'start' },
+                    },
+                )
+                .fromTo(
+                    '.banner-title',
+                    { scale: 0.985 },
+                    { scale: 1, duration: 0.5, ease: 'power2.out' },
+                    '-=0.85',
+                )
+                .fromTo(
+                    '.hero-title-sweep',
+                    { scaleX: 0, opacity: 0, transformOrigin: '0% 50%' },
+                    { scaleX: 1, opacity: 1, duration: 0.55 },
+                    '-=0.5',
+                )
+                .to('.hero-title-sweep', { opacity: 0.35, duration: 0.25 });
+        },
+        { scope: containerRef },
+    );
+
     return (
         <section className="relative overflow-hidden" id="banner">
-            <ArrowAnimation />
+            <ArrowAnimation mobileClassName="top-[54%] left-[86%] -translate-x-1/2 bottom-auto" />
             <div
-                className="container h-[100svh] min-h-[530px] pb-10 flex flex-col justify-center relative"
+                className="container min-h-[100svh] md:h-[100svh] pt-24 sm:pt-0 pb-10 flex flex-col justify-center relative"
                 ref={containerRef}
             >
                 <div className="flex flex-col lg:flex-row items-start lg:items-end gap-10 lg:gap-12">
                     <div className="flex flex-col items-start max-w-[620px]">
-                        <div className="relative">
-                            <h1 className="banner-title slide-up-and-fade leading-[.95] text-6xl sm:text-[80px] font-anton">
-                                <span className="text-primary">IT</span>
-                                <br /> <span className="ml-4">SPECIALIST</span>
+                        <div className="relative w-full max-w-[560px]">
+                            <h1
+                                ref={titleRef}
+                                className="banner-title slide-up-and-fade leading-[0.95] text-5xl sm:text-[76px] md:text-[84px] font-sans font-bold tracking-tight"
+                            >
+                                {renderAnimatedWord('IT', 'text-primary block')}
+                                {renderAnimatedWord('SPECIALIST', 'block')}
                             </h1>
-                            <p className="slide-up-and-fade absolute right-0 top-[32%] sm:top-[34%] text-sm sm:text-base uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">
-                                Orlando, FL
-                            </p>
+                            <span className="hero-title-sweep absolute left-0 mt-2 block h-1.5 w-[180px] rounded-full bg-primary/70" />
                         </div>
-                        <p className="banner-description slide-up-and-fade mt-6 text-lg text-muted-foreground">
+                        <p className="banner-description slide-up-and-fade mt-5 max-w-[52ch] text-base sm:text-lg leading-relaxed text-muted-foreground">
                             Hi! I&apos;m{' '}
                             <span className="font-medium text-foreground">
                                 Thang Le
@@ -86,7 +138,7 @@ const Banner = () => {
                                 variant="primary"
                                 onClick={() => lenis?.scrollTo('#contact')}
                             >
-                                Get In Touch
+                                Let's Connect
                             </Button>
                             <a
                                 href={resumeUrl}
@@ -100,7 +152,7 @@ const Banner = () => {
                         </div>
                     </div>
 
-                    <div className="slide-up-and-fade relative shrink-0 w-full max-w-[300px] sm:max-w-[360px] lg:max-w-[390px] mx-auto lg:mx-0 mt-12 lg:mt-0">
+                    <div className="slide-up-and-fade relative shrink-0 w-full max-w-[300px] sm:max-w-[360px] lg:max-w-[390px] mx-0 mr-auto lg:mx-0 mt-12 lg:mt-0">
                         <div className="relative overflow-hidden">
                             <Image
                                 src="/me.png"
@@ -114,7 +166,7 @@ const Banner = () => {
                     </div>
                 </div>
 
-                <div className="md:absolute bottom-8 left-0 right-0 flex gap-8 md:gap-0 md:justify-between border-t border-border pt-6 mt-8 md:mt-0">
+                <div className="md:absolute bottom-8 left-0 right-0 flex gap-8 md:gap-0 md:justify-between pt-6 mt-8 md:mt-0">
                     <div className="slide-up-and-fade">
                         <h5 className="text-2xl sm:text-3xl font-anton text-primary mb-1">
                             University of Central Florida
