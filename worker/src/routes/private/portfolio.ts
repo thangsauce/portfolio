@@ -178,8 +178,9 @@ r.get('/resume', async (c) => {
     .from(RESUME_BUCKET)
     .list('resume', { search: 'resume.pdf', limit: 10 })
 
+  // If storage bucket is missing/not ready, still allow dashboard to load default resume.
   if (listError) {
-    return c.json({ error: `${listError.message} (ensure storage bucket "${RESUME_BUCKET}" exists)` }, 500)
+    return c.json({ url: '/resume.pdf', hasCustom: false })
   }
 
   const hasCustom = (listed ?? []).some((f) => f.name === 'resume.pdf')

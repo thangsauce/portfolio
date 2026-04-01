@@ -80,8 +80,8 @@ export default function PortfolioPage() {
       if (tab === 'certs')       setCerts(await apiPrivate<Cert[]>('/portfolio/certifications'))
       if (tab === 'experiences') setExperiences(await apiPrivate<Experience[]>('/portfolio/experiences'))
       if (tab === 'resume')      setResumeInfo(await apiPrivate<ResumeInfo>('/portfolio/resume'))
-    } catch {
-      flash(false, 'failed to load records')
+    } catch (err) {
+      flash(false, (err as Error).message || 'failed to load records')
     } finally {
       setLoading(false)
     }

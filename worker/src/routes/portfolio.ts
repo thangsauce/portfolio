@@ -59,7 +59,8 @@ portfolio.get('/resume', async (c) => {
     .from(RESUME_BUCKET)
     .list('resume', { search: 'resume.pdf', limit: 10 })
 
-  if (listError) return c.json({ error: `Failed to fetch resume (bucket "${RESUME_BUCKET}")` }, 500)
+  // If storage bucket is missing/not ready, fall back to local static resume.
+  if (listError) return c.json({ url: '/resume.pdf', hasCustom: false })
 
   const hasCustom = (listed ?? []).some((f) => f.name === 'resume.pdf')
   if (!hasCustom) return c.json({ url: '/resume.pdf', hasCustom: false })

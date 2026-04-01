@@ -14,9 +14,18 @@ export type Variables = { userId: string }
 
 const app = new Hono<{ Bindings: Env; Variables: Variables }>()
 
+const PROD_ALLOWED_ORIGINS = new Set([
+  'https://thangle.me',
+  'https://www.thangle.me',
+])
+
 app.use('*', cors({
-  origin: (origin, c) =>
-    c.env.ENVIRONMENT === 'development' ? (origin ?? '*') : 'https://thangle.me',
+  origin: (origin, c) => {
+    if (c.env.ENVIRONMENT === 'development') return origin ?? '*'
+    if (origin?.endsWith('.pages.dev')) return origin
+    if (origin && PROD_ALLOWED_ORIGINS.has(origin)) return origin
+    return 'https://thangle.me'
+  },
   allowHeaders: ['Content-Type', 'Authorization'],
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 }))
