@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { authMiddleware } from './middleware/auth'
+import portfolio from './routes/portfolio'
 
 export type Env = {
   SUPABASE_URL: string
@@ -20,6 +21,8 @@ app.use('*', cors({
 }))
 
 app.get('/health', (c) => c.json({ ok: true }))
+
+app.route('/api/portfolio', portfolio)
 
 // All /api/private/* routes require a valid Supabase JWT
 app.use('/api/private/*', authMiddleware)
