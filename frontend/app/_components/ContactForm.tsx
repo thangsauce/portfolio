@@ -3,13 +3,81 @@
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
-import { useRef } from 'react';
+import { FormEvent, useRef, useState } from 'react';
 import { GENERAL_INFO } from '@/lib/data';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 export function ContactSection() {
     const containerRef = useRef<HTMLDivElement>(null);
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [message, setMessage] = useState('');
+    const [sending, setSending] = useState(false);
+    const [status, setStatus] = useState<{ ok: boolean; msg: string } | null>(
+        null,
+    );
+
+    async function handleEmailJsSubmit(e: FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        if (!name.trim() || !email.trim() || !message.trim()) {
+            setStatus({ ok: false, msg: 'Please fill in all fields.' });
+            return;
+        }
+
+        const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
+        const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
+        const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
+
+        if (!serviceId || !templateId || !publicKey) {
+            setStatus({
+                ok: false,
+                msg: 'EmailJS is not configured yet. Add env keys first.',
+            });
+            return;
+        }
+
+        setSending(true);
+        setStatus(null);
+        try {
+            const res = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    service_id: serviceId,
+                    template_id: templateId,
+                    user_id: publicKey,
+                    template_params: {
+                        to_name: 'Thang Le',
+                        to_email: GENERAL_INFO.email,
+                        from_name: name,
+                        from_email: email,
+                        reply_to: email,
+                        subject: 'New portfolio contact form message',
+                        message,
+                    },
+                }),
+            });
+
+            if (!res.ok) {
+                throw new Error(`EmailJS error ${res.status}`);
+            }
+
+            setStatus({ ok: true, msg: 'Message sent in real time.' });
+            setName('');
+            setEmail('');
+            setMessage('');
+        } catch {
+            setStatus({
+                ok: false,
+                msg: 'Failed to send. Please try again in a moment.',
+            });
+        } finally {
+            setSending(false);
+        }
+    }
 
     useGSAP(
         () => {
@@ -34,7 +102,8 @@ export function ContactSection() {
                     <h2 className="text-4xl md:text-5xl font-anton leading-none mb-10">
                         Let&apos;s <span className="text-primary">Connect</span>
                     </h2>
-                    <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex flex-col gap-4">
+                        <div className="flex flex-col sm:flex-row gap-4">
                         <a
                             href={`mailto:${GENERAL_INFO.email}`}
                             className="group relative flex-1 flex flex-col items-center justify-center gap-3 px-6 py-6 rounded-xl border border-border bg-background-light overflow-hidden hover:border-primary/60 transition-all duration-300 text-center"
@@ -47,7 +116,6 @@ export function ContactSection() {
                             </div>
                             <div className="flex flex-col items-center">
                                 <span className="text-xs text-muted-foreground/60 uppercase tracking-widest mb-0.5">Email</span>
-                                <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors duration-300">{GENERAL_INFO.email}</span>
                             </div>
                         </a>
                         <a
@@ -64,9 +132,62 @@ export function ContactSection() {
                             </div>
                             <div className="flex flex-col items-center">
                                 <span className="text-xs text-muted-foreground/60 uppercase tracking-widest mb-0.5">LinkedIn</span>
-                                <span className="text-sm font-medium text-foreground group-hover:text-blue-400 transition-colors duration-300">thang-le-it</span>
                             </div>
                         </a>
+                        </div>
+
+                        <form
+                            onSubmit={handleEmailJsSubmit}
+                            className="relative flex flex-col gap-3 px-4 py-4 rounded-xl border border-border bg-background-light"
+                        >
+                            <p className="text-xs text-muted-foreground/60 uppercase tracking-widest text-center">
+                                Questions or connect
+                            </p>
+
+                            <input
+                                type="text"
+                                placeholder="Name"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                className="h-10 px-3 bg-background border border-border rounded-md text-sm outline-none focus:border-primary/60"
+                            />
+
+                            <input
+                                type="email"
+                                placeholder="Root@email.com"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className="h-10 px-3 bg-background border border-border rounded-md text-sm outline-none focus:border-primary/60"
+                            />
+
+                            <textarea
+                                placeholder="Leave a message..."
+                                value={message}
+                                onChange={(e) => setMessage(e.target.value)}
+                                rows={4}
+                                className="px-3 py-2 bg-background border border-border rounded-md text-sm outline-none focus:border-primary/60 resize-none"
+                            />
+
+                            <button
+                                type="submit"
+                                disabled={sending}
+                                className="h-10 px-4 rounded-md border border-primary/40 text-primary disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary/10 transition-colors text-sm uppercase tracking-wider"
+                            >
+                                {sending ? 'Sending...' : 'Send Message'}
+                            </button>
+
+                            {status && (
+                                <p
+                                    className={`text-xs ${
+                                        status.ok
+                                            ? 'text-primary'
+                                            : 'text-red-400'
+                                    }`}
+                                >
+                                    {status.msg}
+                                </p>
+                            )}
+                        </form>
                     </div>
                 </div>
             </div>

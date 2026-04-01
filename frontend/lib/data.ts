@@ -114,4 +114,3 @@ export const PROJECTS: IProject[] = [
         - Designed a participant-facing view for tracking standings and upcoming matches.`,
     },
 ];
-

@@ -54,16 +54,14 @@ const AboutMe = () => {
     return (
         <section className="pb-section" id="about-me">
             <div className="container" ref={container}>
-                <h2 className="text-4xl md:text-6xl font-thin mb-20 slide-up-and-fade">
-                    I enjoy building practical technology solutions — turning
-                    ideas into working applications through curiosity,
-                    persistence, and a love for learning.
+                <h2 className="text-xl md:text-3xl font-thin mb-20 slide-up-and-fade">
+                    With projects like web platforms and security monitoring
+                    tools, I&apos;m constantly picking up new technologies and
+                    sharpening my problem-solving skills. My goal is to keep
+                    growing as a professional and contribute to meaningful
+                    technology projects through my commitment and continuous
+                    learning.
                 </h2>
-
-                <p className="pb-3 border-b text-muted-foreground slide-up-and-fade">
-                    This is me.
-                </p>
-
                 <div className="grid md:grid-cols-12 mt-9">
                     <div className="md:col-span-5">
                         <div className="slide-up-and-fade flex gap-6 items-center">
@@ -93,22 +91,7 @@ const AboutMe = () => {
                     </div>
                     <div className="md:col-span-7">
                         <div className="text-lg text-muted-foreground max-w-[450px]">
-                            <p className="slide-up-and-fade">
-                                I&apos;m an Information Technology student at
-                                the University of Central Florida with a passion
-                                for web development, cybersecurity, and IT
-                                systems. I love taking an idea and building it
-                                into something that actually works.
-                            </p>
-                            <p className="mt-3 slide-up-and-fade">
-                                Through projects like web platforms and security
-                                monitoring tools, I&apos;m constantly picking up
-                                new technologies and sharpening my
-                                problem-solving skills. My goal is to keep
-                                growing as an IT professional and contribute to
-                                meaningful technology projects.
-                            </p>
-                            <p className="mt-5 slide-up-and-fade text-sm uppercase tracking-widest text-muted-foreground/60">
+                            <p className="slide-up-and-fade text-sm uppercase tracking-widest text-muted-foreground/60">
                                 Languages
                             </p>
                             <p className="mt-1 slide-up-and-fade">

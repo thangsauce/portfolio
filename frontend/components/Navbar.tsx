@@ -2,7 +2,7 @@
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { useLenis } from 'lenis/react';
-import { MoveUpRight, Moon, Sun } from 'lucide-react';
+import { MoveUpRight } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { SOCIAL_LINKS } from '@/lib/data';
@@ -51,7 +51,6 @@ const MENU_LINKS = [
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
-    const [theme, setTheme] = useState<'dark' | 'light'>('dark');
     const router = useRouter();
     const pathname = usePathname();
     const lenis = useLenis();
@@ -66,18 +65,18 @@ const Navbar = () => {
     }, []);
 
     useEffect(() => {
-        const saved = localStorage.getItem('theme') as 'dark' | 'light' | null;
-        const initial = saved || 'dark';
-        setTheme(initial);
-        document.documentElement.setAttribute('data-theme', initial);
-    }, []);
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const applySystemTheme = (isDark: boolean) => {
+            document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+        };
 
-    const toggleTheme = () => {
-        const next = theme === 'dark' ? 'light' : 'dark';
-        setTheme(next);
-        document.documentElement.setAttribute('data-theme', next);
-        localStorage.setItem('theme', next);
-    };
+        applySystemTheme(mediaQuery.matches);
+        const handleChange = (e: MediaQueryListEvent) => {
+            applySystemTheme(e.matches);
+        };
+        mediaQuery.addEventListener('change', handleChange);
+        return () => mediaQuery.removeEventListener('change', handleChange);
+    }, []);
 
     return (
         <>
@@ -215,19 +214,6 @@ const Navbar = () => {
                                     </li>
                                 ))}
                             </ul>
-                            <button
-                                onClick={toggleTheme}
-                                className="mt-6 group flex items-center gap-3 text-xl"
-                            >
-                                <span className="size-3.5 bg-primary/20 rounded-full flex items-center justify-center transition-all group-hover:scale-[200%]">
-                                    {theme === 'dark' ? (
-                                        <Sun size={8} className="transition-all group-hover:scale-110" />
-                                    ) : (
-                                        <Moon size={8} className="transition-all group-hover:scale-110" />
-                                    )}
-                                </span>
-                                {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-                            </button>
                         </div>
                     </div>
                 </div>

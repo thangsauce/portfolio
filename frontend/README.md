@@ -24,13 +24,31 @@ Live at: [thangle.me](https://thangle.me)
 Install dependencies:
 
 ```bash
-npm install
+pnpm install
 ```
 
 Run the development server:
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## EmailJS Setup
+
+Create `frontend/.env.local` using `frontend/.env.example` and set:
+
+- `NEXT_PUBLIC_EMAILJS_SERVICE_ID`
+- `NEXT_PUBLIC_EMAILJS_TEMPLATE_ID`
+- `NEXT_PUBLIC_EMAILJS_PUBLIC_KEY`
+
+In EmailJS template params, include at least:
+
+- `to_name`
+- `to_email`
+- `from_name`
+- `from_email`
+- `reply_to`
+- `subject`
+- `message`
