@@ -13,6 +13,10 @@ export type Json =
 
 export type Database = {
   public: {
+    Views: Record<string, never>
+    Functions: Record<string, never>
+    Enums: Record<string, never>
+    CompositeTypes: Record<string, never>
     Tables: {
       portfolio_projects: {
         Row: {
@@ -57,6 +61,7 @@ export type Database = {
           order_index?: number
           created_at?: string
         }
+        Relationships: []
       }
       skills: {
         Row: {
@@ -80,6 +85,7 @@ export type Database = {
           icon_url?: string | null
           order_index?: number
         }
+        Relationships: []
       }
       certifications: {
         Row: {
@@ -109,6 +115,7 @@ export type Database = {
           url?: string | null
           order_index?: number
         }
+        Relationships: []
       }
       experiences: {
         Row: {
@@ -138,6 +145,7 @@ export type Database = {
           description?: string[]
           order_index?: number
         }
+        Relationships: []
       }
     }
   }
