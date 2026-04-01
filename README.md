@@ -1,64 +1,66 @@
 # Thang Le — Portfolio
 
-Personal portfolio website for Thang Le, IT Specialist and UCF student.
+Personal portfolio and dashboard for Thang Le.
 
-**Live site:** [thangle.me](https://thangle.me)
+Live site: [thangle.me](https://thangle.me)
 
----
+## Monorepo Structure
+
+```text
+portfolio/
+├── frontend/          # Next.js app (UI + dashboard)
+├── worker/            # Cloudflare Worker API
+├── supabase/          # Supabase config/migrations
+├── .github/workflows/ # CI/CD workflows
+└── pnpm-workspace.yaml
+```
 
 ## Tech Stack
 
-| Category | Technology |
-|---|---|
-| Framework | Next.js 15 (Static Export) |
-| Language | TypeScript |
-| Styling | Tailwind CSS |
-| Animations | GSAP, Lenis |
-| Deployment | Cloudflare Pages via GitHub Actions |
+- Frontend: Next.js, TypeScript, Tailwind CSS, GSAP, Lenis
+- Backend API: Cloudflare Workers
+- Data: Supabase (Postgres + storage)
+- Tooling: pnpm workspace
+- Deployment: Cloudflare (site + API)
 
----
+## Local Development
 
-## Project Structure
-
-```
-portfolio/
-├── frontend/          # Next.js app
-│   ├── app/           # App router pages & layouts
-│   ├── components/    # Reusable UI components
-│   ├── contexts/      # React context providers
-│   ├── lib/           # Utility functions
-│   ├── public/        # Static assets
-│   └── types/         # TypeScript type definitions
-└── .github/
-    └── workflows/     # CI/CD pipeline (deploy.yml)
-```
-
----
-
-## Development
+Install dependencies at repo root:
 
 ```bash
-cd frontend
-npm install --legacy-peer-deps
-npm run dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view locally.
+Run frontend:
 
----
+```bash
+pnpm --filter ./frontend dev
+```
 
-## Deployment
+Run worker API:
 
-Pushing to `main` automatically triggers the GitHub Actions workflow, which:
+```bash
+pnpm --filter ./worker dev
+```
 
-1. Installs dependencies and runs `next build`
-2. Deploys the static output (`frontend/out`) to **Cloudflare Pages**
+## Environment Notes
 
-The site is served at [thangle.me](https://thangle.me).
+Frontend (`frontend/.env.local`) typically includes:
 
-### Required Secrets
+- `NEXT_PUBLIC_API_URL`
+- `NEXT_PUBLIC_EMAILJS_SERVICE_ID`
+- `NEXT_PUBLIC_EMAILJS_TEMPLATE_ID`
+- `NEXT_PUBLIC_EMAILJS_PUBLIC_KEY`
 
-| Secret | Description |
-|---|---|
-| `CLOUDFLARE_API_TOKEN` | Cloudflare API token with Pages edit permission |
-| `CLOUDFLARE_ACCOUNT_ID` | Your Cloudflare account ID |
+Worker runtime uses secrets/vars such as:
+
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+
+## Features
+
+- Horizontal-scroll portfolio experience with GSAP transitions/parallax
+- Responsive navbar with interactive custom eye icon
+- Portfolio dashboard CMS for content management
+- Real-time contact form flow via EmailJS
+- API-backed sections (projects, skills, certifications, experience, resume)

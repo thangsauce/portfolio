@@ -1,5 +1,4 @@
 'use client';
-import SectionTitle from '@/components/SectionTitle';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
@@ -69,9 +68,15 @@ const ITSkills = () => {
     if (skills.length === 0) return null;
 
     return (
-        <section className="pt-0 pb-12 -mt-10 md:-mt-14" id="it-skills" ref={containerRef}>
+        <section className="pt-0 pb-section" id="it-skills" ref={containerRef}>
             <div className="container">
-                <SectionTitle title="IT Skills" />
+                <div className="flex items-center gap-3 mb-10">
+                    <span className="text-primary font-mono text-xl leading-none select-none">&lt;</span>
+                    <h2 className="text-xl uppercase leading-none tracking-widest">
+                        IT SKILL
+                    </h2>
+                    <span className="text-primary font-mono text-xl leading-none select-none">&gt;</span>
+                </div>
 
                 <ul className="space-y-4 max-w-2xl">
                     {skills.map((skill) => (

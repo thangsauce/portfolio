@@ -1,12 +1,7 @@
 'use client';
 
-import { useGSAP } from '@gsap/react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/all';
 import { FormEvent, useRef, useState } from 'react';
 import { GENERAL_INFO } from '@/lib/data';
-
-gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 export function ContactSection() {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -78,31 +73,6 @@ export function ContactSection() {
             setSending(false);
         }
     }
-
-    useGSAP(
-        () => {
-            const isHorizontalMode = window.innerWidth >= 1024 && !!document.querySelector('.horizontal-mode');
-            if (isHorizontalMode) {
-                gsap.from(containerRef.current, {
-                    opacity: 0,
-                    y: 60,
-                    ease: 'power2.out',
-                    duration: 0.9,
-                });
-                return;
-            }
-            gsap.from(containerRef.current, {
-                opacity: 0,
-                y: 60,
-                ease: 'power2.out',
-                scrollTrigger: {
-                    trigger: containerRef.current,
-                    start: 'top 80%',
-                },
-            });
-        },
-        { scope: containerRef },
-    );
 
     return (
         <section className="pt-28 pb-24 md:pt-40 md:pb-24" id="contact" ref={containerRef}>

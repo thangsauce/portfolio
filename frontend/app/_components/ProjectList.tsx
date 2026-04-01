@@ -1,5 +1,4 @@
 'use client';
-import SectionTitle from '@/components/SectionTitle';
 import { cn } from '@/lib/utils';
 import { apiFetch } from '@/lib/api';
 import { IProject } from '@/types';
@@ -138,7 +137,13 @@ const ProjectList = () => {
     return (
         <section className="pb-section" id="selected-projects">
             <div className="container">
-                <SectionTitle title="FEATURED PROJECTS" />
+                <div className="flex items-center gap-3 mb-10">
+                    <span className="text-primary font-mono text-xl leading-none select-none">&lt;</span>
+                    <h2 className="text-xl uppercase leading-none tracking-widest">
+                        FEATURED PROJECTS
+                    </h2>
+                    <span className="text-primary font-mono text-xl leading-none select-none">&gt;</span>
+                </div>
 
                 <div className="group/projects relative" ref={containerRef}>
                     {selectedProject !== null && (

@@ -1,5 +1,4 @@
 'use client';
-import SectionTitle from '@/components/SectionTitle';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
@@ -63,9 +62,15 @@ const Certifications = () => {
     if (certs.length === 0) return null;
 
     return (
-        <section className="py-12" id="certifications" ref={containerRef}>
+        <section className="pt-0 pb-section" id="certifications" ref={containerRef}>
             <div className="container">
-                <SectionTitle title="Certifications" />
+                <div className="flex items-center gap-3 mb-10">
+                    <span className="text-primary font-mono text-xl leading-none select-none">&lt;</span>
+                    <h2 className="text-xl uppercase leading-none tracking-widest">
+                        CERTIFICAITON
+                    </h2>
+                    <span className="text-primary font-mono text-xl leading-none select-none">&gt;</span>
+                </div>
 
                 <div className="space-y-4 max-w-2xl">
                     {certs.map((cert) =>

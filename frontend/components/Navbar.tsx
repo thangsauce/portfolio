@@ -342,7 +342,7 @@ const Navbar = () => {
                             />
                             <span
                                 className={cn(
-                                    'absolute -right-1 -top-1 size-2 rounded-full bg-primary transition-opacity duration-300',
+                                    'absolute -right-1 -top-1 size-2 rounded-full bg-primary menu-dot-blink transition-opacity duration-300',
                                     {
                                         'opacity-0': isMenuOpen,
                                         'opacity-100': !isMenuOpen,
@@ -368,19 +368,14 @@ const Navbar = () => {
                 className={cn(
                     'fixed top-20 right-4 z-[3] overflow-hidden gap-y-2 transform transition-all duration-300 ease-linear',
                     'w-max max-w-[calc(100vw-2rem)] rounded-xl border border-white/10 -translate-y-3 opacity-0 invisible pointer-events-none',
-                    'md:top-5 md:left-1/2 md:right-auto md:w-max md:max-w-[calc(100vw-5rem)] md:h-auto md:min-h-0 md:rounded-xl md:border md:border-white/10 md:-translate-y-full md:-translate-x-1/2 md:opacity-100 md:visible md:pointer-events-auto',
+                    'md:top-5 md:left-1/2 md:right-auto md:w-max md:max-w-[calc(100vw-5rem)] md:h-auto md:min-h-0 md:rounded-xl md:border md:border-white/10 md:-translate-y-full md:-translate-x-1/2',
                     'flex flex-col py-2 md:py-1',
                     {
                         'translate-y-0 opacity-100 visible pointer-events-auto md:translate-y-0 md:-translate-x-1/2': isMenuOpen,
                     },
                 )}
             >
-                <div
-                    className={cn(
-                        'absolute inset-0 bg-background-light/5 backdrop-blur-sm z-[-1]',
-                    )}
-                ></div>
-
+                <div className="absolute inset-0 bg-background-light/5 backdrop-blur-sm z-[-1]" />
                 <div className="grow flex md:items-start w-auto px-4 md:px-5 lg:px-6">
                     <div className="flex gap-6 md:gap-6 lg:gap-8 md:justify-center md:items-start md:flex-row flex-col w-auto">
                         <div className="order-2 md:order-2">
@@ -467,6 +462,9 @@ const Navbar = () => {
                     transform-origin: center;
                     animation: eyeBlink 5.8s ease-in-out infinite;
                 }
+                .menu-dot-blink {
+                    animation: menuDotBlink 2.4s ease-in-out infinite;
+                }
                 @keyframes eyeBlink {
                     0%,
                     43%,
@@ -477,6 +475,17 @@ const Navbar = () => {
                     45%,
                     46% {
                         transform: scaleY(1);
+                    }
+                }
+                @keyframes menuDotBlink {
+                    0%,
+                    100% {
+                        opacity: 0.35;
+                        transform: scale(0.9);
+                    }
+                    50% {
+                        opacity: 1;
+                        transform: scale(1.15);
                     }
                 }
             `}</style>
