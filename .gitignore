@@ -38,3 +38,10 @@ frontend/tsconfig.tsbuildinfo
 
 # Worktrees
 .worktrees/
+
+# Wrangler
+.wrangler/
+
+# Local env files
+frontend/.env.local
+worker/.dev.vars
