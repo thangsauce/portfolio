@@ -195,7 +195,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
 
         {/* Nav */}
-        <nav style={{ flex: 1, paddingTop: 6, overflowY: 'auto' }}>
+        <nav data-lenis-prevent style={{ flex: 1, paddingTop: 6, overflowY: 'auto' }}>
           <div style={{
             padding: '8px 18px 6px',
             fontSize: 9, letterSpacing: '0.3em', textTransform: 'uppercase',
@@ -290,7 +290,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </header>
 
         {/* Main */}
-        <main style={{ flex: 1, overflowY: 'auto', padding: '32px 28px' }}>
+        <main data-lenis-prevent style={{ flex: 1, overflowY: 'auto', padding: '32px 28px' }}>
           {children}
         </main>
       </div>
