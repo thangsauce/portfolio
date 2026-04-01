@@ -1,6 +1,7 @@
 'use client';
 import ArrowAnimation from '@/components/ArrowAnimation';
 import Button from '@/components/Button';
+import { apiFetch } from '@/lib/api';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
@@ -12,6 +13,21 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
 const Banner = () => {
     const containerRef = React.useRef<HTMLDivElement>(null);
     const lenis = useLenis();
+    const [resumeUrl, setResumeUrl] = React.useState('/resume.pdf');
+
+    React.useEffect(() => {
+        let mounted = true;
+        apiFetch<{ url: string }>('/api/portfolio/resume')
+            .then((r) => {
+                if (mounted && r?.url) setResumeUrl(r.url);
+            })
+            .catch(() => {
+                // Keep /resume.pdf fallback if API is unavailable.
+            });
+        return () => {
+            mounted = false;
+        };
+    }, []);
 
     // move the content a little up on scroll
     useGSAP(
@@ -64,7 +80,7 @@ const Banner = () => {
                             Get In Touch
                         </Button>
                         <a
-                            href="/resume.pdf"
+                            href={resumeUrl}
                             download="Thang_Le_Resume.pdf"
                             className="group h-12 px-8 inline-flex justify-center items-center text-lg uppercase font-anton tracking-widest border border-border hover:border-primary hover:text-primary transition-colors overflow-hidden relative"
                         >

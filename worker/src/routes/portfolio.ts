@@ -3,6 +3,8 @@ import { getSupabase } from '../lib/supabase'
 import type { Env } from '../index'
 
 const portfolio = new Hono<{ Bindings: Env }>()
+const RESUME_BUCKET = 'portfolio-assets'
+const RESUME_PATH = 'resume/resume.pdf'
 
 // Public routes — select only fields needed for display, never expose internal metadata
 portfolio.get('/projects', async (c) => {
@@ -49,6 +51,21 @@ portfolio.get('/experiences', async (c) => {
     .order('order_index')
   if (error) return c.json({ error: 'Failed to fetch experiences' }, 500)
   return c.json(data)
+})
+
+portfolio.get('/resume', async (c) => {
+  const supabase = getSupabase(c.env)
+  const { data: listed, error: listError } = await supabase.storage
+    .from(RESUME_BUCKET)
+    .list('resume', { search: 'resume.pdf', limit: 10 })
+
+  if (listError) return c.json({ error: `Failed to fetch resume (bucket "${RESUME_BUCKET}")` }, 500)
+
+  const hasCustom = (listed ?? []).some((f) => f.name === 'resume.pdf')
+  if (!hasCustom) return c.json({ url: '/resume.pdf', hasCustom: false })
+
+  const { data } = supabase.storage.from(RESUME_BUCKET).getPublicUrl(RESUME_PATH)
+  return c.json({ url: data.publicUrl, hasCustom: true })
 })
 
 export default portfolio

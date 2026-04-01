@@ -5,6 +5,8 @@ import { getSupabase } from '../../lib/supabase'
 import type { Env, Variables } from '../../index'
 
 const r = new Hono<{ Bindings: Env; Variables: Variables }>()
+const RESUME_BUCKET = 'portfolio-assets'
+const RESUME_PATH = 'resume/resume.pdf'
 
 // ── Projects ──────────────────────────────────────────────────────────────────
 
@@ -166,6 +168,53 @@ r.delete('/experiences/:id', async (c) => {
     .from('experiences').delete().eq('id', c.req.param('id'))
   if (error) return c.json({ error: error.message }, 500)
   return c.json({ ok: true })
+})
+
+// ── Resume (PDF upload) ──────────────────────────────────────────────────────
+
+r.get('/resume', async (c) => {
+  const supabase = getSupabase(c.env)
+  const { data: listed, error: listError } = await supabase.storage
+    .from(RESUME_BUCKET)
+    .list('resume', { search: 'resume.pdf', limit: 10 })
+
+  if (listError) {
+    return c.json({ error: `${listError.message} (ensure storage bucket "${RESUME_BUCKET}" exists)` }, 500)
+  }
+
+  const hasCustom = (listed ?? []).some((f) => f.name === 'resume.pdf')
+  if (!hasCustom) {
+    return c.json({ url: '/resume.pdf', hasCustom: false })
+  }
+
+  const { data } = supabase.storage.from(RESUME_BUCKET).getPublicUrl(RESUME_PATH)
+  return c.json({ url: data.publicUrl, hasCustom: true })
+})
+
+r.post('/resume', async (c) => {
+  const form = await c.req.formData()
+  const file = form.get('file')
+
+  if (!file || typeof file === 'string') {
+    return c.json({ error: 'Expected a file field named "file"' }, 400)
+  }
+
+  const uploaded = file as { type?: string; arrayBuffer: () => Promise<ArrayBuffer> }
+  if (uploaded.type !== 'application/pdf') {
+    return c.json({ error: 'Resume must be a PDF file' }, 400)
+  }
+
+  const bytes = new Uint8Array(await uploaded.arrayBuffer())
+  const supabase = getSupabase(c.env)
+  const { error } = await supabase.storage.from(RESUME_BUCKET).upload(RESUME_PATH, bytes, {
+    upsert: true,
+    contentType: 'application/pdf',
+    cacheControl: '3600',
+  })
+  if (error) return c.json({ error: `${error.message} (bucket "${RESUME_BUCKET}")` }, 500)
+
+  const { data } = supabase.storage.from(RESUME_BUCKET).getPublicUrl(RESUME_PATH)
+  return c.json({ url: data.publicUrl, hasCustom: true })
 })
 
 export default r

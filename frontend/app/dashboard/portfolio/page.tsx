@@ -8,7 +8,8 @@ type Project    = { id: string; title: string; slug: string; description: string
 type Skill      = { id: string; name: string; category: string; icon_url: string | null; order_index: number }
 type Cert       = { id: string; name: string; issuer: string | null; issue_date: string | null; credential_id: string | null; url: string | null }
 type Experience = { id: string; company: string; role: string; start_date: string | null; end_date: string | null; description: string[] | null; order_index: number }
-type Tab        = 'projects' | 'skills' | 'certs' | 'experiences'
+type ResumeInfo = { url: string; hasCustom: boolean }
+type Tab        = 'projects' | 'skills' | 'certs' | 'experiences' | 'resume'
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 const sv = { width: 13, height: 13, viewBox: '0 0 16 16', fill: 'none', stroke: 'currentColor', strokeWidth: '1.5', strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, style: { display: 'block' as const } }
@@ -54,12 +55,15 @@ export default function PortfolioPage() {
   const [status, setStatus]         = useState<{ ok: boolean; msg: string } | null>(null)
   const [saving, setSaving]         = useState(false)
   const [loading, setLoading]       = useState(false)
+  const [uploadingResume, setUploadingResume] = useState(false)
 
   // ── Data ──────────────────────────────────────────────────────────────────
   const [projects,    setProjects]    = useState<Project[]>([])
   const [skills,      setSkills]      = useState<Skill[]>([])
   const [certs,       setCerts]       = useState<Cert[]>([])
   const [experiences, setExperiences] = useState<Experience[]>([])
+  const [resumeInfo, setResumeInfo]   = useState<ResumeInfo>({ url: '/resume.pdf', hasCustom: false })
+  const [resumeFile, setResumeFile]   = useState<File | null>(null)
 
   // ── Form state per tab ────────────────────────────────────────────────────
   const [pf, setPf] = useState({ title: '', slug: '', description: '', tech_stack: '', order_index: '0', featured: false })
@@ -75,6 +79,7 @@ export default function PortfolioPage() {
       if (tab === 'skills')      setSkills(await apiPrivate<Skill[]>('/portfolio/skills'))
       if (tab === 'certs')       setCerts(await apiPrivate<Cert[]>('/portfolio/certifications'))
       if (tab === 'experiences') setExperiences(await apiPrivate<Experience[]>('/portfolio/experiences'))
+      if (tab === 'resume')      setResumeInfo(await apiPrivate<ResumeInfo>('/portfolio/resume'))
     } catch {
       flash(false, 'failed to load records')
     } finally {
@@ -180,6 +185,37 @@ export default function PortfolioPage() {
       flash(false, 'delete_failed')
     } finally {
       setConfirmDel(null)
+    }
+  }
+
+  async function handleResumeUpload() {
+    if (!resumeFile) {
+      flash(false, 'select_a_pdf_first')
+      return
+    }
+    if (resumeFile.type !== 'application/pdf') {
+      flash(false, 'resume_must_be_pdf')
+      return
+    }
+
+    setUploadingResume(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', resumeFile)
+      const r = await apiPrivate<ResumeInfo>('/portfolio/resume', {
+        method: 'POST',
+        body: formData,
+      })
+      setResumeInfo({
+        ...r,
+        url: `${r.url}${r.url.includes('?') ? '&' : '?'}v=${Date.now()}`,
+      })
+      setResumeFile(null)
+      flash(true, 'resume_updated')
+    } catch (err) {
+      flash(false, (err as Error).message)
+    } finally {
+      setUploadingResume(false)
     }
   }
 
@@ -303,6 +339,8 @@ export default function PortfolioPage() {
   type Row = { id: string; item: Project | Skill | Cert | Experience; cells: React.ReactNode[] }
 
   function buildRows(): { headers: string[]; rows: Row[] } {
+    if (tab === 'resume') return { headers: [], rows: [] }
+
     if (tab === 'projects') return {
       headers: ['// title', '// slug', '// tech', '// featured', '// order'],
       rows: projects.map(p => ({ id: p.id, item: p, cells: [
@@ -346,8 +384,14 @@ export default function PortfolioPage() {
   }
 
   const { headers, rows } = buildRows()
-  const counts = { projects: projects.length, skills: skills.length, certs: certs.length, experiences: experiences.length }
-  const TABS: Tab[] = ['projects', 'skills', 'certs', 'experiences']
+  const counts: Record<Tab, number> = {
+    projects: projects.length,
+    skills: skills.length,
+    certs: certs.length,
+    experiences: experiences.length,
+    resume: 1,
+  }
+  const TABS: Tab[] = ['projects', 'skills', 'certs', 'experiences', 'resume']
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
@@ -401,6 +445,7 @@ export default function PortfolioPage() {
       </div>
 
       {/* Table panel */}
+      {tab !== 'resume' && (
       <div style={{ border: '1px solid hsl(0 0% 16%)', borderTop: 'none', background: 'hsl(0 0% 8%)' }}>
 
         {/* Toolbar */}
@@ -475,6 +520,57 @@ export default function PortfolioPage() {
           </table>
         </div>
       </div>
+      )}
+
+      {/* Resume panel */}
+      {tab === 'resume' && (
+        <div style={{ border: '1px solid hsl(0 0% 16%)', borderTop: 'none', background: 'hsl(0 0% 8%)' }}>
+          <div style={{ padding: '11px 16px', borderBottom: '1px solid hsl(0 0% 14%)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+            <span style={{ fontSize: 10, letterSpacing: '0.22em', color: 'hsl(0 0% 26%)' }}>
+              {loading ? '// loading...' : `// ${resumeInfo.hasCustom ? 'custom resume active' : 'using default /resume.pdf'}`}
+            </span>
+            <a
+              href={resumeInfo.url}
+              target="_blank"
+              rel="noreferrer"
+              style={{ fontSize: 10, letterSpacing: '0.16em', color: 'hsl(193 100% 47%)', textDecoration: 'none' }}
+            >
+              open_current_resume
+            </a>
+          </div>
+
+          <div style={{ padding: 20 }}>
+            <Fld label="resume_pdf">
+              <input
+                type="file"
+                accept="application/pdf"
+                onChange={(e) => setResumeFile(e.target.files?.[0] ?? null)}
+                style={{ ...iSt, padding: '6px 11px' }}
+              />
+            </Fld>
+
+            <div style={{ fontSize: 10, letterSpacing: '0.08em', color: 'hsl(0 0% 32%)', marginBottom: 14 }}>
+              upload a pdf to replace your public resume link on the homepage
+            </div>
+
+            <button
+              onClick={handleResumeUpload}
+              disabled={uploadingResume || !resumeFile}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 7,
+                padding: '9px 14px',
+                fontSize: 11, letterSpacing: '0.15em',
+                color: uploadingResume || !resumeFile ? 'hsl(0 0% 30%)' : 'hsl(158 64% 55%)',
+                background: 'hsl(158 64% 36% / 0.1)',
+                border: `1px solid ${uploadingResume || !resumeFile ? 'hsl(0 0% 18%)' : 'hsl(158 64% 24%)'}`,
+                cursor: uploadingResume || !resumeFile ? 'not-allowed' : 'pointer',
+              }}
+            >
+              <IcSave /> {uploadingResume ? 'uploading...' : '> upload_resume'}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Backdrop */}
       <div onClick={closePanel} style={{

@@ -18,14 +18,17 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
 
 /** Fetch from a private API endpoint (Bearer token required) */
 export async function apiPrivate<T>(path: string, init?: RequestInit): Promise<T> {
-  const headers = await authHeaders()
+  const auth = await authHeaders()
+  const isFormData = typeof FormData !== 'undefined' && init?.body instanceof FormData
+  const mergedHeaders = new Headers(init?.headers)
+  if (!isFormData && !mergedHeaders.has('Content-Type')) {
+    mergedHeaders.set('Content-Type', 'application/json')
+  }
+  new Headers(auth).forEach((value, key) => mergedHeaders.set(key, value))
+
   const res = await fetch(`${API_URL}/api/private${path}`, {
     ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      ...headers,
-      ...init?.headers,
-    },
+    headers: mergedHeaders,
   })
   if (!res.ok) throw new Error(`API error ${res.status}`)
   return res.json() as Promise<T>

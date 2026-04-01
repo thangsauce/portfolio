@@ -8,10 +8,8 @@ import './globals.css';
 import Footer from '@/components/Footer';
 import ScrollProgressIndicator from '@/components/ScrollProgressIndicator';
 import Navbar from '@/components/Navbar';
-import CustomCursor from '@/components/CustomCursor';
 import Preloader from '../components/Preloader';
 import StickyEmail from './_components/StickyEmail';
-import ThemeToggle from '@/components/ThemeToggle';
 
 
 const antonFont = Anton({
@@ -79,11 +77,9 @@ export default function RootLayout({
                         <main>{children}</main>
                         <Footer />
 
-                        <CustomCursor />
                         <Preloader />
                         <ScrollProgressIndicator />
                         <StickyEmail />
-                        <ThemeToggle />
                     </ReactLenis>
                 </AuthProvider>
             </body>
