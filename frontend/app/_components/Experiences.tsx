@@ -3,17 +3,40 @@ import SectionTitle from '@/components/SectionTitle';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
-import { useRef } from 'react';
-import { MY_EXPERIENCE } from '@/lib/data';
+import { useRef, useEffect, useState } from 'react';
+import { apiFetch } from '@/lib/api';
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
+type Experience = {
+    id: string;
+    company: string;
+    role: string;
+    start_date: string | null;
+    end_date: string | null;
+    order_index: number;
+}
+
+function formatDuration(start: string | null, end: string | null): string {
+    if (!start) return '';
+    const startYear = new Date(start).getFullYear();
+    const endStr = end ? new Date(end).getFullYear().toString() : 'Present';
+    return `${startYear} – ${endStr}`;
+}
+
 const Experiences = () => {
     const containerRef = useRef<HTMLDivElement>(null);
+    const [experiences, setExperiences] = useState<Experience[]>([]);
+
+    useEffect(() => {
+        apiFetch<Experience[]>('/api/portfolio/experiences')
+            .then(setExperiences)
+            .catch(() => {});
+    }, []);
 
     useGSAP(
         () => {
-            if (MY_EXPERIENCE.length === 0) return;
+            if (experiences.length === 0) return;
             const tl = gsap.timeline({
                 scrollTrigger: {
                     trigger: containerRef.current,
@@ -25,7 +48,7 @@ const Experiences = () => {
             });
             tl.from('.experience-item', { y: 50, opacity: 0, stagger: 0.3 });
         },
-        { scope: containerRef },
+        { scope: containerRef, dependencies: [experiences.length] },
     );
 
     useGSAP(
@@ -43,7 +66,7 @@ const Experiences = () => {
         { scope: containerRef },
     );
 
-    if (MY_EXPERIENCE.length === 0) return null;
+    if (experiences.length === 0) return null;
 
     return (
         <section className="pt-16 pb-section" id="my-experience">
@@ -51,11 +74,11 @@ const Experiences = () => {
                 <SectionTitle title="My Experience" />
 
                 <div className="grid gap-14">
-                    {MY_EXPERIENCE.map((item, idx) => (
-                        <div key={idx} className="experience-item">
+                    {experiences.map((item) => (
+                        <div key={item.id} className="experience-item">
                             <p className="text-xl text-muted-foreground">{item.company}</p>
-                            <p className="text-5xl font-anton leading-none mt-3.5 mb-2.5">{item.title}</p>
-                            <p className="text-lg text-muted-foreground">{item.duration}</p>
+                            <p className="text-5xl font-anton leading-none mt-3.5 mb-2.5">{item.role}</p>
+                            <p className="text-lg text-muted-foreground">{formatDuration(item.start_date, item.end_date)}</p>
                         </div>
                     ))}
                 </div>

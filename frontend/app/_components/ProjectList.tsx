@@ -1,16 +1,41 @@
 'use client';
 import SectionTitle from '@/components/SectionTitle';
 import { cn } from '@/lib/utils';
-import { PROJECTS } from '@/lib/data';
+import { apiFetch } from '@/lib/api';
 import { IProject } from '@/types';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
 import Image from 'next/image';
-import React, { useRef, useState, MouseEvent } from 'react';
+import React, { useRef, useState, useEffect, MouseEvent } from 'react';
 import Project from './Project';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
+
+type ApiProject = {
+    id: string;
+    title: string;
+    slug: string;
+    description: string | null;
+    tech_stack: string[];
+    images: { thumbnail: string; long: string; gallery: string[] } | null;
+    featured: boolean;
+    order_index: number;
+}
+
+function mapProject(p: ApiProject): IProject {
+    return {
+        title: p.title,
+        slug: p.slug,
+        year: new Date().getFullYear(),
+        description: p.description ?? '',
+        role: '',
+        techStack: p.tech_stack ?? [],
+        thumbnail: p.images?.thumbnail ?? '',
+        longThumbnail: p.images?.long || undefined,
+        images: p.images?.gallery ?? [],
+    };
+}
 
 const ProjectList = () => {
     const containerRef    = useRef<HTMLDivElement>(null);
@@ -18,10 +43,20 @@ const ProjectList = () => {
     const imageContainer  = useRef<HTMLDivElement>(null);
     const imageRef        = useRef<HTMLImageElement>(null);
 
-    const projects: IProject[] = PROJECTS;
-    const [selectedProject, setSelectedProject] = useState<string | null>(
-        projects.length > 0 ? projects[0].slug : null
-    );
+    const [projects, setProjects] = useState<IProject[]>([]);
+    const [selectedProject, setSelectedProject] = useState<string | null>(null);
+
+    useEffect(() => {
+        apiFetch<ApiProject[]>('/api/portfolio/projects')
+            .then((data) => {
+                const mapped = data.map(mapProject);
+                setProjects(mapped);
+                if (mapped.length > 0 && window.innerWidth >= 768) {
+                    setSelectedProject(mapped[0].slug);
+                }
+            })
+            .catch(() => {});
+    }, []);
 
     // update imageRef.current href based on the cursor hover position
     // also update image position

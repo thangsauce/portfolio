@@ -3,17 +3,38 @@ import SectionTitle from '@/components/SectionTitle';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
-import React, { useRef } from 'react';
-import { CERTIFICATIONS } from '@/lib/data';
+import React, { useRef, useEffect, useState } from 'react';
+import { apiFetch } from '@/lib/api';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
+type Cert = {
+    id: string;
+    name: string;
+    issuer: string | null;
+    issue_date: string | null;
+    credential_id: string | null;
+    url: string | null;
+}
+
+function formatDate(dateStr: string | null): string | null {
+    if (!dateStr) return null;
+    return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+}
+
 const Certifications = () => {
     const containerRef = useRef<HTMLDivElement>(null);
+    const [certs, setCerts] = useState<Cert[]>([]);
+
+    useEffect(() => {
+        apiFetch<Cert[]>('/api/portfolio/certifications')
+            .then(setCerts)
+            .catch(() => {});
+    }, []);
 
     useGSAP(
         () => {
-            if (CERTIFICATIONS.length === 0) return;
+            if (certs.length === 0) return;
             gsap.from('.cert-item', {
                 opacity: 0,
                 y: 30,
@@ -25,10 +46,10 @@ const Certifications = () => {
                 },
             });
         },
-        { scope: containerRef },
+        { scope: containerRef, dependencies: [certs.length] },
     );
 
-    if (CERTIFICATIONS.length === 0) return null;
+    if (certs.length === 0) return null;
 
     return (
         <section className="py-12" id="certifications" ref={containerRef}>
@@ -36,7 +57,7 @@ const Certifications = () => {
                 <SectionTitle title="Certifications" />
 
                 <div className="space-y-4 max-w-2xl">
-                    {CERTIFICATIONS.map((cert) => (
+                    {certs.map((cert) =>
                         cert.url ? (
                             <a
                                 key={cert.id}
@@ -48,11 +69,11 @@ const Certifications = () => {
                                 <div>
                                     <p className="text-lg font-medium group-hover:text-primary transition-colors">{cert.name}</p>
                                     <p className="text-sm text-muted-foreground">
-                                        {cert.issuer}{cert.cert_id ? ` · ID: ${cert.cert_id}` : ''}
+                                        {cert.issuer}{cert.credential_id ? ` · ID: ${cert.credential_id}` : ''}
                                     </p>
                                 </div>
-                                {cert.date && (
-                                    <span className="text-primary font-mono text-sm shrink-0 ml-4">{cert.date}</span>
+                                {cert.issue_date && (
+                                    <span className="text-primary font-mono text-sm shrink-0 ml-4">{formatDate(cert.issue_date)}</span>
                                 )}
                             </a>
                         ) : (
@@ -63,15 +84,15 @@ const Certifications = () => {
                                 <div>
                                     <p className="text-lg font-medium">{cert.name}</p>
                                     <p className="text-sm text-muted-foreground">
-                                        {cert.issuer}{cert.cert_id ? ` · ID: ${cert.cert_id}` : ''}
+                                        {cert.issuer}{cert.credential_id ? ` · ID: ${cert.credential_id}` : ''}
                                     </p>
                                 </div>
-                                {cert.date && (
-                                    <span className="text-primary font-mono text-sm shrink-0 ml-4">{cert.date}</span>
+                                {cert.issue_date && (
+                                    <span className="text-primary font-mono text-sm shrink-0 ml-4">{formatDate(cert.issue_date)}</span>
                                 )}
                             </div>
                         )
-                    ))}
+                    )}
                 </div>
             </div>
         </section>

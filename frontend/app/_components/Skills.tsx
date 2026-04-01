@@ -4,16 +4,24 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
 import Image from 'next/image';
-import React, { useRef } from 'react';
-import { MY_STACK } from '@/lib/data';
+import React, { useRef, useEffect, useState } from 'react';
+import { apiFetch } from '@/lib/api';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-type Category = 'frontend' | 'backend' | 'database' | 'tools';
-const CATEGORY_ORDER: Category[] = ['frontend', 'backend', 'database', 'tools'];
+type Skill = { id: string; name: string; category: string; icon_url: string | null }
+type Category = 'frontend' | 'backend' | 'database' | 'tools'
+const CATEGORY_ORDER: Category[] = ['frontend', 'backend', 'database', 'tools']
 
 const Skills = () => {
     const containerRef = useRef<HTMLDivElement>(null);
+    const [skills, setSkills] = useState<Skill[]>([]);
+
+    useEffect(() => {
+        apiFetch<Skill[]>('/api/portfolio/skills')
+            .then(setSkills)
+            .catch(() => {});
+    }, []);
 
     useGSAP(
         () => {
@@ -31,12 +39,19 @@ const Skills = () => {
                 },
             });
         },
-        { scope: containerRef },
+        { scope: containerRef, dependencies: [skills.length] },
     );
 
+    const grouped = CATEGORY_ORDER.reduce((acc, cat) => {
+        acc[cat] = skills.filter((s) => s.category === cat);
+        return acc;
+    }, {} as Record<Category, Skill[]>);
+
     const entries = CATEGORY_ORDER
-        .filter((cat) => MY_STACK[cat].length > 0)
-        .map((cat) => [cat, MY_STACK[cat]] as [Category, typeof MY_STACK[Category][number][]]);
+        .filter((cat) => grouped[cat].length > 0)
+        .map((cat) => [cat, grouped[cat]] as [Category, Skill[]]);
+
+    if (skills.length === 0) return null;
 
     return (
         <section id="my-stack" ref={containerRef}>
@@ -52,12 +67,12 @@ const Skills = () => {
                                 </p>
                             </div>
                             <div className="sm:col-span-7 flex gap-x-11 gap-y-9 flex-wrap">
-                                {items.map((item, idx) => (
-                                    <div className="slide-up flex gap-3.5 items-center leading-none" key={idx}>
-                                        {item.icon && (
+                                {items.map((item) => (
+                                    <div className="slide-up flex gap-3.5 items-center leading-none" key={item.id}>
+                                        {item.icon_url && (
                                             <div>
                                                 <Image
-                                                    src={item.icon}
+                                                    src={item.icon_url}
                                                     alt={item.name}
                                                     width={40}
                                                     height={40}

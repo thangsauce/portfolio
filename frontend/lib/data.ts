@@ -1,5 +1,6 @@
 import { IProject } from '@/types';
 
+// Static personal info — not stored in DB
 export const GENERAL_INFO = {
     email: 'th432726@ucf.edu',
 
@@ -15,77 +16,12 @@ export const SOCIAL_LINKS = [
     { name: 'linkedin', url: 'https://linkedin.com/in/thang-le-it' },
 ];
 
-export const MY_STACK = {
-    frontend: [
-        {
-            name: 'JavaScript',
-            icon: '/logo/js.png',
-        },
-        {
-            name: 'TypeScript',
-            icon: '/logo/ts.png',
-        },
-        {
-            name: 'React',
-            icon: '/logo/react.png',
-        },
-        {
-            name: 'Next.js',
-            icon: '/logo/next.png',
-        },
-        {
-            name: 'Tailwind CSS',
-            icon: '/logo/tailwind.png',
-        },
-        {
-            name: 'Bootstrap',
-            icon: '/logo/bootstrap.svg',
-        },
-    ],
-    backend: [
-        {
-            name: 'Python',
-            icon: '/logo/python.svg',
-        },
-        {
-            name: 'Java',
-            icon: '/logo/java.svg',
-        },
-        {
-            name: 'Node.js',
-            icon: '/logo/node.png',
-        },
-    ],
-    database: [
-        {
-            name: 'MySQL',
-            icon: '/logo/mysql.svg',
-        },
-        {
-            name: 'PostgreSQL',
-            icon: '/logo/postgreSQL.png',
-        },
-        {
-            name: 'MongoDB',
-            icon: '/logo/mongodb.svg',
-        },
-    ],
-    tools: [
-        {
-            name: 'Git',
-            icon: '/logo/git.png',
-        },
-        {
-            name: 'VS Code',
-            icon: '/logo/vscode.png',
-        },
-        {
-            name: 'Linux',
-            icon: '/logo/linux.png',
-        },
-    ],
-};
+// MY_STACK moved to API: GET /api/portfolio/skills (categories: frontend, backend, database, tools)
+// IT_SKILLS moved to API: GET /api/portfolio/skills (category: it_support)
+// CERTIFICATIONS moved to API: GET /api/portfolio/certifications
+// MY_EXPERIENCE moved to API: GET /api/portfolio/experiences
 
+// PROJECTS is kept here for Next.js generateStaticParams (static export requires build-time slugs)
 export const PROJECTS: IProject[] = [
     {
         title: 'Portfolio Website',
@@ -179,39 +115,3 @@ export const PROJECTS: IProject[] = [
     },
 ];
 
-export const IT_SKILLS = [
-    { id: 1, text: 'Troubleshooting hardware and software issues (PCs, laptops, printers, etc.)' },
-    { id: 2, text: 'Basic networking knowledge (Wi-Fi configuration, setup, troubleshooting, etc.)' },
-    { id: 3, text: 'Proficiency in Windows OS, Mac OS, and Linux OS' },
-    { id: 4, text: 'Experience with Microsoft Office Suite and Google Workspace' },
-    { id: 5, text: 'Excellent verbal and written communication skills for customer support' },
-];
-
-export const CERTIFICATIONS = [
-    {
-        id: 1,
-        name: 'CompTIA IT Fundamentals+',
-        issuer: 'TestOut',
-        date: 'Apr 2025',
-        cert_id: '6-1C6-VPVCKB',
-        url: 'https://certification.testout.com/verifycert/6-1C6-VPVCKB',
-    },
-];
-
-export const MY_EXPERIENCE = [
-    {
-        title: 'IT Support Specialist',
-        company: 'Craze Nails Salon — Lake Mary, FL',
-        duration: '2023 – Present',
-    },
-    {
-        title: 'IT Student',
-        company: 'University of Central Florida — Orlando, FL',
-        duration: 'Aug 2022 – Present',
-    },
-    {
-        title: 'Sushi Chef',
-        company: 'Sushi Pop — Winter Park, FL',
-        duration: '2017 – 2019',
-    },
-];
