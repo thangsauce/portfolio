@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Anton, Roboto_Flex } from 'next/font/google';
+import { AuthProvider } from '@/contexts/AuthContext';
 import { ReactLenis } from 'lenis/react';
 
 import 'lenis/dist/lenis.css';
@@ -58,6 +59,7 @@ export default function RootLayout({
             <body
                 className={`${antonFont.variable} ${robotoFlex.variable} antialiased`}
             >
+                <AuthProvider>
                 <ReactLenis
                         root
                         options={{
@@ -85,6 +87,7 @@ export default function RootLayout({
                         <StickyEmail />
                         <ThemeToggle />
                     </ReactLenis>
+                </AuthProvider>
             </body>
         </html>
     );

@@ -1,168 +1,66 @@
-'use client';
+'use client'
+import { createContext, useContext, useEffect, useState } from 'react'
+import type { User, Session } from '@supabase/supabase-js'
+import { createClient } from '@/lib/supabase/client'
 
-import React, {
-    createContext,
-    useCallback,
-    useContext,
-    useEffect,
-    useState,
-} from 'react';
-import type { User, AuthState } from '@/types/auth';
-import { get, post, setAccessToken } from '@/lib/api';
-
-// ─── Cookie helpers (non-httpOnly, readable by JS for middleware signalling) ──
-
-const isProduction = process.env.NODE_ENV === 'production';
-const secureFlag = isProduction ? '; Secure' : '';
-
-function setAuthCookie(): void {
-    document.cookie =
-        `auth_status=logged_in; path=/; max-age=604800; SameSite=Lax${secureFlag}`;
+type AuthContextType = {
+  user: User | null
+  session: Session | null
+  isLoading: boolean
+  isAuthenticated: boolean
+  login: (email: string, password: string) => Promise<void>
+  logout: () => Promise<void>
 }
 
-function clearAuthCookie(): void {
-    document.cookie = `auth_status=; path=/; max-age=0; SameSite=Lax${secureFlag}`;
-}
-
-// ─── Context shape ────────────────────────────────────────────────────────────
-
-interface AuthContextValue extends AuthState {
-    login: (email: string, password: string) => Promise<void>;
-    register: (email: string, password: string) => Promise<void>;
-    logout: () => Promise<void>;
-}
-
-const AuthContext = createContext<AuthContextValue | null>(null);
-
-// ─── Provider ─────────────────────────────────────────────────────────────────
+const AuthContext = createContext<AuthContextType | null>(null)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [state, setState] = useState<AuthState>({
-        user: null,
-        accessToken: null,
-        isLoading: true,
-        isAuthenticated: false,
-    });
+  const [user, setUser] = useState<User | null>(null)
+  const [session, setSession] = useState<Session | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
-    // On mount: try to restore session via refresh token cookie
-    useEffect(() => {
-        async function restoreSession() {
-            try {
-                const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/auth/refresh`,
-                    { method: 'POST', credentials: 'include' },
-                );
+  useEffect(() => {
+    const supabase = createClient()
 
-                if (!res.ok) {
-                    setState((prev) => ({ ...prev, isLoading: false }));
-                    return;
-                }
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+      setUser(session?.user ?? null)
+      setIsLoading(false)
+    })
 
-                const data = await res.json();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setSession(session)
+      setUser(session?.user ?? null)
+    })
 
-                if (data.success && data.data?.accessToken) {
-                    setAccessToken(data.data.accessToken);
+    return () => subscription.unsubscribe()
+  }, [])
 
-                    const meRes = await get<{ user: User }>('/api/auth/me');
+  const login = async (email: string, password: string) => {
+    const { error } = await createClient().auth.signInWithPassword({ email, password })
+    if (error) throw error
+  }
 
-                    if (meRes.success && meRes.data?.user) {
-                        setAuthCookie();
-                        setState({
-                            user: meRes.data.user,
-                            accessToken: data.data.accessToken,
-                            isLoading: false,
-                            isAuthenticated: true,
-                        });
-                        return;
-                    }
-                }
-            } catch {
-                // Network error or no session — silently fall through
-            }
+  const logout = async () => {
+    await createClient().auth.signOut()
+  }
 
-            clearAuthCookie();
-            setState({ user: null, accessToken: null, isLoading: false, isAuthenticated: false });
-        }
-
-        restoreSession();
-    }, []);
-
-    const login = useCallback(async (email: string, password: string) => {
-        const res = await post<{ user: User; accessToken: string }>(
-            '/api/auth/login',
-            { email, password },
-        );
-
-        if (!res.success || !res.data) {
-            throw new Error(res.message || 'Login failed');
-        }
-
-        setAccessToken(res.data.accessToken);
-        setAuthCookie();
-
-        setState({
-            user: res.data.user,
-            accessToken: res.data.accessToken,
-            isLoading: false,
-            isAuthenticated: true,
-        });
-    }, []);
-
-    const register = useCallback(
-        async (email: string, password: string) => {
-            const res = await post<{ user: User; accessToken: string }>(
-                '/api/auth/register',
-                { email, password },
-            );
-
-            if (!res.success || !res.data) {
-                throw new Error(res.message || 'Registration failed');
-            }
-
-            setAccessToken(res.data.accessToken);
-            setAuthCookie();
-
-            setState({
-                user: res.data.user,
-                accessToken: res.data.accessToken,
-                isLoading: false,
-                isAuthenticated: true,
-            });
-        },
-        [],
-    );
-
-    const logout = useCallback(async () => {
-        try {
-            await post('/api/auth/logout');
-        } catch {
-            // Best-effort — clear local state regardless
-        }
-
-        setAccessToken(null);
-        clearAuthCookie();
-
-        setState({
-            user: null,
-            accessToken: null,
-            isLoading: false,
-            isAuthenticated: false,
-        });
-    }, []);
-
-    return (
-        <AuthContext.Provider value={{ ...state, login, register, logout }}>
-            {children}
-        </AuthContext.Provider>
-    );
+  return (
+    <AuthContext.Provider value={{
+      user,
+      session,
+      isLoading,
+      isAuthenticated: !!user,
+      login,
+      logout,
+    }}>
+      {children}
+    </AuthContext.Provider>
+  )
 }
 
-// ─── Hook ─────────────────────────────────────────────────────────────────────
-
-export function useAuth(): AuthContextValue {
-    const ctx = useContext(AuthContext);
-    if (!ctx) {
-        throw new Error('useAuth must be used inside <AuthProvider>');
-    }
-    return ctx;
+export function useAuth() {
+  const ctx = useContext(AuthContext)
+  if (!ctx) throw new Error('useAuth must be used within AuthProvider')
+  return ctx
 }
