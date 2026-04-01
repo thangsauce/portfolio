@@ -26,16 +26,16 @@ const MENU_LINKS = [
         url: '/#selected-projects',
     },
     {
-        name: 'Certifications',
-        url: '/#certifications',
-    },
-    {
         name: 'IT Skills',
         url: '/#it-skills',
     },
     {
         name: 'My Stack',
         url: '/#my-stack',
+    },
+    {
+        name: 'Certifications',
+        url: '/#certifications',
     },
 ];
 
@@ -264,7 +264,7 @@ const Navbar = () => {
                     <Link
                         href="/"
                         aria-label="Go to homepage"
-                        className="absolute top-5 left-5 md:left-10 z-[2] h-16 w-24 flex items-center justify-center text-primary/80"
+                        className="absolute top-5 left-5 md:left-6 z-[2] h-16 w-24 flex items-center justify-center text-primary/80"
                     >
                         <svg
                             ref={eyeRef}

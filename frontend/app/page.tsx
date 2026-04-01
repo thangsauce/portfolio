@@ -23,14 +23,14 @@ export default function Home() {
             <div className="page-">
                 <ProjectList />
             </div>
-            <div className="page- md:pl-10 lg:pl-16 xl:pl-20">
-                <Certifications />
-            </div>
             <div className="page- md:-ml-14 lg:-ml-24 xl:-ml-28">
                 <ITSkills />
             </div>
-            <div className="page- md:-ml-10 lg:-ml-16 xl:-ml-20">
+            <div className="page- md:-ml-16 lg:-ml-24 xl:-ml-32">
                 <Skills />
+            </div>
+            <div className="page- md:pl-10 lg:pl-16 xl:pl-20">
+                <Certifications />
             </div>
             <div className="page- md:pl-12 lg:pl-20 xl:pl-28">
                 <ContactSection />

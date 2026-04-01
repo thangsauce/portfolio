@@ -81,7 +81,7 @@ const Experiences = () => {
     if (experiences.length === 0) return null;
 
     return (
-        <section className="pt-0 pb-section" id="my-experience">
+        <section className="-mt-10 md:-mt-16 pb-section" id="my-experience">
             <div className="container" ref={containerRef}>
                 <div className="flex items-center gap-3 mb-10">
                     <span className="text-primary font-mono text-xl leading-none select-none">&lt;</span>

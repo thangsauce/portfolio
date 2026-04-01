@@ -1,5 +1,4 @@
 'use client';
-import SectionTitle from '@/components/SectionTitle';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
@@ -83,7 +82,13 @@ const Skills = () => {
     return (
         <section id="my-stack" ref={containerRef}>
             <div className="container">
-                <SectionTitle title="My Stack" />
+                <div className="flex items-center gap-3 mb-10">
+                    <span className="text-primary font-mono text-xl leading-none select-none">&lt;</span>
+                    <h2 className="text-xl uppercase leading-none tracking-widest">
+                        MY STACK
+                    </h2>
+                    <span className="text-primary font-mono text-xl leading-none select-none">&gt;</span>
+                </div>
 
                 <div className="space-y-20">
                     {entries.map(([category, items]) => (
