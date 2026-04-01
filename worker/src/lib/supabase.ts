@@ -1,0 +1,9 @@
+import { createClient } from '@supabase/supabase-js'
+import type { Database } from '../types/database'
+import type { Env } from '../index'
+
+export function getSupabase(env: Pick<Env, 'SUPABASE_URL' | 'SUPABASE_SERVICE_ROLE_KEY'>) {
+  return createClient<Database>(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
+    auth: { persistSession: false },
+  })
+}
