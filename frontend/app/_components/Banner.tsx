@@ -160,7 +160,6 @@ const Banner = () => {
                                 width={768}
                                 height={768}
                                 className="w-full h-auto object-cover"
-                                priority
                             />
                         </div>
                     </div>
