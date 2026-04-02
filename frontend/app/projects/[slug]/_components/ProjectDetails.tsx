@@ -108,13 +108,13 @@ const ProjectDetails = ({ project }: Props) => {
                                 </span>
                             </h1>
 
-                            <div className="fade-in-later opacity-0 flex gap-2">
+                            <div className="fade-in-later opacity-0 flex items-center gap-4">
                                 {project.sourceCode && (
                                     <a
                                         href={project.sourceCode}
                                         target="_blank"
                                         rel="noreferrer noopener"
-                                        className="hover:text-primary"
+                                        className="inline-flex items-center text-foreground/80 hover:text-primary transition-colors"
                                     >
                                         <Github size={30} />
                                     </a>
@@ -124,9 +124,10 @@ const ProjectDetails = ({ project }: Props) => {
                                         href={project.liveUrl}
                                         target="_blank"
                                         rel="noreferrer noopener"
-                                        className="hover:text-primary"
+                                        className="inline-flex items-center gap-2 text-xs sm:text-sm uppercase tracking-[0.14em] text-foreground/80 hover:text-primary transition-colors"
                                     >
-                                        <ExternalLink size={30} />
+                                        <span className="live-demo-dot inline-block size-2.5 rounded-full bg-red-500" />
+                                        <span>LIVE Demo</span>
                                     </a>
                                 )}
                             </div>
@@ -201,6 +202,21 @@ const ProjectDetails = ({ project }: Props) => {
                     ))}
                 </div>
             </div>
+            <style jsx>{`
+                .live-demo-dot {
+                    animation: liveDotBlink 1.15s ease-in-out infinite;
+                }
+
+                @keyframes liveDotBlink {
+                    0%,
+                    100% {
+                        opacity: 0.25;
+                    }
+                    50% {
+                        opacity: 1;
+                    }
+                }
+            `}</style>
         </section>
     );
 };

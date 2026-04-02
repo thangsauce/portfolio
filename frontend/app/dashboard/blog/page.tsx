@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { apiPrivate } from '@/lib/api'
+import { useDashboardTheme } from '../theme-context'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type PostItem = {
@@ -53,11 +54,13 @@ function PostEditor({
   onSave,
   onDelete,
   onPublishToggle,
+  isLight,
 }: {
   post: Post
   onSave: (id: string, data: Partial<Post>) => Promise<void>
   onDelete: (id: string) => Promise<void>
   onPublishToggle: (id: string, published: boolean) => Promise<void>
+  isLight: boolean
 }) {
   const [title,      setTitle]      = useState(post.title)
   const [slug,       setSlug]       = useState(post.slug)
@@ -132,15 +135,19 @@ function PostEditor({
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
 
       {/* Header */}
-      <div style={{ padding: '18px 36px 0', flexShrink: 0, borderBottom: '1px solid hsl(0 0% 14%)' }}>
+      <div style={{
+        padding: '18px 36px 0', flexShrink: 0,
+        borderBottom: `1px solid ${isLight ? 'hsl(220 8% 90%)' : 'hsl(0 0% 14%)'}`,
+      }}>
         {/* Save status */}
         <div style={{
-          fontSize: 9, letterSpacing: '0.28em', textTransform: 'uppercase',
+          fontSize: 11,
           height: 14, marginBottom: 12,
-          color: status === 'saved' ? 'hsl(158 64% 42%)' : status === 'saving' ? 'hsl(0 0% 32%)' : 'transparent',
+          color: status === 'saved' ? 'hsl(158 64% 42%)' : status === 'saving' ? (isLight ? 'hsl(220 8% 60%)' : 'hsl(0 0% 32%)') : 'transparent',
           transition: 'color 0.2s',
+          fontFamily: 'var(--font-roboto-flex)',
         }}>
-          {status === 'saved' ? '// saved' : '// saving...'}
+          {status === 'saved' ? 'Saved' : 'Saving...'}
         </div>
 
         {/* Title */}
@@ -152,7 +159,7 @@ function PostEditor({
             width: '100%', background: 'none', border: 'none', outline: 'none',
             fontFamily: 'var(--font-anton)',
             fontSize: 24, letterSpacing: '0.08em', textTransform: 'uppercase',
-            color: 'hsl(0 0% 87%)', caretColor: 'hsl(158 64% 36%)',
+            color: isLight ? 'hsl(220 20% 14%)' : 'hsl(0 0% 87%)', caretColor: 'hsl(158 64% 36%)',
             marginBottom: 14,
           }}
         />
@@ -160,21 +167,21 @@ function PostEditor({
         {/* Slug + Tags */}
         <div style={{ display: 'flex', gap: 20, marginBottom: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
-            <span style={{ fontSize: 9, letterSpacing: '0.2em', color: 'hsl(0 0% 26%)', flexShrink: 0 }}>slug/</span>
+            <span style={{ fontSize: 11, color: isLight ? 'hsl(220 8% 52%)' : 'hsl(0 0% 26%)', flexShrink: 0, fontFamily: 'var(--font-roboto-flex)' }}>Slug</span>
             <input
               value={slug}
               onChange={e => handleSlug(e.target.value)}
               placeholder="post-slug"
               style={{
                 background: 'none', border: 'none', outline: 'none',
-                fontFamily: 'monospace', fontSize: 11, letterSpacing: '0.06em',
+                fontFamily: 'monospace', fontSize: 11, letterSpacing: '0.04em',
                 color: 'hsl(158 64% 36%)', caretColor: 'hsl(158 64% 36%)',
                 flex: 1, minWidth: 0,
               }}
             />
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
-            <span style={{ fontSize: 9, letterSpacing: '0.2em', color: 'hsl(0 0% 26%)', flexShrink: 0 }}>tags/</span>
+            <span style={{ fontSize: 11, color: isLight ? 'hsl(220 8% 52%)' : 'hsl(0 0% 26%)', flexShrink: 0, fontFamily: 'var(--font-roboto-flex)' }}>Tags</span>
             <input
               value={tags}
               onChange={e => handleTags(e.target.value)}
@@ -182,7 +189,7 @@ function PostEditor({
               style={{
                 background: 'none', border: 'none', outline: 'none',
                 fontFamily: 'var(--font-roboto-flex)', fontSize: 11, letterSpacing: '0.04em',
-                color: 'hsl(0 0% 50%)', caretColor: 'hsl(158 64% 36%)',
+                color: isLight ? 'hsl(220 12% 40%)' : 'hsl(0 0% 50%)', caretColor: 'hsl(158 64% 36%)',
                 flex: 1, minWidth: 0,
               }}
             />
@@ -199,7 +206,7 @@ function PostEditor({
             width: '100%', boxSizing: 'border-box',
             background: 'none', border: 'none', outline: 'none', resize: 'none',
             fontFamily: 'var(--font-roboto-flex)', fontSize: 12, letterSpacing: '0.03em',
-            color: 'hsl(0 0% 44%)', caretColor: 'hsl(158 64% 36%)',
+            color: isLight ? 'hsl(220 10% 44%)' : 'hsl(0 0% 44%)', caretColor: 'hsl(158 64% 36%)',
             marginBottom: 16, lineHeight: 1.55,
           }}
         />
@@ -215,7 +222,7 @@ function PostEditor({
             flex: 1, width: '100%', boxSizing: 'border-box',
             background: 'none', border: 'none', outline: 'none', resize: 'none',
             fontFamily: 'monospace', fontSize: 13, letterSpacing: '0.02em',
-            color: 'hsl(0 0% 60%)', caretColor: 'hsl(158 64% 36%)',
+            color: isLight ? 'hsl(220 14% 34%)' : 'hsl(0 0% 60%)', caretColor: 'hsl(158 64% 36%)',
             lineHeight: 1.7,
           }}
         />
@@ -224,29 +231,31 @@ function PostEditor({
       {/* Bottom bar */}
       <div style={{
         flexShrink: 0, padding: '12px 36px',
-        borderTop: '1px solid hsl(0 0% 13%)',
+        borderTop: `1px solid ${isLight ? 'hsl(220 8% 90%)' : 'hsl(0 0% 13%)'}`,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
           <button
             onClick={() => onPublishToggle(post.id, !post.published)}
             style={{
-              fontSize: 10, letterSpacing: '0.18em',
+              fontSize: 11,
               color: post.published ? 'hsl(0 62% 52%)' : 'hsl(158 64% 42%)',
               background: 'none',
               border: `1px solid ${post.published ? 'hsl(0 62% 52% / 0.28)' : 'hsl(158 64% 36% / 0.28)'}`,
+              borderRadius: 6,
               padding: '4px 12px', cursor: 'pointer', transition: 'all 0.12s',
               fontFamily: 'var(--font-roboto-flex)',
             }}
             onMouseEnter={e => e.currentTarget.style.opacity = '0.75'}
             onMouseLeave={e => e.currentTarget.style.opacity = '1'}
           >
-            {post.published ? '> unpublish' : '> publish'}
+            {post.published ? 'Unpublish' : 'Publish'}
           </button>
 
           <span style={{
-            fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase',
-            color: post.published ? 'hsl(158 64% 40%)' : 'hsl(0 0% 26%)',
+            fontSize: 10,
+            color: post.published ? 'hsl(158 64% 40%)' : (isLight ? 'hsl(220 8% 54%)' : 'hsl(0 0% 26%)'),
+            fontFamily: 'var(--font-roboto-flex)',
           }}>
             {post.published ? 'live' : 'draft'}
           </span>
@@ -255,18 +264,18 @@ function PostEditor({
         <div>
           {confirmDel ? (
             <span style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-              <button onClick={() => onDelete(post.id)} style={{ color: 'hsl(0 62% 52%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 9, letterSpacing: '0.12em', padding: 0, fontFamily: 'var(--font-roboto-flex)' }}>rm</button>
-              <button onClick={() => setConfirmDel(false)} style={{ color: 'hsl(0 0% 28%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 9, letterSpacing: '0.12em', padding: 0, fontFamily: 'var(--font-roboto-flex)' }}>no</button>
+              <button onClick={() => onDelete(post.id)} style={{ color: 'hsl(0 62% 52%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, padding: 0, fontFamily: 'var(--font-roboto-flex)' }}>Delete</button>
+              <button onClick={() => setConfirmDel(false)} style={{ color: isLight ? 'hsl(220 8% 62%)' : 'hsl(0 0% 28%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, padding: 0, fontFamily: 'var(--font-roboto-flex)' }}>Cancel</button>
             </span>
           ) : (
             <button
               onClick={() => setConfirmDel(true)}
               style={{
-                color: 'hsl(0 0% 28%)', background: 'none', border: 'none',
+                color: isLight ? 'hsl(220 8% 62%)' : 'hsl(0 0% 28%)', background: 'none', border: 'none',
                 cursor: 'pointer', padding: 0, display: 'flex', transition: 'color 0.12s',
               }}
               onMouseEnter={e => e.currentTarget.style.color = 'hsl(0 62% 52%)'}
-              onMouseLeave={e => e.currentTarget.style.color = 'hsl(0 0% 28%)'}
+              onMouseLeave={e => e.currentTarget.style.color = isLight ? 'hsl(220 8% 62%)' : 'hsl(0 0% 28%)'}
             >
               <IcTrash />
             </button>
@@ -279,6 +288,7 @@ function PostEditor({
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function BlogDashboardPage() {
+  const { isLight } = useDashboardTheme()
   const [posts,       setPosts]       = useState<PostItem[]>([])
   const [activePost,  setActivePost]  = useState<Post | null>(null)
   const [loading,     setLoading]     = useState(true)
@@ -357,24 +367,29 @@ export default function BlogDashboardPage() {
       {/* ── Left panel ──────────────────────────────────── */}
       <div style={{
         width: 280, minWidth: 280, flexShrink: 0,
-        background: 'hsl(0 0% 7%)',
-        borderRight: '1px solid hsl(0 0% 16%)',
+        background: isLight ? 'hsl(0 0% 100%)' : 'hsl(0 0% 7%)',
+        borderRight: `1px solid ${isLight ? 'hsl(220 8% 88%)' : 'hsl(0 0% 16%)'}`,
         display: 'flex', flexDirection: 'column',
         overflow: 'hidden',
       }}>
 
         {/* Header */}
-        <div style={{ padding: '14px 14px 12px', borderBottom: '1px solid hsl(0 0% 13%)', flexShrink: 0 }}>
+        <div style={{
+          padding: '14px 14px 12px',
+          borderBottom: `1px solid ${isLight ? 'hsl(220 8% 92%)' : 'hsl(0 0% 13%)'}`,
+          flexShrink: 0,
+        }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 11 }}>
-            <span style={{ fontSize: 9, letterSpacing: '0.3em', color: 'hsl(0 0% 26%)', textTransform: 'uppercase' }}>
-              // posts
+            <span style={{ fontSize: 11, color: isLight ? 'hsl(220 8% 52%)' : 'hsl(0 0% 26%)' }}>
+              Posts
             </span>
             <button onClick={createPost} disabled={creating}
               style={{
                 display: 'flex', alignItems: 'center', gap: 5,
-                fontSize: 10, letterSpacing: '0.18em',
-                color: creating ? 'hsl(0 0% 28%)' : 'hsl(158 64% 42%)',
+                fontSize: 11,
+                color: creating ? (isLight ? 'hsl(220 8% 62%)' : 'hsl(0 0% 28%)') : 'hsl(158 64% 42%)',
                 background: 'none', border: 'none',
+                borderRadius: 6,
                 cursor: creating ? 'not-allowed' : 'pointer',
                 padding: 0, transition: 'color 0.12s',
                 fontFamily: 'var(--font-roboto-flex)',
@@ -388,7 +403,11 @@ export default function BlogDashboardPage() {
 
           {/* Search */}
           <div style={{ position: 'relative' }}>
-            <div style={{ position: 'absolute', left: 9, top: '50%', transform: 'translateY(-50%)', color: 'hsl(0 0% 26%)', pointerEvents: 'none', display: 'flex' }}>
+            <div style={{
+              position: 'absolute', left: 9, top: '50%', transform: 'translateY(-50%)',
+              color: isLight ? 'hsl(220 8% 60%)' : 'hsl(0 0% 26%)',
+              pointerEvents: 'none', display: 'flex',
+            }}>
               <IcSearch />
             </div>
             <input
@@ -398,8 +417,11 @@ export default function BlogDashboardPage() {
               style={{
                 width: '100%', boxSizing: 'border-box',
                 padding: '6px 10px 6px 28px',
-                background: 'hsl(0 0% 5%)', border: '1px solid hsl(0 0% 17%)',
-                color: 'hsl(0 0% 62%)', fontSize: 11, letterSpacing: '0.04em',
+                background: isLight ? 'hsl(0 0% 97%)' : 'hsl(0 0% 5%)',
+                border: `1px solid ${isLight ? 'hsl(220 8% 88%)' : 'hsl(0 0% 17%)'}`,
+                borderRadius: 6,
+                color: isLight ? 'hsl(220 14% 32%)' : 'hsl(0 0% 62%)',
+                fontSize: 11, letterSpacing: '0.04em',
                 outline: 'none', fontFamily: 'var(--font-roboto-flex)',
               }}
             />
@@ -409,13 +431,13 @@ export default function BlogDashboardPage() {
         {/* List */}
         <div style={{ flex: 1, overflowY: 'auto' }}>
           {loading && (
-            <div style={{ padding: '16px 14px', fontSize: 9, letterSpacing: '0.25em', color: 'hsl(0 0% 24%)', textTransform: 'uppercase' }}>
-              // loading...
+            <div style={{ padding: '16px 14px', fontSize: 11, color: isLight ? 'hsl(220 8% 52%)' : 'hsl(0 0% 24%)' }}>
+              Loading...
             </div>
           )}
           {!loading && filtered.length === 0 && (
-            <div style={{ padding: '16px 14px', fontSize: 9, letterSpacing: '0.25em', color: 'hsl(0 0% 24%)', textTransform: 'uppercase' }}>
-              // no posts yet
+            <div style={{ padding: '16px 14px', fontSize: 11, color: isLight ? 'hsl(220 8% 52%)' : 'hsl(0 0% 24%)' }}>
+              No posts yet
             </div>
           )}
           {filtered.map(post => {
@@ -428,7 +450,7 @@ export default function BlogDashboardPage() {
                 onMouseLeave={() => setHoveredId(null)}
                 style={{
                   borderLeft: `2px solid ${isActive ? 'hsl(158 64% 36%)' : 'transparent'}`,
-                  background: isActive ? 'hsl(158 64% 36% / 0.07)' : isHov ? 'hsl(0 0% 10%)' : 'transparent',
+                  background: isActive ? 'hsl(158 64% 36% / 0.07)' : isHov ? (isLight ? 'hsl(220 8% 96%)' : 'hsl(0 0% 10%)') : 'transparent',
                   transition: 'all 0.1s', cursor: 'pointer',
                   padding: '10px 12px 10px 10px',
                 }}
@@ -436,20 +458,20 @@ export default function BlogDashboardPage() {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 3 }}>
                   <div style={{
                     fontSize: 12, letterSpacing: '0.03em',
-                    color: isActive ? 'hsl(0 0% 82%)' : 'hsl(0 0% 55%)',
+                    color: isActive ? (isLight ? 'hsl(220 20% 14%)' : 'hsl(0 0% 82%)') : (isLight ? 'hsl(220 12% 40%)' : 'hsl(0 0% 55%)'),
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                     flex: 1, marginRight: 8,
                   }}>
                     {post.title || 'Untitled'}
                   </div>
                   <span style={{
-                    fontSize: 8, letterSpacing: '0.2em', textTransform: 'uppercase', flexShrink: 0,
-                    color: post.published ? 'hsl(158 64% 42%)' : 'hsl(0 0% 26%)',
+                    fontSize: 9, letterSpacing: '0.06em', flexShrink: 0,
+                    color: post.published ? 'hsl(158 64% 42%)' : (isLight ? 'hsl(220 8% 54%)' : 'hsl(0 0% 26%)'),
                   }}>
                     {post.published ? 'live' : 'draft'}
                   </span>
                 </div>
-                <div style={{ fontSize: 9, letterSpacing: '0.15em', color: 'hsl(0 0% 26%)', textTransform: 'uppercase' }}>
+                <div style={{ fontSize: 10, color: isLight ? 'hsl(220 8% 54%)' : 'hsl(0 0% 26%)' }}>
                   {reltime(post.updated_at)}
                 </div>
               </div>
@@ -459,20 +481,25 @@ export default function BlogDashboardPage() {
       </div>
 
       {/* ── Right panel ─────────────────────────────────── */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'hsl(0 0% 10%)' }}>
+      <div style={{
+        flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden',
+        background: isLight ? 'hsl(0 0% 98%)' : 'hsl(0 0% 10%)',
+      }}>
 
         {!activePost && !loadingPost && (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
-            <div style={{ fontSize: 10, letterSpacing: '0.3em', color: 'hsl(0 0% 22%)', textTransform: 'uppercase' }}>
-              // select a post or create one
+            <div style={{ fontSize: 11, color: isLight ? 'hsl(220 8% 52%)' : 'hsl(0 0% 22%)' }}>
+              Select a post to start
             </div>
             <button onClick={createPost}
               style={{
                 display: 'flex', alignItems: 'center', gap: 7,
-                fontSize: 11, letterSpacing: '0.15em',
+                fontSize: 11,
                 color: 'hsl(158 64% 42%)',
                 background: 'none', border: '1px solid hsl(158 64% 18%)',
+                borderRadius: 8,
                 padding: '7px 18px', cursor: 'pointer', transition: 'all 0.12s',
+                fontFamily: 'var(--font-roboto-flex)',
               }}
               onMouseEnter={e => { e.currentTarget.style.color = 'hsl(158 64% 58%)'; e.currentTarget.style.borderColor = 'hsl(158 64% 30%)' }}
               onMouseLeave={e => { e.currentTarget.style.color = 'hsl(158 64% 42%)'; e.currentTarget.style.borderColor = 'hsl(158 64% 18%)' }}
@@ -484,8 +511,8 @@ export default function BlogDashboardPage() {
 
         {loadingPost && (
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ fontSize: 10, letterSpacing: '0.3em', color: 'hsl(0 0% 22%)', textTransform: 'uppercase' }}>
-              // loading...
+            <div style={{ fontSize: 11, color: isLight ? 'hsl(220 8% 52%)' : 'hsl(0 0% 22%)' }}>
+              Loading...
             </div>
           </div>
         )}
@@ -497,6 +524,7 @@ export default function BlogDashboardPage() {
             onSave={savePost}
             onDelete={deletePost}
             onPublishToggle={togglePublish}
+            isLight={isLight}
           />
         )}
       </div>

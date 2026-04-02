@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { IProject } from '@/types';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
-import { ExternalLink, Github } from 'lucide-react';
+import { Github } from 'lucide-react';
 import { useRef } from 'react';
 
 interface Props {
@@ -102,11 +102,12 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
     });
 
     return (
-        <div
-            className="project-item group leading-none py-5 first:!pt-0 last:pb-0 md:group-hover/projects:opacity-30 md:hover:!opacity-100 transition-all"
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-        >
+        <>
+            <div
+                className="project-item group leading-none py-5 first:!pt-0 last:pb-0 md:group-hover/projects:opacity-30 md:hover:!opacity-100 transition-all"
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+            >
             {selectedProject === null && project.thumbnail && (
                 <img
                     src={project.thumbnail}
@@ -160,13 +161,13 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
                             </h4>
                         </TransitionLink>
                         {(project.sourceCode || project.liveUrl) && (
-                            <div className="inline-flex items-center justify-center gap-2.5 pt-2 shrink-0">
+                            <div className="inline-flex items-center justify-center gap-4 pt-2 shrink-0">
                                 {project.sourceCode && (
                                     <a
                                         href={project.sourceCode}
                                         target="_blank"
                                         rel="noreferrer noopener"
-                                        className="inline-flex items-center justify-center size-11 rounded-full border border-border text-muted-foreground hover:text-primary hover:border-primary/45 transition-colors"
+                                        className="inline-flex items-center justify-center text-muted-foreground hover:text-primary transition-colors"
                                         aria-label={`${project.title} GitHub`}
                                         onClick={(e) => e.stopPropagation()}
                                     >
@@ -178,11 +179,12 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
                                         href={project.liveUrl}
                                         target="_blank"
                                         rel="noreferrer noopener"
-                                        className="inline-flex items-center justify-center size-11 rounded-full border border-border text-muted-foreground hover:text-primary hover:border-primary/45 transition-colors"
+                                        className="inline-flex items-center gap-2 text-[11px] sm:text-xs uppercase tracking-[0.14em] text-muted-foreground hover:text-primary transition-colors live-demo-link"
                                         aria-label={`${project.title} website`}
                                         onClick={(e) => e.stopPropagation()}
                                     >
-                                        <ExternalLink size={22} />
+                                        <span className="live-demo-dot inline-block size-2 rounded-full bg-red-500" />
+                                        <span>LIVE Demo</span>
                                     </a>
                                 )}
                             </div>
@@ -210,7 +212,23 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
                     )}
                 </div>
             </div>
-        </div>
+            </div>
+            <style jsx>{`
+                .live-demo-dot {
+                    animation: liveDotBlink 1.15s ease-in-out infinite;
+                }
+
+                @keyframes liveDotBlink {
+                    0%,
+                    100% {
+                        opacity: 0.25;
+                    }
+                    50% {
+                        opacity: 1;
+                    }
+                }
+            `}</style>
+        </>
     );
 };
 

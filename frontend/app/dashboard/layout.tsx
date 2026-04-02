@@ -377,15 +377,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           padding: '0 28px',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 13, color: 'hsl(220 6% 30%)', letterSpacing: '-0.01em' }}>
+            <span style={{ fontSize: 13, letterSpacing: '-0.01em', color: isLight ? 'hsl(220 14% 42%)' : 'hsl(220 8% 50%)' }}>
               Dashboard
             </span>
             {segments.map((seg, i) => (
               <span key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ color: 'hsl(220 6% 24%)', fontSize: 16, lineHeight: 1, fontWeight: 300 }}>›</span>
+                <span style={{ fontSize: 16, lineHeight: 1, fontWeight: 300, color: isLight ? 'hsl(220 10% 62%)' : 'hsl(220 8% 36%)' }}>›</span>
                 <span style={{
                   fontSize: 13, letterSpacing: '-0.01em',
-                  color: i === segments.length - 1 ? 'hsl(220 12% 70%)' : 'hsl(220 8% 40%)',
+                  color: i === segments.length - 1
+                    ? (isLight ? 'hsl(220 18% 22%)' : 'hsl(220 12% 70%)')
+                    : (isLight ? 'hsl(220 14% 40%)' : 'hsl(220 8% 46%)'),
                   fontWeight: i === segments.length - 1 ? 500 : 400,
                   textTransform: 'capitalize',
                 }}>
@@ -417,7 +419,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               background: 'hsl(158 64% 42%)',
               boxShadow: '0 0 0 2px hsl(158 64% 42% / 0.22)',
             }} />
-            <span style={{ fontSize: 12, color: 'hsl(220 6% 34%)', letterSpacing: '-0.01em' }}>
+            <span style={{ fontSize: 12, letterSpacing: '-0.01em', color: isLight ? 'hsl(220 12% 42%)' : 'hsl(220 8% 50%)' }}>
               Online
             </span>
           </div>
