@@ -8,6 +8,10 @@
         --background-light: 0 0% 19%;
         --foreground: 0 0% 87%;
 
+        --dash-bg: 226 12% 10%;
+        --dash-sidebar: 228 14% 7%;
+        --dash-header: 227 13% 9%;
+
         --card: 0 0% 3.9%;
         --card-foreground: 0 0% 98%;
         --popover: 0 0% 3.9%;
@@ -37,6 +41,10 @@
         --background: 0 0% 97%;
         --background-light: 0 0% 91%;
         --foreground: 0 0% 10%;
+
+        --dash-bg: 0 0% 96%;
+        --dash-sidebar: 0 0% 100%;
+        --dash-header: 0 0% 100%;
 
         --card: 0 0% 100%;
         --card-foreground: 0 0% 10%;
