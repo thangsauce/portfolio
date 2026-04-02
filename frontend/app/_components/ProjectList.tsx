@@ -280,7 +280,7 @@ const ProjectList = () => {
     return (
         <section className="pb-section" id="selected-projects">
             <div className="container">
-                <div className="flex items-center gap-3 mb-10">
+                <div className="flex items-center gap-3 mb-6 md:mb-10">
                     <span className="text-primary font-mono text-xl leading-none select-none">&lt;</span>
                     <h2 className="text-xl uppercase leading-none tracking-widest">
                         PROJECTS
@@ -320,8 +320,8 @@ const ProjectList = () => {
                         </div>
                     )}
 
-                    <div className="flex flex-col max-md:gap-10 md:pr-[230px] xl:pr-[390px]" ref={projectListRef}>
-                        <div className="mb-6 flex flex-wrap items-center gap-2.5">
+                    <div className="flex flex-col max-md:gap-4 md:pr-[230px] xl:pr-[390px]" ref={projectListRef}>
+                        <div className="mb-4 md:mb-6 flex flex-wrap items-center gap-2.5">
                             {categories.map((category) => (
                                 <button
                                     key={category.key}
@@ -343,7 +343,7 @@ const ProjectList = () => {
                             ))}
                         </div>
 
-                        <div className="mb-6 flex items-center gap-3">
+                        <div className="mb-4 md:mb-6 flex items-center gap-3">
                             <button
                                 type="button"
                                 onClick={() => flipProject(-1)}

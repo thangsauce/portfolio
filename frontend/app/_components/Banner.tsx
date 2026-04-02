@@ -239,7 +239,7 @@ const Banner = () => {
                                     network
                                 </button>
                             </span>
-                            <span className="mt-1 block">I love taking new ideas and build it into a functioning product.</span>
+                            <span className="mt-1 block">and I love taking new ideas and build it into a functioning product.</span>
                         </p>
                         <div className="flex gap-4 flex-wrap mt-9 banner-button slide-up-and-fade">
                             <Button

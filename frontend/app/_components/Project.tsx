@@ -105,7 +105,7 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
     return (
         <>
             <div
-                className="project-item group leading-none py-5 first:!pt-0 last:pb-0 md:group-hover/projects:opacity-30 md:hover:!opacity-100 transition-all"
+                className="project-item group leading-none py-3 md:py-5 first:!pt-0 last:pb-0 md:group-hover/projects:opacity-30 md:hover:!opacity-100 transition-all"
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
             >
@@ -114,7 +114,7 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
                     src={project.thumbnail}
                     alt="Project"
                     className={cn(
-                        'w-full object-cover mb-6 aspect-[3/2] object-top',
+                        'w-full object-cover mb-4 md:mb-6 aspect-[3/2] object-top',
                     )}
                     key={project.slug}
                     loading="lazy"
