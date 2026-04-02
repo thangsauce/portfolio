@@ -28,12 +28,12 @@ function IcSave()  { return <svg {...sv}><polyline points="2,9 6,13 14,3"/></svg
 // ─── Shared styles ────────────────────────────────────────────────────────────
 const iSt: React.CSSProperties = {
   width: '100%', padding: '8px 11px', boxSizing: 'border-box',
-  background: 'hsl(0 0% 5%)', border: '1px solid hsl(0 0% 20%)',
-  color: 'hsl(0 0% 78%)', fontSize: 12, letterSpacing: '0.04em',
+  background: 'hsl(var(--dash-input))', border: '1px solid hsl(var(--dash-border))',
+  color: 'hsl(var(--dash-fg))', fontSize: 12, letterSpacing: '0.04em',
   outline: 'none', fontFamily: 'var(--font-roboto-flex)',
 }
-const thSt: React.CSSProperties = { padding: '8px 14px', textAlign: 'left', fontSize: 9, letterSpacing: '0.28em', textTransform: 'uppercase', color: 'hsl(0 0% 26%)', borderBottom: '1px solid hsl(0 0% 15%)', whiteSpace: 'nowrap' }
-const tdSt: React.CSSProperties = { padding: '9px 14px', fontSize: 11, letterSpacing: '0.04em', color: 'hsl(0 0% 55%)', borderBottom: '1px solid hsl(0 0% 12%)', verticalAlign: 'middle' }
+const thSt: React.CSSProperties = { padding: '8px 14px', textAlign: 'left', fontSize: 9, letterSpacing: '0.28em', textTransform: 'uppercase', color: 'hsl(var(--dash-fg-dim))', borderBottom: '1px solid hsl(var(--dash-border-subtle))', whiteSpace: 'nowrap' }
+const tdSt: React.CSSProperties = { padding: '9px 14px', fontSize: 11, letterSpacing: '0.04em', color: 'hsl(var(--dash-fg-muted))', borderBottom: '1px solid hsl(var(--dash-border-subtle))', verticalAlign: 'middle' }
 
 // ─── Field wrapper ────────────────────────────────────────────────────────────
 function Fld({ label, children }: { label: string; children: React.ReactNode }) {
@@ -455,7 +455,7 @@ export default function PortfolioPage() {
               }}
               style={{ ...iSt, padding: '6px 11px' }}
             />
-            <div style={{ fontSize: 10, letterSpacing: '0.08em', color: 'hsl(0 0% 32%)', marginTop: 6 }}>
+            <div style={{ fontSize: 10, letterSpacing: '0.08em', color: 'hsl(var(--dash-fg-dim))', marginTop: 6 }}>
               {uploadingProjectImage.thumbnail ? 'uploading_thumbnail...' : 'upload thumbnail (jpg/png/webp/gif) from computer'}
             </div>
           </div>
@@ -474,7 +474,7 @@ export default function PortfolioPage() {
               }}
               style={{ ...iSt, padding: '6px 11px' }}
             />
-            <div style={{ fontSize: 10, letterSpacing: '0.08em', color: 'hsl(0 0% 32%)', marginTop: 6 }}>
+            <div style={{ fontSize: 10, letterSpacing: '0.08em', color: 'hsl(var(--dash-fg-dim))', marginTop: 6 }}>
               {uploadingProjectImage.long ? 'uploading_long...' : 'upload long image from computer'}
             </div>
           </div>
@@ -494,7 +494,7 @@ export default function PortfolioPage() {
               }}
               style={{ ...iSt, padding: '6px 11px' }}
             />
-            <div style={{ fontSize: 10, letterSpacing: '0.08em', color: 'hsl(0 0% 32%)', marginTop: 6 }}>
+            <div style={{ fontSize: 10, letterSpacing: '0.08em', color: 'hsl(var(--dash-fg-dim))', marginTop: 6 }}>
               {uploadingProjectImage.gallery ? 'uploading_gallery...' : 'upload one or many gallery images from computer'}
             </div>
           </div>
@@ -507,31 +507,31 @@ export default function PortfolioPage() {
             <div style={{ display: 'grid', gap: 8 }}>
               {pf.image_thumbnail && (
                 <div>
-                  <div style={{ fontSize: 9, letterSpacing: '0.12em', color: 'hsl(0 0% 36%)', marginBottom: 4 }}>
+                  <div style={{ fontSize: 9, letterSpacing: '0.12em', color: 'hsl(var(--dash-fg-dim))', marginBottom: 4 }}>
                     thumbnail (recommended 1200x800, ratio 3:2)
                   </div>
                   <img
                     src={pf.image_thumbnail}
                     alt="Thumbnail preview"
-                    style={{ width: '100%', maxHeight: 120, objectFit: 'cover', border: '1px solid hsl(0 0% 20%)', borderRadius: 6 }}
+                    style={{ width: '100%', maxHeight: 120, objectFit: 'cover', border: '1px solid hsl(var(--dash-border))', borderRadius: 6 }}
                   />
                 </div>
               )}
               {pf.image_long && (
                 <div>
-                  <div style={{ fontSize: 9, letterSpacing: '0.12em', color: 'hsl(0 0% 36%)', marginBottom: 4 }}>
+                  <div style={{ fontSize: 9, letterSpacing: '0.12em', color: 'hsl(var(--dash-fg-dim))', marginBottom: 4 }}>
                     long (recommended 900x1200, ratio 3:4 portrait)
                   </div>
                   <img
                     src={pf.image_long}
                     alt="Long image preview"
-                    style={{ width: '100%', maxHeight: 120, objectFit: 'cover', border: '1px solid hsl(0 0% 20%)', borderRadius: 6 }}
+                    style={{ width: '100%', maxHeight: 120, objectFit: 'cover', border: '1px solid hsl(var(--dash-border))', borderRadius: 6 }}
                   />
                 </div>
               )}
               {parseCsvUrls(pf.image_gallery).length > 0 && (
                 <div>
-                  <div style={{ fontSize: 9, letterSpacing: '0.12em', color: 'hsl(0 0% 36%)', marginBottom: 4 }}>
+                  <div style={{ fontSize: 9, letterSpacing: '0.12em', color: 'hsl(var(--dash-fg-dim))', marginBottom: 4 }}>
                     gallery (recommended 1500x800, ratio 15:8)
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 6 }}>
@@ -540,7 +540,7 @@ export default function PortfolioPage() {
                         key={url}
                         src={url}
                         alt="Gallery preview"
-                        style={{ width: '100%', height: 64, objectFit: 'cover', border: '1px solid hsl(0 0% 20%)', borderRadius: 4 }}
+                        style={{ width: '100%', height: 64, objectFit: 'cover', border: '1px solid hsl(var(--dash-border))', borderRadius: 4 }}
                       />
                     ))}
                   </div>
@@ -557,7 +557,7 @@ export default function PortfolioPage() {
           <label style={{ display: 'flex', alignItems: 'center', gap: 9, cursor: 'pointer' }}>
             <input type="checkbox" checked={pf.featured} style={{ accentColor: 'hsl(158 64% 36%)', width: 13, height: 13 }}
               onChange={e => setPf(p => ({ ...p, featured: e.target.checked }))} />
-            <span style={{ fontSize: 11, color: 'hsl(0 0% 45%)', letterSpacing: '0.08em' }}>show on homepage</span>
+            <span style={{ fontSize: 11, color: 'hsl(var(--dash-fg-muted))', letterSpacing: '0.08em' }}>show on homepage</span>
           </label>
         </Fld>
       </>
@@ -657,7 +657,7 @@ export default function PortfolioPage() {
               style={{ accentColor: 'hsl(158 64% 36%)', width: 13, height: 13 }}
               onChange={e => setEf(p => ({ ...p, featured: e.target.checked }))}
             />
-            <span style={{ fontSize: 11, color: 'hsl(0 0% 45%)', letterSpacing: '0.08em' }}>pin as featured experience</span>
+            <span style={{ fontSize: 11, color: 'hsl(var(--dash-fg-muted))', letterSpacing: '0.08em' }}>pin as featured experience</span>
           </label>
         </Fld>
         <Fld label="order_index">
@@ -695,22 +695,22 @@ export default function PortfolioPage() {
           return categoryPass && featuredPass && queryPass
         })
         .map(p => ({ id: p.id, item: p, cells: [
-        <span key="title" style={{ color: 'hsl(0 0% 76%)' }}>{p.title}</span>,
-        <span key="slug" style={{ fontFamily: 'monospace', fontSize: 10, color: 'hsl(0 0% 38%)' }}>{p.slug}</span>,
-        <span key="done_for" style={{ color: 'hsl(0 0% 62%)', fontSize: 10 }}>{p.done_for ?? '—'}</span>,
+        <span key="title" style={{ color: 'hsl(var(--dash-fg))' }}>{p.title}</span>,
+        <span key="slug" style={{ fontFamily: 'monospace', fontSize: 10, color: 'hsl(var(--dash-fg-muted))' }}>{p.slug}</span>,
+        <span key="done_for" style={{ color: 'hsl(var(--dash-fg-muted))', fontSize: 10 }}>{p.done_for ?? '—'}</span>,
         <span key="category" style={{ color: 'hsl(193 80% 45%)', fontSize: 10, letterSpacing: '0.12em' }}>
           {PROJECT_CATEGORY_LABELS[normalizeProjectCategory(p.category)]}
         </span>,
         <span key="links" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
           {p.source_code_url ? (
-            <span title="GitHub link" style={{ color: 'hsl(0 0% 78%)', fontSize: 12 }}>🐙</span>
+            <span title="GitHub link" style={{ color: 'hsl(var(--dash-fg))', fontSize: 12 }}>🐙</span>
           ) : (
-            <span style={{ color: 'hsl(0 0% 24%)', fontSize: 11 }}>—</span>
+            <span style={{ color: 'hsl(var(--dash-border))', fontSize: 11 }}>—</span>
           )}
           {p.live_url ? (
             <span title="Website link" style={{ color: 'hsl(193 88% 60%)', fontSize: 12 }}>🔗</span>
           ) : (
-            <span style={{ color: 'hsl(0 0% 24%)', fontSize: 11 }}>—</span>
+            <span style={{ color: 'hsl(var(--dash-border))', fontSize: 11 }}>—</span>
           )}
         </span>,
         p.images?.thumbnail ? (
@@ -718,24 +718,24 @@ export default function PortfolioPage() {
             key="thumb"
             src={p.images.thumbnail}
             alt={`${p.title} thumbnail`}
-            style={{ width: 64, height: 42, objectFit: 'cover', borderRadius: 4, border: '1px solid hsl(0 0% 20%)' }}
+            style={{ width: 64, height: 42, objectFit: 'cover', borderRadius: 4, border: '1px solid hsl(var(--dash-border))' }}
           />
         ) : (
-          <span key="thumb-empty" style={{ color: 'hsl(0 0% 26%)', fontSize: 10 }}>—</span>
+          <span key="thumb-empty" style={{ color: 'hsl(var(--dash-fg-dim))', fontSize: 10 }}>—</span>
         ),
         p.images?.long ? (
           <img
             key="long"
             src={p.images.long}
             alt={`${p.title} long`}
-            style={{ width: 44, height: 56, objectFit: 'cover', borderRadius: 4, border: '1px solid hsl(0 0% 20%)' }}
+            style={{ width: 44, height: 56, objectFit: 'cover', borderRadius: 4, border: '1px solid hsl(var(--dash-border))' }}
           />
         ) : (
-          <span key="long-empty" style={{ color: 'hsl(0 0% 26%)', fontSize: 10 }}>—</span>
+          <span key="long-empty" style={{ color: 'hsl(var(--dash-fg-dim))', fontSize: 10 }}>—</span>
         ),
-        <span key="tech" style={{ fontSize: 10, color: 'hsl(0 0% 38%)' }}>{toTechStackArray(p.tech_stack).slice(0, 2).join(', ')}{toTechStackArray(p.tech_stack).length > 2 ? ' …' : ''}</span>,
-        <span key="featured" style={{ color: p.featured ? 'hsl(158 64% 45%)' : 'hsl(0 0% 26%)', fontSize: 10, letterSpacing: '0.15em' }}>{p.featured ? 'yes' : 'no'}</span>,
-        <span key="order" style={{ color: 'hsl(0 0% 35%)' }}>{p.order_index}</span>,
+        <span key="tech" style={{ fontSize: 10, color: 'hsl(var(--dash-fg-muted))' }}>{toTechStackArray(p.tech_stack).slice(0, 2).join(', ')}{toTechStackArray(p.tech_stack).length > 2 ? ' …' : ''}</span>,
+        <span key="featured" style={{ color: p.featured ? 'hsl(158 64% 45%)' : 'hsl(var(--dash-fg-dim))', fontSize: 10, letterSpacing: '0.15em' }}>{p.featured ? 'yes' : 'no'}</span>,
+        <span key="order" style={{ color: 'hsl(var(--dash-fg-dim))' }}>{p.order_index}</span>,
       ]})),
     }
 
@@ -744,10 +744,10 @@ export default function PortfolioPage() {
       rows: stacks
         .filter((s) => includesQ(s.name, s.category ?? '', s.icon_url ?? ''))
         .map(s => ({ id: s.id, item: s, cells: [
-        <span key="name" style={{ color: 'hsl(0 0% 76%)' }}>{s.name}</span>,
+        <span key="name" style={{ color: 'hsl(var(--dash-fg))' }}>{s.name}</span>,
         <span key="category" style={{ color: 'hsl(193 80% 45%)', fontSize: 10, letterSpacing: '0.12em' }}>{s.category ?? '—'}</span>,
-        <span key="icon" style={{ fontSize: 10, color: s.icon_url ? 'hsl(158 64% 42%)' : 'hsl(0 0% 25%)' }}>{s.icon_url ? '✓ set' : '—'}</span>,
-        <span key="order" style={{ color: 'hsl(0 0% 35%)' }}>{s.order_index}</span>,
+        <span key="icon" style={{ fontSize: 10, color: s.icon_url ? 'hsl(158 64% 42%)' : 'hsl(var(--dash-fg-dim))' }}>{s.icon_url ? '✓ set' : '—'}</span>,
+        <span key="order" style={{ color: 'hsl(var(--dash-fg-dim))' }}>{s.order_index}</span>,
       ]})),
     }
 
@@ -756,9 +756,9 @@ export default function PortfolioPage() {
       rows: skills
         .filter((s) => includesQ(s.name, s.icon_url ?? ''))
         .map(s => ({ id: s.id, item: s, cells: [
-        <span key="name" style={{ color: 'hsl(0 0% 76%)' }}>{s.name}</span>,
-        <span key="icon" style={{ fontSize: 10, color: s.icon_url ? 'hsl(158 64% 42%)' : 'hsl(0 0% 25%)' }}>{s.icon_url ? '✓ set' : '—'}</span>,
-        <span key="order" style={{ color: 'hsl(0 0% 35%)' }}>{s.order_index}</span>,
+        <span key="name" style={{ color: 'hsl(var(--dash-fg))' }}>{s.name}</span>,
+        <span key="icon" style={{ fontSize: 10, color: s.icon_url ? 'hsl(158 64% 42%)' : 'hsl(var(--dash-fg-dim))' }}>{s.icon_url ? '✓ set' : '—'}</span>,
+        <span key="order" style={{ color: 'hsl(var(--dash-fg-dim))' }}>{s.order_index}</span>,
       ]})),
     }
 
@@ -767,10 +767,10 @@ export default function PortfolioPage() {
       rows: certs
         .filter((c) => includesQ(c.name, c.issuer ?? '', c.credential_id ?? '', c.url ?? ''))
         .map(c => ({ id: c.id, item: c, cells: [
-        <span key="name" style={{ color: 'hsl(0 0% 76%)' }}>{c.name}</span>,
+        <span key="name" style={{ color: 'hsl(var(--dash-fg))' }}>{c.name}</span>,
         <span key="issuer">{c.issuer ?? '—'}</span>,
-        <span key="date" style={{ fontSize: 10, color: 'hsl(0 0% 38%)', fontFamily: 'monospace' }}>{c.issue_date ?? '—'}</span>,
-        <span key="id" style={{ fontSize: 10, color: 'hsl(0 0% 32%)', fontFamily: 'monospace' }}>{c.credential_id ?? '—'}</span>,
+        <span key="date" style={{ fontSize: 10, color: 'hsl(var(--dash-fg-muted))', fontFamily: 'monospace' }}>{c.issue_date ?? '—'}</span>,
+        <span key="id" style={{ fontSize: 10, color: 'hsl(var(--dash-fg-dim))', fontFamily: 'monospace' }}>{c.credential_id ?? '—'}</span>,
       ]})),
     }
 
@@ -779,11 +779,11 @@ export default function PortfolioPage() {
       rows: experiences
         .filter((e) => includesQ(e.role, e.company, (e.description ?? []).join(' ')))
         .map(e => ({ id: e.id, item: e, cells: [
-        <span key="role" style={{ color: 'hsl(0 0% 76%)' }}>{e.role}</span>,
+        <span key="role" style={{ color: 'hsl(var(--dash-fg))' }}>{e.role}</span>,
         <span key="company" style={{ maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block' }}>{e.company}</span>,
-        <span key="featured" style={{ color: e.featured ? 'hsl(158 64% 45%)' : 'hsl(0 0% 26%)', fontSize: 10, letterSpacing: '0.15em' }}>{e.featured ? 'yes' : 'no'}</span>,
-        <span key="start" style={{ fontSize: 10, color: 'hsl(0 0% 38%)', fontFamily: 'monospace' }}>{e.start_date ?? '—'}</span>,
-        <span key="end" style={{ fontSize: 10, color: e.end_date ? 'hsl(0 0% 38%)' : 'hsl(158 64% 38%)', fontFamily: 'monospace' }}>{e.end_date ?? 'Present'}</span>,
+        <span key="featured" style={{ color: e.featured ? 'hsl(158 64% 45%)' : 'hsl(var(--dash-fg-dim))', fontSize: 10, letterSpacing: '0.15em' }}>{e.featured ? 'yes' : 'no'}</span>,
+        <span key="start" style={{ fontSize: 10, color: 'hsl(var(--dash-fg-muted))', fontFamily: 'monospace' }}>{e.start_date ?? '—'}</span>,
+        <span key="end" style={{ fontSize: 10, color: e.end_date ? 'hsl(var(--dash-fg-muted))' : 'hsl(158 64% 38%)', fontFamily: 'monospace' }}>{e.end_date ?? 'Present'}</span>,
       ]})),
     }
   }
@@ -816,7 +816,7 @@ export default function PortfolioPage() {
         <p style={{ fontSize: 10, letterSpacing: '0.35em', textTransform: 'uppercase', color: 'hsl(158 64% 36%)', marginBottom: 8 }}>
           $ portfolio.cms --mode manage
         </p>
-        <h1 style={{ fontFamily: 'var(--font-anton)', fontSize: 26, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'hsl(0 0% 87%)', lineHeight: 1 }}>
+        <h1 style={{ fontFamily: 'var(--font-anton)', fontSize: 26, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'hsl(var(--dash-fg))', lineHeight: 1 }}>
           PORTFOLIO CMS
         </h1>
       </div>
@@ -835,7 +835,7 @@ export default function PortfolioPage() {
       )}
 
       {/* Tab bar */}
-      <div style={{ display: 'flex', borderBottom: '1px solid hsl(0 0% 16%)' }}>
+      <div style={{ display: 'flex', borderBottom: '1px solid hsl(var(--dash-border))' }}>
         {TABS.map(t => {
           const active = tab === t
           return (
@@ -844,13 +844,13 @@ export default function PortfolioPage() {
               style={{
                 padding: '10px 18px 9px',
                 fontSize: 10, letterSpacing: '0.25em', textTransform: 'uppercase',
-                color: active ? 'hsl(158 64% 55%)' : 'hsl(0 0% 30%)',
+                color: active ? 'hsl(158 64% 55%)' : 'hsl(var(--dash-fg-dim))',
                 background: 'none', border: 'none', outline: 'none',
                 borderBottom: `2px solid ${active ? 'hsl(158 64% 36%)' : 'transparent'}`,
                 marginBottom: -1, cursor: 'pointer', transition: 'color 0.12s',
               }}
-              onMouseEnter={e => { if (!active) (e.currentTarget).style.color = 'hsl(0 0% 52%)' }}
-              onMouseLeave={e => { if (!active) (e.currentTarget).style.color = 'hsl(0 0% 30%)' }}
+              onMouseEnter={e => { if (!active) (e.currentTarget).style.color = 'hsl(var(--dash-fg-muted))' }}
+              onMouseLeave={e => { if (!active) (e.currentTarget).style.color = 'hsl(var(--dash-fg-dim))' }}
             >
               {'// '}
               {TAB_LABELS[t]}
@@ -861,10 +861,10 @@ export default function PortfolioPage() {
 
       {/* Table panel */}
       {tab !== 'resume' && (
-      <div style={{ border: '1px solid hsl(0 0% 16%)', borderTop: 'none', background: 'hsl(0 0% 8%)' }}>
+      <div style={{ border: '1px solid hsl(var(--dash-border))', borderTop: 'none', background: 'hsl(var(--dash-panel))' }}>
 
         {/* Toolbar */}
-        <div style={{ padding: '11px 16px', borderBottom: '1px solid hsl(0 0% 14%)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+        <div style={{ padding: '11px 16px', borderBottom: '1px solid hsl(var(--dash-border-subtle))', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
             <input
               value={query}
@@ -896,7 +896,7 @@ export default function PortfolioPage() {
               </>
             )}
           </div>
-          <span style={{ fontSize: 10, letterSpacing: '0.22em', color: 'hsl(0 0% 26%)' }}>
+          <span style={{ fontSize: 10, letterSpacing: '0.22em', color: 'hsl(var(--dash-fg-dim))' }}>
             {loading ? '// loading...' : `// ${rows.length} shown (${counts[tab]} total)`}
           </span>
           <button onClick={openAdd}
@@ -926,14 +926,14 @@ export default function PortfolioPage() {
             <tbody>
               {rows.length === 0 && !loading && (
                 <tr>
-                  <td colSpan={headers.length + 1} style={{ ...tdSt, textAlign: 'center', color: 'hsl(0 0% 24%)', padding: '28px 0', letterSpacing: '0.2em', fontSize: 10, textTransform: 'uppercase' }}>
+                  <td colSpan={headers.length + 1} style={{ ...tdSt, textAlign: 'center', color: 'hsl(var(--dash-border))', padding: '28px 0', letterSpacing: '0.2em', fontSize: 10, textTransform: 'uppercase' }}>
                     {'// no records'}
                   </td>
                 </tr>
               )}
               {rows.map(({ id, cells, item }) => (
                 <tr key={id}
-                  onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'hsl(0 0% 9.5%)'}
+                  onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'hsl(var(--dash-bg))'}
                   onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
                   style={{ transition: 'background 0.1s' }}
                 >
@@ -941,21 +941,21 @@ export default function PortfolioPage() {
                   <td style={{ ...tdSt, textAlign: 'right' }}>
                     {confirmDel === id ? (
                       <span style={{ display: 'flex', alignItems: 'center', gap: 5, justifyContent: 'flex-end', fontSize: 10, letterSpacing: '0.1em', whiteSpace: 'nowrap' }}>
-                        <span style={{ color: 'hsl(0 0% 30%)' }}>rm?</span>
+                        <span style={{ color: 'hsl(var(--dash-fg-dim))' }}>rm?</span>
                         <button onClick={() => handleDelete(id)} style={{ color: 'hsl(0 62% 55%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 10, padding: 0 }}>yes</button>
-                        <button onClick={() => setConfirmDel(null)} style={{ color: 'hsl(0 0% 32%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 10, padding: 0 }}>no</button>
+                        <button onClick={() => setConfirmDel(null)} style={{ color: 'hsl(var(--dash-fg-dim))', background: 'none', border: 'none', cursor: 'pointer', fontSize: 10, padding: 0 }}>no</button>
                       </span>
                     ) : (
                       <span style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'flex-end' }}>
                         <button onClick={() => openEdit(item)} title="edit"
-                          style={{ color: 'hsl(0 0% 32%)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', transition: 'color 0.12s' }}
+                          style={{ color: 'hsl(var(--dash-fg-dim))', background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', transition: 'color 0.12s' }}
                           onMouseEnter={e => (e.currentTarget).style.color = 'hsl(193 100% 47%)'}
-                          onMouseLeave={e => (e.currentTarget).style.color = 'hsl(0 0% 32%)'}
+                          onMouseLeave={e => (e.currentTarget).style.color = 'hsl(var(--dash-fg-dim))'}
                         ><IcEdit /></button>
                         <button onClick={() => setConfirmDel(id)} title="delete"
-                          style={{ color: 'hsl(0 0% 32%)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', transition: 'color 0.12s' }}
+                          style={{ color: 'hsl(var(--dash-fg-dim))', background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', transition: 'color 0.12s' }}
                           onMouseEnter={e => (e.currentTarget).style.color = 'hsl(0 62% 55%)'}
-                          onMouseLeave={e => (e.currentTarget).style.color = 'hsl(0 0% 32%)'}
+                          onMouseLeave={e => (e.currentTarget).style.color = 'hsl(var(--dash-fg-dim))'}
                         ><IcTrash /></button>
                       </span>
                     )}
@@ -970,9 +970,9 @@ export default function PortfolioPage() {
 
       {/* Resume panel */}
       {tab === 'resume' && (
-        <div style={{ border: '1px solid hsl(0 0% 16%)', borderTop: 'none', background: 'hsl(0 0% 8%)' }}>
-          <div style={{ padding: '11px 16px', borderBottom: '1px solid hsl(0 0% 14%)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-            <span style={{ fontSize: 10, letterSpacing: '0.22em', color: 'hsl(0 0% 26%)' }}>
+        <div style={{ border: '1px solid hsl(var(--dash-border))', borderTop: 'none', background: 'hsl(var(--dash-panel))' }}>
+          <div style={{ padding: '11px 16px', borderBottom: '1px solid hsl(var(--dash-border-subtle))', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+            <span style={{ fontSize: 10, letterSpacing: '0.22em', color: 'hsl(var(--dash-fg-dim))' }}>
               {loading ? '// loading...' : `// ${resumeInfo.hasCustom ? 'custom resume active' : 'using default /resume.pdf'}`}
             </span>
             <a
@@ -995,7 +995,7 @@ export default function PortfolioPage() {
               />
             </Fld>
 
-            <div style={{ fontSize: 10, letterSpacing: '0.08em', color: 'hsl(0 0% 32%)', marginBottom: 14 }}>
+            <div style={{ fontSize: 10, letterSpacing: '0.08em', color: 'hsl(var(--dash-fg-dim))', marginBottom: 14 }}>
               upload a pdf to replace your public resume link on the homepage
             </div>
 
@@ -1006,9 +1006,9 @@ export default function PortfolioPage() {
                 display: 'inline-flex', alignItems: 'center', gap: 7,
                 padding: '9px 14px',
                 fontSize: 11, letterSpacing: '0.15em',
-                color: uploadingResume || !resumeFile ? 'hsl(0 0% 30%)' : 'hsl(158 64% 55%)',
+                color: uploadingResume || !resumeFile ? 'hsl(var(--dash-fg-dim))' : 'hsl(158 64% 55%)',
                 background: 'hsl(158 64% 36% / 0.1)',
-                border: `1px solid ${uploadingResume || !resumeFile ? 'hsl(0 0% 18%)' : 'hsl(158 64% 24%)'}`,
+                border: `1px solid ${uploadingResume || !resumeFile ? 'hsl(var(--dash-border))' : 'hsl(158 64% 24%)'}`,
                 cursor: uploadingResume || !resumeFile ? 'not-allowed' : 'pointer',
               }}
             >
@@ -1030,8 +1030,8 @@ export default function PortfolioPage() {
       {/* Slide panel */}
       <div style={{
         position: 'fixed', top: 44, right: 0, bottom: 0, width: 420,
-        background: 'hsl(0 0% 7%)',
-        borderLeft: '1px solid hsl(0 0% 17%)',
+        background: 'hsl(var(--dash-panel))',
+        borderLeft: '1px solid hsl(var(--dash-border))',
         zIndex: 60,
         transform: panelOpen ? 'translateX(0)' : 'translateX(100%)',
         transition: 'transform 0.24s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -1039,20 +1039,20 @@ export default function PortfolioPage() {
       }}>
 
         {/* Panel header */}
-        <div style={{ padding: '15px 20px', borderBottom: '1px solid hsl(0 0% 14%)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+        <div style={{ padding: '15px 20px', borderBottom: '1px solid hsl(var(--dash-border-subtle))', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
           <div>
             <div style={{ fontSize: 9, letterSpacing: '0.3em', color: 'hsl(158 64% 36%)', textTransform: 'uppercase', marginBottom: 3 }}>
               {'// '}
               {editingId ? 'edit' : 'new'} record
             </div>
-            <div style={{ fontFamily: 'var(--font-anton)', fontSize: 14, letterSpacing: '0.18em', color: 'hsl(0 0% 80%)', textTransform: 'uppercase' }}>
+            <div style={{ fontFamily: 'var(--font-anton)', fontSize: 14, letterSpacing: '0.18em', color: 'hsl(var(--dash-fg))', textTransform: 'uppercase' }}>
               {tab}
             </div>
           </div>
           <button onClick={closePanel}
-            style={{ color: 'hsl(0 0% 32%)', background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', transition: 'color 0.12s' }}
-            onMouseEnter={e => (e.currentTarget).style.color = 'hsl(0 0% 60%)'}
-            onMouseLeave={e => (e.currentTarget).style.color = 'hsl(0 0% 32%)'}
+            style={{ color: 'hsl(var(--dash-fg-dim))', background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', transition: 'color 0.12s' }}
+            onMouseEnter={e => (e.currentTarget).style.color = 'hsl(var(--dash-fg-muted))'}
+            onMouseLeave={e => (e.currentTarget).style.color = 'hsl(var(--dash-fg-dim))'}
           ><IcX /></button>
         </div>
 
@@ -1062,15 +1062,15 @@ export default function PortfolioPage() {
         </div>
 
         {/* Panel footer */}
-        <div style={{ padding: '14px 20px', borderTop: '1px solid hsl(0 0% 14%)', display: 'flex', gap: 10, flexShrink: 0 }}>
+        <div style={{ padding: '14px 20px', borderTop: '1px solid hsl(var(--dash-border-subtle))', display: 'flex', gap: 10, flexShrink: 0 }}>
           <button onClick={handleSave} disabled={saving}
             style={{
               flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
               padding: '9px 0',
               fontSize: 11, letterSpacing: '0.15em',
-              color: saving ? 'hsl(0 0% 30%)' : 'hsl(158 64% 55%)',
+              color: saving ? 'hsl(var(--dash-fg-dim))' : 'hsl(158 64% 55%)',
               background: 'hsl(158 64% 36% / 0.1)',
-              border: `1px solid ${saving ? 'hsl(0 0% 18%)' : 'hsl(158 64% 24%)'}`,
+              border: `1px solid ${saving ? 'hsl(var(--dash-border))' : 'hsl(158 64% 24%)'}`,
               cursor: saving ? 'not-allowed' : 'pointer',
               transition: 'all 0.12s',
             }}
@@ -1081,10 +1081,10 @@ export default function PortfolioPage() {
             style={{
               padding: '9px 16px', fontSize: 11, letterSpacing: '0.15em',
               color: 'hsl(0 62% 50%)', background: 'none',
-              border: '1px solid hsl(0 0% 17%)', cursor: 'pointer', transition: 'border-color 0.12s',
+              border: '1px solid hsl(var(--dash-border))', cursor: 'pointer', transition: 'border-color 0.12s',
             }}
             onMouseEnter={e => (e.currentTarget).style.borderColor = 'hsl(0 62% 32%)'}
-            onMouseLeave={e => (e.currentTarget).style.borderColor = 'hsl(0 0% 17%)'}
+            onMouseLeave={e => (e.currentTarget).style.borderColor = 'hsl(var(--dash-border))'}
           >
             &gt; cancel
           </button>

@@ -49,7 +49,7 @@ const CurrentlyUsing = () => {
             if (isHorizontalMode) {
                 gsap.from('.it-skill-item', {
                     opacity: 0,
-                    x: -30,
+                    y: 24,
                     stagger: 0.15,
                     ease: 'power2.out',
                     duration: 0.8,
@@ -58,7 +58,7 @@ const CurrentlyUsing = () => {
             }
             gsap.from('.it-skill-item', {
                 opacity: 0,
-                x: -30,
+                y: 24,
                 stagger: 0.15,
                 ease: 'power2.out',
                 scrollTrigger: {
@@ -98,20 +98,20 @@ const CurrentlyUsing = () => {
                 </div>
 
                 {skills.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-6 items-start">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-6 items-start justify-items-start">
                         {skills.map((skill) => (
                             <div
                                 key={skill.id}
-                                className="it-skill-item grid grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-3 leading-none min-w-0"
+                                className="it-skill-item flex items-center gap-2.5 leading-none min-w-0 w-full"
                             >
-                                <div className="w-9 h-9 shrink-0 flex items-center justify-center">
+                                <div className="w-8 h-8 shrink-0 flex items-center justify-start">
                                     {skill.icon_url ? (
                                         <Image
                                             src={skill.icon_url}
                                             alt={skill.name}
                                             width={40}
                                             height={40}
-                                            className="w-8 h-8 object-contain"
+                                            className="w-8 h-8 object-contain object-left"
                                         />
                                     ) : null}
                                 </div>
