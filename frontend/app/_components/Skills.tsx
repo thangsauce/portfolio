@@ -9,7 +9,7 @@ import { apiFetch } from '@/lib/api';
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 type Skill = { id: string; name: string; category: string; icon_url: string | null }
-const PREFERRED_CATEGORY_ORDER = ['frontend', 'backend', 'database', 'tools', 'languages']
+const PREFERRED_CATEGORY_ORDER = ['frontend', 'backend', 'database', 'languages', 'tools']
 
 function normalizeSkillCategory(value: string): string {
     const normalized = value.toLowerCase().trim().replace(/[\s-]+/g, '_');
@@ -110,9 +110,9 @@ const Skills = () => {
                                     {formatCategoryLabel(category)}
                                 </p>
                             </div>
-                            <div className="sm:col-span-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-x-6 gap-y-5 items-start justify-items-start">
+                            <div className="sm:col-span-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-x-6 gap-y-8 items-start justify-items-start">
                                 {items.map((item) => (
-                                    <div className="slide-up flex items-center gap-2.5 leading-none min-w-0 w-full" key={item.id}>
+                                    <div key={item.id} className="slide-up flex items-center gap-2.5 min-w-0 w-full">
                                         <div className="w-8 h-8 shrink-0 flex items-center justify-start">
                                             {item.icon_url ? (
                                                 <Image
@@ -124,7 +124,7 @@ const Skills = () => {
                                                 />
                                             ) : null}
                                         </div>
-                                        <span className="text-lg md:text-xl capitalize break-words">{item.name}</span>
+                                        <span className="text-base md:text-lg leading-tight capitalize break-words">{item.name}</span>
                                     </div>
                                 ))}
                             </div>

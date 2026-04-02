@@ -26,7 +26,7 @@ export default function Home() {
             <div className="page- md:pl-40 lg:pl-64 xl:pl-80">
                 <Experiences />
             </div>
-            <div className="page- md:pl-44 lg:pl-72 xl:pl-96">
+            <div className="page- md:pl-56 lg:pl-88 xl:pl-[28rem]">
                 <Skills />
             </div>
             <div className="page- md:pl-64 lg:pl-88 xl:pl-[24rem]">
