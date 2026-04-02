@@ -159,34 +159,37 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
                                 </span>
                             </h4>
                         </TransitionLink>
-
-                        <div className="flex items-center gap-2.5 pt-2">
-                            {project.sourceCode && (
-                                <a
-                                    href={project.sourceCode}
-                                    target="_blank"
-                                    rel="noreferrer noopener"
-                                    className="text-muted-foreground hover:text-primary transition-colors"
-                                    aria-label={`${project.title} GitHub`}
-                                    onClick={(e) => e.stopPropagation()}
-                                >
-                                    <Github size={18} />
-                                </a>
-                            )}
-                            {project.liveUrl && (
-                                <a
-                                    href={project.liveUrl}
-                                    target="_blank"
-                                    rel="noreferrer noopener"
-                                    className="text-muted-foreground hover:text-primary transition-colors"
-                                    aria-label={`${project.title} website`}
-                                    onClick={(e) => e.stopPropagation()}
-                                >
-                                    <ExternalLink size={18} />
-                                </a>
-                            )}
-                        </div>
                     </div>
+                    {(project.sourceCode || project.liveUrl) && (
+                        <div className="mt-3 flex justify-center">
+                            <div className="inline-flex items-center justify-center gap-2.5">
+                                {project.sourceCode && (
+                                    <a
+                                        href={project.sourceCode}
+                                        target="_blank"
+                                        rel="noreferrer noopener"
+                                        className="inline-flex items-center justify-center size-11 rounded-full border border-border text-muted-foreground hover:text-primary hover:border-primary/45 transition-colors"
+                                        aria-label={`${project.title} GitHub`}
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        <Github size={22} />
+                                    </a>
+                                )}
+                                {project.liveUrl && (
+                                    <a
+                                        href={project.liveUrl}
+                                        target="_blank"
+                                        rel="noreferrer noopener"
+                                        className="inline-flex items-center justify-center size-11 rounded-full border border-border text-muted-foreground hover:text-primary hover:border-primary/45 transition-colors"
+                                        aria-label={`${project.title} website`}
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        <ExternalLink size={22} />
+                                    </a>
+                                )}
+                            </div>
+                        </div>
+                    )}
                     <div className="mt-2 flex flex-wrap gap-3 text-muted-foreground text-xs">
                         {project.techStack
                             .slice(0, 3)

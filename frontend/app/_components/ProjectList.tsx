@@ -309,7 +309,7 @@ const ProjectList = () => {
                         </div>
                     )}
 
-                    <div className="flex flex-col max-md:gap-10" ref={projectListRef}>
+                    <div className="flex flex-col max-md:gap-10 md:pr-[230px] xl:pr-[390px]" ref={projectListRef}>
                         <div className="mb-6 flex flex-wrap items-center gap-2.5">
                             {categories.map((category) => (
                                 <button
