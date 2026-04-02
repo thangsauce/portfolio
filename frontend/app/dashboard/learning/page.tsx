@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { apiPrivate } from '@/lib/api'
+import { useDashboardTheme } from '../theme-context'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type LStatus = 'to_learn' | 'learning' | 'learned'
@@ -18,10 +19,27 @@ type LearningItem = {
 // ─── Config ───────────────────────────────────────────────────────────────────
 const STATUSES: LStatus[] = ['to_learn', 'learning', 'learned']
 
-const COL: Record<LStatus, { label: string; headerColor: string; bg: string; countColor: string }> = {
-  to_learn: { label: '// to learn', headerColor: 'hsl(0 0% 30%)',      bg: 'hsl(0 0% 8%)',               countColor: 'hsl(0 0% 22%)' },
-  learning: { label: '// lesson',   headerColor: 'hsl(158 64% 42%)',   bg: 'hsl(158 64% 36% / 0.04)',    countColor: 'hsl(158 64% 28%)' },
-  learned:  { label: '// learned',  headerColor: 'hsl(158 64% 28%)',   bg: 'hsl(0 0% 8%)',               countColor: 'hsl(0 0% 22%)' },
+function getColConfig(isLight: boolean) {
+  return {
+    to_learn: {
+      label: 'To Learn',
+      headerColor: isLight ? 'hsl(220 12% 44%)' : 'hsl(0 0% 30%)',
+      bg: isLight ? 'hsl(220 10% 96%)' : 'hsl(0 0% 8%)',
+      countColor: isLight ? 'hsl(220 8% 56%)' : 'hsl(0 0% 22%)',
+    },
+    learning: {
+      label: 'In Progress',
+      headerColor: isLight ? 'hsl(158 48% 38%)' : 'hsl(158 64% 42%)',
+      bg: isLight ? 'hsl(158 64% 42% / 0.06)' : 'hsl(158 64% 36% / 0.04)',
+      countColor: isLight ? 'hsl(158 48% 36%)' : 'hsl(158 64% 28%)',
+    },
+    learned: {
+      label: 'Learned',
+      headerColor: isLight ? 'hsl(158 40% 36%)' : 'hsl(158 64% 28%)',
+      bg: isLight ? 'hsl(220 10% 96%)' : 'hsl(0 0% 8%)',
+      countColor: isLight ? 'hsl(220 8% 56%)' : 'hsl(0 0% 22%)',
+    },
+  }
 }
 
 // ─── Icon ─────────────────────────────────────────────────────────────────────
@@ -34,7 +52,13 @@ const sv = {
 function IcTrash() { return <svg {...sv}><polyline points="2,5 14,5"/><path d="M5 5V3h6v2"/><path d="M4 5l1 9h6l1-9"/></svg> }
 
 // ─── Inline Add ───────────────────────────────────────────────────────────────
-function InlineAdd({ onSubmit, onCancel }: { onSubmit: (t: string) => Promise<void>; onCancel: () => void }) {
+function InlineAdd({
+  isLight, onSubmit, onCancel,
+}: {
+  isLight: boolean
+  onSubmit: (t: string) => Promise<void>
+  onCancel: () => void
+}) {
   const [value, setValue] = useState('')
   const ref = useRef<HTMLInputElement>(null)
 
@@ -48,8 +72,9 @@ function InlineAdd({ onSubmit, onCancel }: { onSubmit: (t: string) => Promise<vo
 
   return (
     <div style={{
-      background: 'hsl(0 0% 12%)',
+      background: isLight ? 'hsl(0 0% 100%)' : 'hsl(0 0% 12%)',
       border: '1px solid hsl(158 64% 36% / 0.35)',
+      borderRadius: 8,
       padding: '10px 12px', marginBottom: 6,
     }}>
       <input
@@ -62,7 +87,8 @@ function InlineAdd({ onSubmit, onCancel }: { onSubmit: (t: string) => Promise<vo
         style={{
           width: '100%', background: 'none', border: 'none', outline: 'none',
           fontFamily: 'var(--font-roboto-flex)',
-          fontSize: 12, letterSpacing: '0.03em', color: 'hsl(0 0% 84%)',
+          fontSize: 12, letterSpacing: '0.03em',
+          color: isLight ? 'hsl(220 18% 14%)' : 'hsl(0 0% 84%)',
           caretColor: 'hsl(158 64% 36%)',
         }}
       />
@@ -72,8 +98,9 @@ function InlineAdd({ onSubmit, onCancel }: { onSubmit: (t: string) => Promise<vo
 
 // ─── Learning Card ────────────────────────────────────────────────────────────
 function LearningCard({
-  item, onUpdate, onDelete, canMoveLeft, canMoveRight, onDragStart, onDragEnd,
+  isLight, item, onUpdate, onDelete, canMoveLeft, canMoveRight, onDragStart, onDragEnd,
 }: {
+  isLight: boolean
   item: LearningItem
   onUpdate: (id: string, patch: Partial<LearningItem>) => Promise<void>
   onDelete: (id: string) => Promise<void>
@@ -131,6 +158,9 @@ function LearningCard({
     if (idx < STATUSES.length - 1) onUpdate(item.id, { status: STATUSES[idx + 1] })
   }
 
+  const arrowColor = isLight ? 'hsl(220 8% 56%)' : 'hsl(0 0% 26%)'
+  const trashColor = isLight ? 'hsl(220 8% 60%)' : 'hsl(0 0% 28%)'
+
   return (
     <div
       onMouseEnter={() => setHovered(true)}
@@ -139,8 +169,11 @@ function LearningCard({
       onDragStart={() => onDragStart(item)}
       onDragEnd={onDragEnd}
       style={{
-        background: 'hsl(0 0% 12%)',
-        border: `1px solid ${hovered ? 'hsl(0 0% 22%)' : 'hsl(0 0% 16%)'}`,
+        background: isLight ? 'hsl(0 0% 100%)' : 'hsl(0 0% 12%)',
+        border: `1px solid ${hovered
+          ? (isLight ? 'hsl(220 8% 82%)' : 'hsl(0 0% 22%)')
+          : (isLight ? 'hsl(220 8% 90%)' : 'hsl(0 0% 16%)')}`,
+        borderRadius: 8,
         padding: '10px 12px', marginBottom: 6,
         transition: 'border-color 0.12s',
         cursor: 'grab',
@@ -157,7 +190,8 @@ function LearningCard({
           style={{
             width: '100%', background: 'none', border: 'none', outline: 'none',
             fontFamily: 'var(--font-roboto-flex)',
-            fontSize: 12, letterSpacing: '0.03em', color: 'hsl(0 0% 84%)',
+            fontSize: 12, letterSpacing: '0.03em',
+            color: isLight ? 'hsl(220 18% 14%)' : 'hsl(0 0% 84%)',
             caretColor: 'hsl(158 64% 36%)', marginBottom: 6,
           }}
         />
@@ -165,7 +199,8 @@ function LearningCard({
         <div
           onClick={() => setEditTitle(true)}
           style={{
-            fontSize: 12, letterSpacing: '0.03em', color: 'hsl(0 0% 72%)',
+            fontSize: 12, letterSpacing: '0.03em',
+            color: isLight ? 'hsl(220 18% 22%)' : 'hsl(0 0% 72%)',
             cursor: 'text', marginBottom: 6,
             overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           }}
@@ -186,7 +221,8 @@ function LearningCard({
           style={{
             background: 'none', border: 'none', outline: 'none',
             fontFamily: 'var(--font-roboto-flex)',
-            fontSize: 9, letterSpacing: '0.18em', color: 'hsl(158 64% 36%)',
+            fontSize: 9, letterSpacing: '0.04em',
+            color: 'hsl(158 64% 36%)',
             caretColor: 'hsl(158 64% 36%)', marginBottom: 6, width: '100%',
           }}
         />
@@ -194,8 +230,8 @@ function LearningCard({
         <div
           onClick={() => setEditCat(true)}
           style={{
-            fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase',
-            color: item.category ? 'hsl(158 64% 30%)' : 'hsl(0 0% 18%)',
+            fontSize: 9, letterSpacing: '0.04em',
+            color: item.category ? 'hsl(158 64% 30%)' : (isLight ? 'hsl(220 8% 72%)' : 'hsl(0 0% 18%)'),
             cursor: 'text', marginBottom: 6,
           }}
         >
@@ -215,10 +251,13 @@ function LearningCard({
           rows={3}
           style={{
             width: '100%', boxSizing: 'border-box',
-            background: 'hsl(0 0% 8%)', border: '1px solid hsl(0 0% 18%)',
+            background: isLight ? 'hsl(0 0% 97%)' : 'hsl(0 0% 8%)',
+            border: `1px solid ${isLight ? 'hsl(220 8% 88%)' : 'hsl(0 0% 18%)'}`,
+            borderRadius: 8,
             outline: 'none', resize: 'none',
             fontFamily: 'var(--font-roboto-flex)',
-            fontSize: 10, letterSpacing: '0.03em', color: 'hsl(0 0% 55%)',
+            fontSize: 10, letterSpacing: '0.03em',
+            color: isLight ? 'hsl(220 12% 40%)' : 'hsl(0 0% 55%)',
             caretColor: 'hsl(158 64% 36%)', padding: '5px 7px',
             marginBottom: 8,
           }}
@@ -227,7 +266,8 @@ function LearningCard({
         <div
           onClick={() => setEditNotes(true)}
           style={{
-            fontSize: 10, letterSpacing: '0.03em', color: 'hsl(0 0% 34%)',
+            fontSize: 10, letterSpacing: '0.03em',
+            color: isLight ? 'hsl(220 10% 48%)' : 'hsl(0 0% 34%)',
             cursor: 'text', marginBottom: 8, lineHeight: 1.5,
             display: '-webkit-box', WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical', overflow: 'hidden',
@@ -239,8 +279,9 @@ function LearningCard({
         <div
           onClick={() => setEditNotes(true)}
           style={{
-            fontSize: 9, letterSpacing: '0.1em',
-            color: 'hsl(0 0% 18%)', cursor: 'text', marginBottom: 8,
+            fontSize: 9, letterSpacing: '0.04em',
+            color: isLight ? 'hsl(220 8% 72%)' : 'hsl(0 0% 18%)',
+            cursor: 'text', marginBottom: 8,
           }}
         >
           + notes
@@ -254,12 +295,13 @@ function LearningCard({
             <button
               onClick={moveLeft}
               style={{
-                fontFamily: 'monospace', fontSize: 11,
-                color: 'hsl(0 0% 26%)', background: 'none', border: 'none',
+                fontSize: 11,
+                color: arrowColor, background: 'none', border: 'none',
                 cursor: 'pointer', padding: '0 4px', transition: 'color 0.1s',
+                borderRadius: 4,
               }}
               onMouseEnter={e => e.currentTarget.style.color = 'hsl(158 64% 42%)'}
-              onMouseLeave={e => e.currentTarget.style.color = 'hsl(0 0% 26%)'}
+              onMouseLeave={e => e.currentTarget.style.color = arrowColor}
             >
               ←
             </button>
@@ -268,12 +310,13 @@ function LearningCard({
             <button
               onClick={moveRight}
               style={{
-                fontFamily: 'monospace', fontSize: 11,
-                color: 'hsl(0 0% 26%)', background: 'none', border: 'none',
+                fontSize: 11,
+                color: arrowColor, background: 'none', border: 'none',
                 cursor: 'pointer', padding: '0 4px', transition: 'color 0.1s',
+                borderRadius: 4,
               }}
               onMouseEnter={e => e.currentTarget.style.color = 'hsl(158 64% 42%)'}
-              onMouseLeave={e => e.currentTarget.style.color = 'hsl(0 0% 26%)'}
+              onMouseLeave={e => e.currentTarget.style.color = arrowColor}
             >
               →
             </button>
@@ -285,28 +328,37 @@ function LearningCard({
             <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
               <button
                 onClick={() => onDelete(item.id)}
-                style={{ color: 'hsl(0 62% 52%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 9, letterSpacing: '0.12em', padding: 0, fontFamily: 'var(--font-roboto-flex)' }}
+                style={{
+                  color: 'hsl(0 62% 52%)', background: 'none', border: 'none',
+                  cursor: 'pointer', fontSize: 11, letterSpacing: '0.03em',
+                  padding: 0, fontFamily: 'var(--font-roboto-flex)', borderRadius: 4,
+                }}
               >
-                rm
+                Delete
               </button>
               <button
                 onClick={() => setConfirmDel(false)}
-                style={{ color: 'hsl(0 0% 28%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 9, letterSpacing: '0.12em', padding: 0, fontFamily: 'var(--font-roboto-flex)' }}
+                style={{
+                  color: trashColor, background: 'none', border: 'none',
+                  cursor: 'pointer', fontSize: 11, letterSpacing: '0.03em',
+                  padding: 0, fontFamily: 'var(--font-roboto-flex)', borderRadius: 4,
+                }}
               >
-                no
+                Cancel
               </button>
             </span>
           ) : (
             <button
               onClick={() => setConfirmDel(true)}
               style={{
-                color: 'hsl(0 0% 28%)', background: 'none', border: 'none',
+                color: trashColor, background: 'none', border: 'none',
                 cursor: 'pointer', padding: 0, display: 'flex',
                 opacity: hovered ? 1 : 0,
                 transition: 'opacity 0.12s, color 0.12s',
+                borderRadius: 4,
               }}
               onMouseEnter={e => e.currentTarget.style.color = 'hsl(0 62% 52%)'}
-              onMouseLeave={e => e.currentTarget.style.color = 'hsl(0 0% 28%)'}
+              onMouseLeave={e => e.currentTarget.style.color = trashColor}
             >
               <IcTrash />
             </button>
@@ -319,11 +371,14 @@ function LearningCard({
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function LearningPage() {
+  const { isLight } = useDashboardTheme()
   const [items,    setItems]    = useState<LearningItem[]>([])
   const [loading,  setLoading]  = useState(true)
   const [addingTo, setAddingTo] = useState<LStatus | null>(null)
   const [draggingItem, setDraggingItem] = useState<LearningItem | null>(null)
   const [dragOverStatus, setDragOverStatus] = useState<LStatus | null>(null)
+
+  const COL = getColConfig(isLight)
 
   useEffect(() => {
     apiPrivate<LearningItem[]>('/learning')
@@ -367,15 +422,9 @@ export default function LearningPage() {
 
   return (
     <div>
-      <div style={{ marginBottom: 24 }}>
-        <span style={{ fontSize: 9, letterSpacing: '0.3em', textTransform: 'uppercase', color: 'hsl(0 0% 26%)' }}>
-          // learning tracker
-        </span>
-      </div>
-
       {loading ? (
-        <div style={{ fontSize: 9, letterSpacing: '0.25em', color: 'hsl(0 0% 22%)', textTransform: 'uppercase' }}>
-          // loading...
+        <div style={{ fontSize: 12, color: isLight ? 'hsl(220 8% 56%)' : 'hsl(0 0% 22%)' }}>
+          Loading...
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, alignItems: 'start' }}>
@@ -402,6 +451,7 @@ export default function LearningPage() {
                 }}
                 style={{
                   background: conf.bg,
+                  borderRadius: 8,
                   padding: 12,
                   outline: isDropTarget ? '1px dashed hsl(158 64% 42% / 0.7)' : 'none',
                   boxShadow: isDropTarget ? 'inset 0 0 0 1px hsl(158 64% 42% / 0.2)' : 'none',
@@ -412,47 +462,43 @@ export default function LearningPage() {
                 {/* Column header */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                    <span style={{ fontSize: 9, letterSpacing: '0.28em', textTransform: 'uppercase', color: conf.headerColor }}>
+                    <span style={{ fontSize: 11, letterSpacing: '0.02em', color: conf.headerColor, fontFamily: 'var(--font-roboto-flex)' }}>
                       {conf.label}
                     </span>
-                    <span style={{ fontFamily: 'monospace', fontSize: 9, color: conf.countColor }}>
+                    <span style={{ fontSize: 10, color: conf.countColor, fontFamily: 'var(--font-roboto-flex)' }}>
                       {colItems.length}
                     </span>
                   </div>
                   <button
                     onClick={() => setAddingTo(status)}
                     style={{
-                      fontSize: 9, letterSpacing: '0.18em',
+                      fontSize: 11, letterSpacing: '0.02em',
                       color: 'hsl(158 64% 36%)', background: 'none', border: 'none',
                       cursor: 'pointer', padding: 0, transition: 'color 0.12s',
                       fontFamily: 'var(--font-roboto-flex)',
+                      borderRadius: 4,
                     }}
                     onMouseEnter={e => e.currentTarget.style.color = 'hsl(158 64% 58%)'}
                     onMouseLeave={e => e.currentTarget.style.color = 'hsl(158 64% 36%)'}
                   >
-                    &gt; add
+                    + Add
                   </button>
                 </div>
 
                 {/* Inline add */}
                 {addingTo === status && (
                   <InlineAdd
+                    isLight={isLight}
                     onSubmit={title => createItem(status, title)}
                     onCancel={() => setAddingTo(null)}
                   />
-                )}
-
-                {/* Empty state */}
-                {colItems.length === 0 && addingTo !== status && (
-                  <div style={{ fontSize: 9, letterSpacing: '0.2em', color: 'hsl(0 0% 18%)', textTransform: 'uppercase', padding: '6px 0' }}>
-                    // empty
-                  </div>
                 )}
 
                 {/* Cards */}
                 {colItems.map(item => (
                   <LearningCard
                     key={item.id}
+                    isLight={isLight}
                     item={item}
                     onUpdate={updateItem}
                     onDelete={deleteItem}

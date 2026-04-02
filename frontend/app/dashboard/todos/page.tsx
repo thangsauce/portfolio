@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { apiPrivate } from '@/lib/api'
+import { useDashboardTheme } from '../theme-context'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Status   = 'todo' | 'in_progress' | 'done'
@@ -36,14 +37,9 @@ const PRIORITY_COLOR: Record<Priority, string> = {
   high:   'hsl(0 62% 52%)',
 }
 const STATUS_GLYPH: Record<Status, string> = {
-  todo:        '[ ]',
-  in_progress: '[~]',
-  done:        '[✓]',
-}
-const STATUS_COLOR: Record<Status, string> = {
-  todo:        'hsl(0 0% 30%)',
-  in_progress: 'hsl(158 64% 42%)',
-  done:        'hsl(0 0% 22%)',
+  todo:        '○',
+  in_progress: '◑',
+  done:        '●',
 }
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
@@ -62,17 +58,25 @@ function TodoRow({
   onUpdate,
   onDelete,
   autoFocus,
+  isLight,
 }: {
   todo: Todo
   onUpdate: (id: string, patch: Partial<Omit<Todo, 'id' | 'created_at' | 'updated_at'>>) => Promise<void>
   onDelete: (id: string) => Promise<void>
   autoFocus?: boolean
+  isLight: boolean
 }) {
-  const [title,      setTitle]      = useState(todo.title)
-  const [editing,    setEditing]    = useState(autoFocus ?? false)
+  const STATUS_COLOR: Record<Status, string> = {
+    todo:        isLight ? 'hsl(220 8% 54%)' : 'hsl(0 0% 30%)',
+    in_progress: 'hsl(158 64% 42%)',
+    done:        isLight ? 'hsl(220 8% 72%)' : 'hsl(0 0% 22%)',
+  }
+
+  const [title,       setTitle]       = useState(todo.title)
+  const [editing,     setEditing]     = useState(autoFocus ?? false)
   const [editingDate, setEditingDate] = useState(false)
-  const [confirmDel, setConfirmDel] = useState(false)
-  const [hovered,    setHovered]    = useState(false)
+  const [confirmDel,  setConfirmDel]  = useState(false)
+  const [hovered,     setHovered]     = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const dateRef  = useRef<HTMLInputElement>(null)
 
@@ -90,8 +94,19 @@ function TodoRow({
   // Keep local title in sync if todo updates externally
   useEffect(() => { setTitle(todo.title) }, [todo.title])
 
-  const isDone   = todo.status === 'done'
-  const overdue  = isOverdue(todo.due_date, isDone)
+  const isDone  = todo.status === 'done'
+  const overdue = isOverdue(todo.due_date, isDone)
+
+  const trashColor        = isLight ? 'hsl(220 8% 60%)' : 'hsl(0 0% 28%)'
+  const rowDivider        = isLight ? 'hsl(220 8% 92%)' : 'hsl(0 0% 11%)'
+  const titleEditingColor = isLight ? 'hsl(220 18% 14%)' : 'hsl(0 0% 84%)'
+  const titleActiveColor  = isLight ? 'hsl(220 16% 24%)' : 'hsl(0 0% 70%)'
+  const titleDoneColor    = isLight ? 'hsl(220 8% 60%)'  : 'hsl(0 0% 32%)'
+  const dueDateColor      = isLight ? 'hsl(220 10% 50%)' : 'hsl(0 0% 34%)'
+  const dueDateEmpty      = isLight ? 'hsl(220 8% 74%)'  : 'hsl(0 0% 20%)'
+  const dateInputBg       = isLight ? 'hsl(0 0% 97%)'    : 'hsl(0 0% 7%)'
+  const dateInputBorder   = isLight ? 'hsl(220 8% 88%)'  : 'hsl(0 0% 22%)'
+  const dateInputColor    = isLight ? 'hsl(220 14% 34%)' : 'hsl(0 0% 60%)'
 
   async function handleTitleBlur() {
     setEditing(false)
@@ -113,7 +128,7 @@ function TodoRow({
       style={{
         display: 'flex', alignItems: 'center', gap: 12,
         padding: '9px 0',
-        borderBottom: '1px solid hsl(0 0% 11%)',
+        borderBottom: `1px solid ${rowDivider}`,
         opacity: isDone ? 0.38 : 1,
         transition: 'opacity 0.2s',
       }}
@@ -123,13 +138,13 @@ function TodoRow({
         onClick={() => onUpdate(todo.id, { status: nextStatus(todo.status) })}
         title="cycle status"
         style={{
-          fontFamily: 'monospace',
-          fontSize: 11, letterSpacing: '0.02em',
+          fontSize: 13,
           color: STATUS_COLOR[todo.status],
           background: 'none', border: 'none', cursor: 'pointer',
           padding: 0, flexShrink: 0, userSelect: 'none',
           transition: 'color 0.12s',
           minWidth: 30,
+          lineHeight: 1,
         }}
         onMouseEnter={e => e.currentTarget.style.color = 'hsl(158 64% 52%)'}
         onMouseLeave={e => e.currentTarget.style.color = STATUS_COLOR[todo.status]}
@@ -152,19 +167,20 @@ function TodoRow({
             style={{
               width: '100%', background: 'none', border: 'none', outline: 'none',
               fontFamily: 'var(--font-roboto-flex)',
-              fontSize: 12, letterSpacing: '0.03em',
-              color: 'hsl(0 0% 84%)',
+              fontSize: 12, letterSpacing: '0.01em',
+              color: titleEditingColor,
               caretColor: 'hsl(158 64% 36%)',
+              borderRadius: 6,
             }}
           />
         ) : (
           <span
             onClick={() => setEditing(true)}
             style={{
-              fontSize: 12, letterSpacing: '0.03em',
-              color: isDone ? 'hsl(0 0% 32%)' : 'hsl(0 0% 70%)',
+              fontSize: 12, letterSpacing: '0.01em',
+              color: isDone ? titleDoneColor : titleActiveColor,
               textDecoration: isDone ? 'line-through' : 'none',
-              textDecorationColor: 'hsl(0 0% 28%)',
+              textDecorationColor: isLight ? 'hsl(220 8% 72%)' : 'hsl(0 0% 28%)',
               cursor: 'text',
               display: 'block',
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
@@ -180,10 +196,11 @@ function TodoRow({
         onClick={() => onUpdate(todo.id, { priority: nextPriority(todo.priority) })}
         title="cycle priority"
         style={{
-          fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase',
+          fontSize: 11, letterSpacing: '-0.01em',
           color: PRIORITY_COLOR[todo.priority],
           background: 'none',
           border: `1px solid ${PRIORITY_COLOR[todo.priority]}28`,
+          borderRadius: 6,
           padding: '2px 7px', cursor: 'pointer', flexShrink: 0,
           fontFamily: 'var(--font-roboto-flex)',
           transition: 'border-color 0.15s',
@@ -191,7 +208,7 @@ function TodoRow({
         onMouseEnter={e => e.currentTarget.style.borderColor = `${PRIORITY_COLOR[todo.priority]}80`}
         onMouseLeave={e => e.currentTarget.style.borderColor = `${PRIORITY_COLOR[todo.priority]}28`}
       >
-        {todo.priority === 'low' ? 'lo' : todo.priority === 'medium' ? 'md' : 'hi'}
+        {todo.priority === 'low' ? 'Low' : todo.priority === 'medium' ? 'Mid' : 'High'}
       </button>
 
       {/* Due date */}
@@ -207,25 +224,26 @@ function TodoRow({
               if (e.key === 'Escape') setEditingDate(false)
             }}
             style={{
-              background: 'hsl(0 0% 7%)',
-              border: '1px solid hsl(0 0% 22%)',
-              color: 'hsl(0 0% 60%)', fontSize: 10,
+              background: dateInputBg,
+              border: `1px solid ${dateInputBorder}`,
+              borderRadius: 6,
+              color: dateInputColor, fontSize: 10,
               padding: '2px 5px', outline: 'none',
               fontFamily: 'var(--font-roboto-flex)',
-              colorScheme: 'dark', width: 110,
+              colorScheme: isLight ? 'light' : 'dark', width: 110,
             }}
           />
         ) : (
           <span
             onClick={() => setEditingDate(true)}
             style={{
-              fontSize: 10, letterSpacing: '0.08em',
-              color: overdue ? 'hsl(0 62% 52%)' : todo.due_date ? 'hsl(0 0% 34%)' : 'hsl(0 0% 20%)',
+              fontSize: 10, letterSpacing: '0.02em',
+              color: overdue ? 'hsl(0 62% 52%)' : todo.due_date ? dueDateColor : dueDateEmpty,
               cursor: 'pointer', display: 'inline-block',
               transition: 'color 0.12s',
             }}
             onMouseEnter={e => e.currentTarget.style.color = 'hsl(0 0% 52%)'}
-            onMouseLeave={e => e.currentTarget.style.color = overdue ? 'hsl(0 62% 52%)' : todo.due_date ? 'hsl(0 0% 34%)' : 'hsl(0 0% 20%)'}
+            onMouseLeave={e => e.currentTarget.style.color = overdue ? 'hsl(0 62% 52%)' : todo.due_date ? dueDateColor : dueDateEmpty}
           >
             {todo.due_date ?? '—'}
           </span>
@@ -238,28 +256,28 @@ function TodoRow({
           <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
             <button
               onClick={() => onDelete(todo.id)}
-              style={{ color: 'hsl(0 62% 52%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 9, letterSpacing: '0.12em', padding: 0, fontFamily: 'var(--font-roboto-flex)' }}
+              style={{ color: 'hsl(0 62% 52%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, letterSpacing: '-0.01em', padding: 0, fontFamily: 'var(--font-roboto-flex)' }}
             >
-              rm
+              Delete
             </button>
             <button
               onClick={() => setConfirmDel(false)}
-              style={{ color: 'hsl(0 0% 28%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 9, letterSpacing: '0.12em', padding: 0, fontFamily: 'var(--font-roboto-flex)' }}
+              style={{ color: trashColor, background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, letterSpacing: '-0.01em', padding: 0, fontFamily: 'var(--font-roboto-flex)' }}
             >
-              no
+              Cancel
             </button>
           </span>
         ) : (
           <button
             onClick={() => setConfirmDel(true)}
             style={{
-              color: 'hsl(0 0% 28%)', background: 'none', border: 'none',
+              color: trashColor, background: 'none', border: 'none',
               cursor: 'pointer', padding: 0, display: 'flex',
               opacity: hovered ? 1 : 0,
               transition: 'opacity 0.12s, color 0.12s',
             }}
             onMouseEnter={e => e.currentTarget.style.color = 'hsl(0 62% 52%)'}
-            onMouseLeave={e => e.currentTarget.style.color = 'hsl(0 0% 28%)'}
+            onMouseLeave={e => e.currentTarget.style.color = trashColor}
           >
             <IcTrash />
           </button>
@@ -271,6 +289,8 @@ function TodoRow({
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function TodosPage() {
+  const { isLight } = useDashboardTheme()
+
   const [todos,    setTodos]    = useState<Todo[]>([])
   const [loading,  setLoading]  = useState(true)
   const [filter,   setFilter]   = useState<FilterTab>('all')
@@ -320,10 +340,10 @@ export default function TodosPage() {
   }
 
   const TABS: { key: FilterTab; label: string }[] = [
-    { key: 'all',         label: 'all'         },
-    { key: 'todo',        label: 'todo'        },
-    { key: 'in_progress', label: 'in progress' },
-    { key: 'done',        label: 'done'        },
+    { key: 'all',         label: 'All'         },
+    { key: 'todo',        label: 'Todo'        },
+    { key: 'in_progress', label: 'In progress' },
+    { key: 'done',        label: 'Done'        },
   ]
 
   const counts: Record<FilterTab, number> = {
@@ -335,17 +355,23 @@ export default function TodosPage() {
 
   const filtered = filter === 'all' ? todos : todos.filter(t => t.status === filter)
 
+  const tabBorder      = isLight ? 'hsl(220 8% 90%)'  : 'hsl(0 0% 14%)'
+  const colHeaderColor = isLight ? 'hsl(220 8% 56%)'  : 'hsl(0 0% 20%)'
+  const tabInactive    = isLight ? 'hsl(220 8% 52%)'  : 'hsl(0 0% 28%)'
+  const badgeInactive  = isLight ? 'hsl(220 8% 68%)'  : 'hsl(0 0% 20%)'
+  const emptyTextColor = isLight ? 'hsl(220 8% 56%)'  : 'hsl(0 0% 22%)'
+
   return (
     <div style={{ maxWidth: 820, margin: '0 auto' }}>
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 22 }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-          <span style={{ fontSize: 9, letterSpacing: '0.3em', textTransform: 'uppercase', color: 'hsl(0 0% 26%)' }}>
-            // todos
+          <span style={{ fontSize: 11, letterSpacing: '-0.01em', color: isLight ? 'hsl(220 8% 46%)' : 'hsl(0 0% 26%)' }}>
+            Tasks
           </span>
           {counts.todo > 0 && (
-            <span style={{ fontFamily: 'monospace', fontSize: 9, letterSpacing: '0.12em', color: 'hsl(158 64% 36%)' }}>
+            <span style={{ fontSize: 11, letterSpacing: '-0.01em', color: 'hsl(158 64% 36%)' }}>
               {counts.todo} pending
             </span>
           )}
@@ -356,9 +382,10 @@ export default function TodosPage() {
           disabled={creating}
           style={{
             display: 'flex', alignItems: 'center', gap: 5,
-            fontSize: 10, letterSpacing: '0.18em',
-            color: creating ? 'hsl(0 0% 28%)' : 'hsl(158 64% 42%)',
+            fontSize: 11, letterSpacing: '-0.01em',
+            color: creating ? (isLight ? 'hsl(220 8% 52%)' : 'hsl(0 0% 28%)') : 'hsl(158 64% 42%)',
             background: 'none', border: 'none',
+            borderRadius: 6,
             cursor: creating ? 'not-allowed' : 'pointer',
             padding: 0, transition: 'color 0.12s',
             fontFamily: 'var(--font-roboto-flex)',
@@ -366,12 +393,12 @@ export default function TodosPage() {
           onMouseEnter={e => { if (!creating) e.currentTarget.style.color = 'hsl(158 64% 60%)' }}
           onMouseLeave={e => { if (!creating) e.currentTarget.style.color = 'hsl(158 64% 42%)' }}
         >
-          <IcPlus /> new
+          <IcPlus /> New task
         </button>
       </div>
 
       {/* Filter tabs */}
-      <div style={{ display: 'flex', gap: 0, marginBottom: 0, borderBottom: '1px solid hsl(0 0% 14%)' }}>
+      <div style={{ display: 'flex', gap: 0, marginBottom: 0, borderBottom: `1px solid ${tabBorder}` }}>
         {TABS.map(({ key, label }) => {
           const active = filter === key
           return (
@@ -379,8 +406,8 @@ export default function TodosPage() {
               key={key}
               onClick={() => setFilter(key)}
               style={{
-                fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase',
-                color: active ? 'hsl(158 64% 52%)' : 'hsl(0 0% 28%)',
+                fontSize: 11, letterSpacing: '-0.01em',
+                color: active ? 'hsl(158 64% 52%)' : tabInactive,
                 background: 'none', border: 'none',
                 borderBottom: `1px solid ${active ? 'hsl(158 64% 36%)' : 'transparent'}`,
                 padding: '6px 12px 7px',
@@ -388,11 +415,11 @@ export default function TodosPage() {
                 marginBottom: -1,
                 fontFamily: 'var(--font-roboto-flex)',
               }}
-              onMouseEnter={e => { if (!active) e.currentTarget.style.color = 'hsl(0 0% 48%)' }}
-              onMouseLeave={e => { if (!active) e.currentTarget.style.color = 'hsl(0 0% 28%)' }}
+              onMouseEnter={e => { if (!active) e.currentTarget.style.color = isLight ? 'hsl(220 8% 32%)' : 'hsl(0 0% 48%)' }}
+              onMouseLeave={e => { if (!active) e.currentTarget.style.color = tabInactive }}
             >
               {label}
-              <span style={{ marginLeft: 6, color: active ? 'hsl(158 64% 36%)' : 'hsl(0 0% 20%)' }}>
+              <span style={{ marginLeft: 6, color: active ? 'hsl(158 64% 36%)' : badgeInactive }}>
                 {counts[key]}
               </span>
             </button>
@@ -404,27 +431,27 @@ export default function TodosPage() {
       <div style={{
         display: 'flex', alignItems: 'center', gap: 12,
         padding: '10px 0 8px',
-        fontSize: 9, letterSpacing: '0.25em', textTransform: 'uppercase',
-        color: 'hsl(0 0% 20%)',
-        borderBottom: '1px solid hsl(0 0% 13%)',
+        fontSize: 11, letterSpacing: '-0.01em',
+        color: colHeaderColor,
+        borderBottom: `1px solid ${tabBorder}`,
       }}>
-        <span style={{ minWidth: 30 }}>st</span>
-        <span style={{ flex: 1 }}>task</span>
-        <span>pri</span>
-        <span style={{ minWidth: 76, textAlign: 'right' }}>due</span>
+        <span style={{ minWidth: 30 }}>Status</span>
+        <span style={{ flex: 1 }}>Task</span>
+        <span>Priority</span>
+        <span style={{ minWidth: 76, textAlign: 'right' }}>Due</span>
         <span style={{ width: 44 }} />
       </div>
 
       {/* List */}
       {loading && (
-        <div style={{ padding: '20px 0', fontSize: 9, letterSpacing: '0.25em', color: 'hsl(0 0% 22%)', textTransform: 'uppercase' }}>
-          // loading...
+        <div style={{ padding: '20px 0', fontSize: 11, letterSpacing: '-0.01em', color: emptyTextColor }}>
+          Loading...
         </div>
       )}
 
       {!loading && filtered.length === 0 && (
-        <div style={{ padding: '20px 0', fontSize: 9, letterSpacing: '0.25em', color: 'hsl(0 0% 22%)', textTransform: 'uppercase' }}>
-          // {filter === 'all' ? 'no todos yet' : `no ${filter.replace('_', ' ')} todos`}
+        <div style={{ padding: '20px 0', fontSize: 11, letterSpacing: '-0.01em', color: emptyTextColor }}>
+          {filter === 'all' ? 'No tasks yet' : `No ${filter.replace('_', ' ')} tasks`}
         </div>
       )}
 
@@ -435,6 +462,7 @@ export default function TodosPage() {
           onUpdate={updateTodo}
           onDelete={deleteTodo}
           autoFocus={todo.id === newId}
+          isLight={isLight}
         />
       ))}
     </div>

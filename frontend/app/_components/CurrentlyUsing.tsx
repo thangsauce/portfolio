@@ -99,7 +99,7 @@ const CurrentlyUsing = () => {
                             <span className="text-2xl capitalize">{skill.name}</span>
                         </div>
                     ))}
-                </ul>
+                </div>
             </div>
         </section>
     );

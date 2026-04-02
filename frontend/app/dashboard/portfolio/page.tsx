@@ -55,7 +55,6 @@ function parseCsvUrls(csv: string) {
   return csv.split(',').map((s) => s.trim()).filter(Boolean)
 }
 
-const SKILL_CATEGORIES = ['frontend', 'backend', 'database', 'tools', 'it_support'] as const
 const PROJECT_CATEGORIES: ProjectCategory[] = ['web_development', 'cybersecurity', 'network']
 const PROJECT_CATEGORY_LABELS: Record<ProjectCategory, string> = {
   web_development: 'Web Development',
@@ -66,15 +65,6 @@ const PROJECT_CATEGORY_LABELS: Record<ProjectCategory, string> = {
 function normalizeProjectCategory(value: LegacyProjectCategory | null | undefined): ProjectCategory {
   if (!value || value === 'it_systems') return 'network'
   return value
-}
-
-function normalizeSkillCategory(value: string) {
-  const normalized = value.toLowerCase().trim().replace(/[\s-]+/g, '_')
-  if (!normalized) return ''
-  if (normalized === 'it' || normalized === 'itsupport' || normalized === 'it_skills') return 'it_support'
-  if (normalized === 'front_end' || normalized === 'frontend_dev' || normalized === 'web') return 'frontend'
-  if (normalized === 'back_end' || normalized === 'backend_dev') return 'backend'
-  return normalized
 }
 
 function toTechStackArray(value: Project['tech_stack']): string[] {
@@ -127,7 +117,7 @@ export default function PortfolioPage() {
     order_index: '0',
     featured: false,
   })
-  const [stf, setStf] = useState({ name: '', category: '', icon_url: '', order_index: '0' })
+  const [stf, setStf] = useState({ name: '', icon_url: '', order_index: '0' })
   const [sf, setSf] = useState({ name: '', order_index: '0' })
   const [cf, setCf] = useState({ name: '', issuer: '', issue_date: '', credential_id: '', url: '' })
   const [ef, setEf] = useState({ company: '', role: '', start_date: '', end_date: '', description: '', order_index: '0' })
@@ -139,7 +129,7 @@ export default function PortfolioPage() {
       if (tab === 'projects')    setProjects(await apiPrivate<Project[]>('/portfolio/projects'))
       if (tab === 'stacks') {
         const loaded = await apiPrivate<Stack[]>('/portfolio/stacks')
-        setStacks(loaded.map((s) => ({ ...s, category: normalizeSkillCategory(s.category ?? '') })))
+        setStacks(loaded)
       }
       if (tab === 'skills') {
         const loaded = await apiPrivate<Skill[]>('/portfolio/skills')
@@ -179,7 +169,7 @@ export default function PortfolioPage() {
       order_index: '0',
       featured: false,
     })
-    setStf({ name: '', category: '', icon_url: '', order_index: '0' })
+    setStf({ name: '', icon_url: '', order_index: '0' })
     setSf({ name: '', order_index: '0' })
     setCf({ name: '', issuer: '', issue_date: '', credential_id: '', url: '' })
     setEf({ company: '', role: '', start_date: '', end_date: '', description: '', order_index: '0' })
@@ -213,7 +203,7 @@ export default function PortfolioPage() {
       })
     } else if (tab === 'stacks') {
       const s = item as Stack
-      setStf({ name: s.name, category: normalizeSkillCategory(s.category ?? ''), icon_url: s.icon_url ?? '', order_index: String(s.order_index) })
+      setStf({ name: s.name, icon_url: s.icon_url ?? '', order_index: String(s.order_index) })
     } else if (tab === 'skills') {
       const s = item as Skill
       setSf({ name: s.name, order_index: String(s.order_index) })
@@ -263,7 +253,6 @@ export default function PortfolioPage() {
       } else if (tab === 'stacks') {
         const body = {
           name: stf.name,
-          category: normalizeSkillCategory(stf.category),
           icon_url: stf.icon_url || null,
           order_index: parseInt(stf.order_index) || 0,
         }
@@ -573,15 +562,6 @@ export default function PortfolioPage() {
           <input style={iSt} value={stf.name} placeholder="Stack item name"
             onChange={e => setStf(p => ({ ...p, name: e.target.value }))} />
         </Fld>
-        <Fld label="category">
-          <select style={{ ...iSt, appearance: 'none' }} value={stf.category}
-            onChange={e => setStf(p => ({ ...p, category: e.target.value }))}>
-            <option value="">-- select category --</option>
-            {SKILL_CATEGORIES.filter((c) => c !== 'it_support').map(c => (
-              <option key={c} value={c}>{c}</option>
-            ))}
-          </select>
-        </Fld>
         <Fld label="icon_url">
           <input style={iSt} value={stf.icon_url} placeholder="/logo/react.png"
             onChange={e => setStf(p => ({ ...p, icon_url: e.target.value }))} />
@@ -732,12 +712,11 @@ export default function PortfolioPage() {
     }
 
     if (tab === 'stacks') return {
-      headers: ['// name', '// category', '// icon', '// order'],
+      headers: ['// name', '// icon', '// order'],
       rows: stacks
-        .filter((s) => includesQ(s.name, s.category ?? '', s.icon_url ?? ''))
+        .filter((s) => includesQ(s.name, s.icon_url ?? ''))
         .map(s => ({ id: s.id, item: s, cells: [
         <span style={{ color: 'hsl(0 0% 76%)' }}>{s.name}</span>,
-        <span style={{ color: 'hsl(193 80% 45%)', fontSize: 10, letterSpacing: '0.12em' }}>{normalizeSkillCategory(s.category ?? '') || '—'}</span>,
         <span style={{ fontSize: 10, color: s.icon_url ? 'hsl(158 64% 42%)' : 'hsl(0 0% 25%)' }}>{s.icon_url ? '✓ set' : '—'}</span>,
         <span style={{ color: 'hsl(0 0% 35%)' }}>{s.order_index}</span>,
       ]})),
@@ -788,6 +767,14 @@ export default function PortfolioPage() {
     resume: 1,
   }
   const TABS: Tab[] = ['projects', 'stacks', 'skills', 'certs', 'experiences', 'resume']
+  const TAB_LABELS: Record<Tab, string> = {
+    projects: 'projects',
+    stacks: 'currently using',
+    skills: 'skills',
+    certs: 'certs',
+    experiences: 'experiences',
+    resume: 'resume',
+  }
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
@@ -834,7 +821,7 @@ export default function PortfolioPage() {
               onMouseEnter={e => { if (!active) (e.currentTarget).style.color = 'hsl(0 0% 52%)' }}
               onMouseLeave={e => { if (!active) (e.currentTarget).style.color = 'hsl(0 0% 30%)' }}
             >
-              // {t}
+              // {TAB_LABELS[t]}
             </button>
           )
         })}
