@@ -185,7 +185,7 @@ const Banner = () => {
                                 ref={titleRef}
                                 className="banner-title slide-up-and-fade leading-[0.92] font-sans font-bold tracking-tight"
                             >
-                                {renderAnimatedWord('IT', 'text-primary block text-[32px] sm:text-[42px] md:text-[48px] font-google-sans uppercase tracking-[0.38em] font-semibold')}
+                                {renderAnimatedWord('IT', 'text-primary block text-[32px] sm:text-[42px] md:text-[48px] font-anton uppercase tracking-[0.24em]')}
                                 <span className="block text-[52px] sm:text-[80px] md:text-[96px] lg:text-[102px]">
                                     {'SPECIALIST'.split('').map((char, idx) => (
                                         <span

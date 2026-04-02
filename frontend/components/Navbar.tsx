@@ -18,16 +18,16 @@ const MENU_LINKS = [
         url: '/#about-me',
     },
     {
-        name: 'Experience',
-        url: '/#my-experience',
+        name: 'Currently Using',
+        url: '/#currently-using',
     },
     {
         name: 'Projects',
         url: '/#selected-projects',
     },
     {
-        name: 'IT Skills',
-        url: '/#it-skills',
+        name: 'Experience',
+        url: '/#my-experience',
     },
     {
         name: 'My Stack',
@@ -78,6 +78,14 @@ const Navbar = () => {
         window.scrollTo({ top: y, behavior: 'smooth' });
     };
 
+    const scrollToElement = (target: HTMLElement) => {
+        if (lenis) {
+            lenis.scrollTo(target, { duration: 1.05 });
+            return;
+        }
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
     const scrollToHash = (hash: string) => {
         const target = document.querySelector(hash) as HTMLElement | null;
         if (!target) return;
@@ -91,7 +99,7 @@ const Navbar = () => {
             const track = root?.firstElementChild as HTMLElement | null;
             const panel = target.closest('.horizontal-panel') as HTMLElement | null;
             if (!root || !track || !panel) {
-                setTimeout(() => lenis?.scrollTo(hash), 120);
+                setTimeout(() => scrollToElement(target), 120);
                 return;
             }
 
@@ -104,7 +112,7 @@ const Navbar = () => {
         }
 
         // Mobile/normal layout.
-        setTimeout(() => lenis?.scrollTo(hash), 120);
+        setTimeout(() => scrollToElement(target), 120);
     };
 
     const navigateTo = (url: string) => {

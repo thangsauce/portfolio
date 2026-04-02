@@ -199,14 +199,68 @@ export function ContactSection() {
                 </div>
             </div>
             </section>
-            <footer className="border-t border-border/60 bg-background/60">
-                <div className="container py-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs tracking-wide">
-                    <p className="text-muted-foreground">
-                        © {new Date().getFullYear()} Thang Le. All rights reserved.
-                    </p>
-                    <p className="text-muted-foreground">
-                        Built with care in Orlando, FL.
-                    </p>
+            <footer
+                className="relative overflow-hidden border-t border-primary/20 bg-gradient-to-b from-background/95 via-background/85 to-background/95"
+                itemScope
+                itemType="https://schema.org/Person"
+            >
+                <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/70 to-transparent" />
+                <div className="pointer-events-none absolute -top-24 left-1/2 h-52 w-52 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
+
+                <div className="container py-6">
+                    <div className="flex flex-col gap-4 rounded-2xl border border-border/70 bg-background/55 px-4 py-4 backdrop-blur-sm sm:px-6">
+                        <div className="flex flex-wrap items-center gap-3">
+                            <span className="relative inline-flex h-2.5 w-2.5">
+                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary/80 opacity-70" />
+                                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-primary" />
+                            </span>
+                            <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground" itemProp="name">
+                                © {new Date().getFullYear()} Thang Le
+                            </p>
+                        </div>
+
+                        <nav
+                            aria-label="Footer links"
+                            className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] uppercase tracking-[0.16em] text-muted-foreground"
+                        >
+                            <a href="#banner" className="hover:text-foreground transition-colors">Home</a>
+                            <a href="#about-me" className="hover:text-foreground transition-colors">About Me</a>
+                            <a href="#selected-projects" className="hover:text-foreground transition-colors">Projects</a>
+                            <a href="/blog" className="hover:text-foreground transition-colors">Blog</a>
+                            <a href="#contact" className="hover:text-foreground transition-colors">Contact</a>
+                        </nav>
+
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+                            <address className="not-italic text-foreground/85" itemProp="address">
+                                Based in Orlando, FL
+                            </address>
+                            <a
+                                href={`mailto:${GENERAL_INFO.email}`}
+                                className="hover:text-foreground transition-colors"
+                                itemProp="email"
+                            >
+                                {GENERAL_INFO.email}
+                            </a>
+                            <a
+                                href={GENERAL_INFO.githubProfile}
+                                target="_blank"
+                                rel="noopener noreferrer me"
+                                className="hover:text-foreground transition-colors"
+                                itemProp="sameAs"
+                            >
+                                GitHub
+                            </a>
+                            <a
+                                href={GENERAL_INFO.linkedinProfile}
+                                target="_blank"
+                                rel="noopener noreferrer me"
+                                className="hover:text-foreground transition-colors"
+                                itemProp="sameAs"
+                            >
+                                LinkedIn
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </footer>
         </>
