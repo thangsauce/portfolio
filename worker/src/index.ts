@@ -4,6 +4,7 @@ import { authMiddleware } from './middleware/auth'
 import portfolio from './routes/portfolio'
 import privatePortfolio from './routes/private/portfolio'
 import privateNotes from './routes/private/notes'
+import privateTodos from './routes/private/todos'
 
 export type Env = {
   SUPABASE_URL: string
@@ -50,5 +51,6 @@ app.route('/api/portfolio', portfolio)
 app.use('/api/private/*', authMiddleware)
 app.route('/api/private/portfolio', privatePortfolio)
 app.route('/api/private/notes', privateNotes)
+app.route('/api/private/todos', privateTodos)
 
 export default app
