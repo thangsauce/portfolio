@@ -82,7 +82,7 @@ const Experiences = () => {
     if (experiences.length === 0) return null;
 
     return (
-        <section className="mt-16 md:mt-24 pb-section" id="my-experience">
+        <section className="mt-8 md:mt-12 pb-section" id="my-experience">
             <div className="container" ref={containerRef}>
                 <div className="flex items-center gap-3 mb-10">
                     <span className="text-primary font-mono text-xl leading-none select-none">&lt;</span>
