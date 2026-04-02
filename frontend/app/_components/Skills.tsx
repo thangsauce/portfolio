@@ -9,7 +9,7 @@ import { apiFetch } from '@/lib/api';
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 type Skill = { id: string; name: string; category: string; icon_url: string | null }
-const PREFERRED_CATEGORY_ORDER = ['frontend', 'backend', 'database', 'tools']
+const PREFERRED_CATEGORY_ORDER = ['frontend', 'backend', 'database', 'tools', 'languages']
 
 function normalizeSkillCategory(value: string): string {
     const normalized = value.toLowerCase().trim().replace(/[\s-]+/g, '_');
@@ -18,6 +18,7 @@ function normalizeSkillCategory(value: string): string {
     if (normalized === 'back_end' || normalized === 'backend_dev') return 'backend';
     if (normalized === 'tool' || normalized === 'tooling') return 'tools';
     if (normalized === 'db' || normalized === 'data') return 'database';
+    if (normalized === 'language' || normalized === 'lang') return 'languages';
     if (normalized === 'itsupport' || normalized === 'it_skills' || normalized === 'it') return 'it_support';
     return normalized;
 }
@@ -109,7 +110,7 @@ const Skills = () => {
                                     {formatCategoryLabel(category)}
                                 </p>
                             </div>
-                            <div className="sm:col-span-8 flex gap-x-6 gap-y-5 flex-wrap">
+                            <div className="sm:col-span-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-5">
                                 {items.map((item) => (
                                     <div className="slide-up flex gap-2.5 items-center leading-none min-w-0" key={item.id}>
                                         {item.icon_url && (

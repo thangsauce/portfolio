@@ -570,7 +570,7 @@ export default function PortfolioPage() {
             onChange={e => setStf(p => ({ ...p, name: e.target.value }))} />
         </Fld>
         <Fld label="category">
-          <input style={iSt} value={stf.category} placeholder="frontend / backend / database / tools"
+          <input style={iSt} value={stf.category} placeholder="frontend / backend / database / tools / languages"
             onChange={e => setStf(p => ({ ...p, category: e.target.value }))} />
         </Fld>
         <Fld label="icon_url">

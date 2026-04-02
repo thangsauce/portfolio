@@ -98,11 +98,11 @@ const CurrentlyUsing = () => {
                 </div>
 
                 {skills.length > 0 ? (
-                    <div className="flex gap-x-11 gap-y-9 flex-wrap">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-6">
                         {skills.map((skill) => (
                             <div
                                 key={skill.id}
-                                className="it-skill-item flex gap-3.5 items-center leading-none"
+                                className="it-skill-item flex gap-3.5 items-center leading-none min-w-0"
                             >
                                 {skill.icon_url && (
                                     <div>
@@ -115,7 +115,7 @@ const CurrentlyUsing = () => {
                                         />
                                     </div>
                                 )}
-                                <span className="text-2xl capitalize">{skill.name}</span>
+                                <span className="text-xl capitalize break-words">{skill.name}</span>
                             </div>
                         ))}
                     </div>
