@@ -159,10 +159,8 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
                                 </span>
                             </h4>
                         </TransitionLink>
-                    </div>
-                    {(project.sourceCode || project.liveUrl) && (
-                        <div className="mt-3 flex justify-center">
-                            <div className="inline-flex items-center justify-center gap-2.5">
+                        {(project.sourceCode || project.liveUrl) && (
+                            <div className="inline-flex items-center justify-center gap-2.5 pt-2 shrink-0">
                                 {project.sourceCode && (
                                     <a
                                         href={project.sourceCode}
@@ -188,8 +186,8 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
                                     </a>
                                 )}
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
                     <div className="mt-2 flex flex-wrap gap-3 text-muted-foreground text-xs">
                         {project.techStack
                             .slice(0, 3)
