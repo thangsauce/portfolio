@@ -2,9 +2,11 @@
 
 import { FormEvent, useRef, useState } from 'react';
 import { GENERAL_INFO } from '@/lib/data';
+import { useLenis } from 'lenis/react';
 
 export function ContactSection() {
     const containerRef = useRef<HTMLDivElement>(null);
+    const lenis = useLenis();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
@@ -74,8 +76,45 @@ export function ContactSection() {
         }
     }
 
+    const handleBackToHome = () => {
+        if (lenis) {
+            lenis.scrollTo('#banner', { duration: 1.2 });
+            return;
+        }
+        if (typeof window !== 'undefined') {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    };
+
     return (
-        <section className="pt-28 pb-24 md:pt-40 md:pb-24" id="contact" ref={containerRef}>
+        <section className="relative pt-28 pb-24 md:pt-40 md:pb-24" id="contact" ref={containerRef}>
+            <button
+                type="button"
+                onClick={handleBackToHome}
+                aria-label="Back to home"
+                className="group absolute bottom-6 right-6 md:bottom-10 md:right-10 inline-flex items-center gap-3 text-primary hover:text-foreground transition-colors z-20"
+            >
+                <span className="inline-flex h-10 w-10 items-center justify-center">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="22"
+                        height="22"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.4"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="rotate-90 md:rotate-0 transition-transform duration-300 ease-out group-hover:-translate-y-1.5 md:group-hover:translate-y-0 md:group-hover:-translate-x-1.5"
+                    >
+                        <path d="M19 12H5" />
+                        <path d="m12 19-7-7 7-7" />
+                    </svg>
+                </span>
+                <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground group-hover:text-foreground transition-colors">
+                    Back To Home
+                </span>
+            </button>
             <div className="container">
                 <div className="max-w-2xl">
                     <p className="text-sm uppercase tracking-widest text-muted-foreground/60 mb-3">Let's Connect</p>
@@ -83,6 +122,84 @@ export function ContactSection() {
                         Let&apos;s <span className="text-primary">Connect</span>
                     </h2>
                     <div className="flex flex-col gap-4">
+                        <form
+                            onSubmit={handleEmailJsSubmit}
+                            className="order-2 relative flex flex-col gap-3 px-4 py-4 rounded-xl border border-border bg-background-light"
+                        >
+                            <p className="text-xs text-muted-foreground/60 uppercase tracking-widest text-center">
+                                Questions or connect
+                            </p>
+
+                            <label htmlFor="contact-name" className="sr-only">
+                                Name
+                            </label>
+                            <input
+                                id="contact-name"
+                                name="name"
+                                type="text"
+                                placeholder="Name"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                autoComplete="name"
+                                required
+                                tabIndex={1}
+                                className="h-10 px-3 bg-background border border-border rounded-md text-sm outline-none focus:border-primary/60"
+                            />
+
+                            <label htmlFor="contact-email" className="sr-only">
+                                Email
+                            </label>
+                            <input
+                                id="contact-email"
+                                name="email"
+                                type="email"
+                                placeholder="Root@email.com"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                autoComplete="email"
+                                inputMode="email"
+                                required
+                                tabIndex={2}
+                                className="h-10 px-3 bg-background border border-border rounded-md text-sm outline-none focus:border-primary/60"
+                            />
+
+                            <label htmlFor="contact-message" className="sr-only">
+                                Message
+                            </label>
+                            <textarea
+                                id="contact-message"
+                                name="message"
+                                placeholder="Leave a message..."
+                                value={message}
+                                onChange={(e) => setMessage(e.target.value)}
+                                rows={4}
+                                required
+                                tabIndex={3}
+                                className="px-3 py-2 bg-background border border-border rounded-md text-sm outline-none focus:border-primary/60 resize-none"
+                            />
+
+                            <button
+                                type="submit"
+                                disabled={sending}
+                                tabIndex={4}
+                                className="h-10 px-4 rounded-md border border-primary/40 text-primary disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary/10 transition-colors text-sm uppercase tracking-wider"
+                            >
+                                {sending ? 'Sending...' : 'Send Message'}
+                            </button>
+
+                            {status && (
+                                <p
+                                    className={`text-xs ${
+                                        status.ok
+                                            ? 'text-primary'
+                                            : 'text-red-400'
+                                    }`}
+                                >
+                                    {status.msg}
+                                </p>
+                            )}
+                        </form>
+
                         <div className="flex flex-col sm:flex-row gap-4">
                         <a
                             href={GENERAL_INFO.githubProfile}
@@ -117,59 +234,6 @@ export function ContactSection() {
                             </div>
                         </a>
                         </div>
-
-                        <form
-                            onSubmit={handleEmailJsSubmit}
-                            className="relative flex flex-col gap-3 px-4 py-4 rounded-xl border border-border bg-background-light"
-                        >
-                            <p className="text-xs text-muted-foreground/60 uppercase tracking-widest text-center">
-                                Questions or connect
-                            </p>
-
-                            <input
-                                type="text"
-                                placeholder="Name"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                className="h-10 px-3 bg-background border border-border rounded-md text-sm outline-none focus:border-primary/60"
-                            />
-
-                            <input
-                                type="email"
-                                placeholder="Root@email.com"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="h-10 px-3 bg-background border border-border rounded-md text-sm outline-none focus:border-primary/60"
-                            />
-
-                            <textarea
-                                placeholder="Leave a message..."
-                                value={message}
-                                onChange={(e) => setMessage(e.target.value)}
-                                rows={4}
-                                className="px-3 py-2 bg-background border border-border rounded-md text-sm outline-none focus:border-primary/60 resize-none"
-                            />
-
-                            <button
-                                type="submit"
-                                disabled={sending}
-                                className="h-10 px-4 rounded-md border border-primary/40 text-primary disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary/10 transition-colors text-sm uppercase tracking-wider"
-                            >
-                                {sending ? 'Sending...' : 'Send Message'}
-                            </button>
-
-                            {status && (
-                                <p
-                                    className={`text-xs ${
-                                        status.ok
-                                            ? 'text-primary'
-                                            : 'text-red-400'
-                                    }`}
-                                >
-                                    {status.msg}
-                                </p>
-                            )}
-                        </form>
                     </div>
                 </div>
             </div>

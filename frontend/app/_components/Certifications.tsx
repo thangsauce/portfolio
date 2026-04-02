@@ -67,7 +67,7 @@ const Certifications = () => {
                 <div className="flex items-center gap-3 mb-10">
                     <span className="text-primary font-mono text-xl leading-none select-none">&lt;</span>
                     <h2 className="text-xl uppercase leading-none tracking-widest">
-                        CERTIFICAITON
+                        CERTIFICATION
                     </h2>
                     <span className="text-primary font-mono text-xl leading-none select-none">&gt;</span>
                 </div>
