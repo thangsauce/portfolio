@@ -5,9 +5,9 @@ import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
 
-// ── Icon base props ─────────────────────────────────────────────────────────
+// ── Icon base props ──────────────────────────────────────────────────────────
 const ip = {
-  width: 14, height: 14, viewBox: '0 0 16 16',
+  width: 15, height: 15, viewBox: '0 0 16 16',
   fill: 'none', stroke: 'currentColor', strokeWidth: '1.5',
   strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const,
   style: { flexShrink: 0 as const },
@@ -16,17 +16,17 @@ const ip = {
 function IconOverview() {
   return (
     <svg {...ip}>
-      <rect x="1" y="1" width="6" height="6" rx="0.5" />
-      <rect x="9" y="1" width="6" height="6" rx="0.5" />
-      <rect x="1" y="9" width="6" height="6" rx="0.5" />
-      <rect x="9" y="9" width="6" height="6" rx="0.5" />
+      <rect x="1" y="1" width="6" height="6" rx="1" />
+      <rect x="9" y="1" width="6" height="6" rx="1" />
+      <rect x="1" y="9" width="6" height="6" rx="1" />
+      <rect x="9" y="9" width="6" height="6" rx="1" />
     </svg>
   )
 }
 function IconPortfolio() {
   return (
     <svg {...ip}>
-      <rect x="1" y="5" width="14" height="10" rx="1" />
+      <rect x="1" y="5" width="14" height="10" rx="1.5" />
       <path d="M5 5V4a2 2 0 012-2h2a2 2 0 012 2v1" />
       <line x1="1" y1="9.5" x2="15" y2="9.5" />
     </svg>
@@ -35,17 +35,16 @@ function IconPortfolio() {
 function IconNotes() {
   return (
     <svg {...ip}>
-      <path d="M3 2h10v10l-3 3H3z" />
+      <path d="M3 2h10v10l-3 3H3z" strokeLinejoin="round" />
       <line x1="5.5" y1="6" x2="10.5" y2="6" />
       <line x1="5.5" y1="9" x2="8" y2="9" />
-      <path d="M10 12v3l3-3h-3z" />
     </svg>
   )
 }
 function IconTodos() {
   return (
     <svg {...ip}>
-      <rect x="1" y="1" width="14" height="14" rx="1" />
+      <rect x="1" y="1" width="14" height="14" rx="2" />
       <polyline points="4.5,8 6.5,10 11,5.5" />
     </svg>
   )
@@ -86,18 +85,18 @@ function IconLogout() {
   )
 }
 
-// ── Nav config ──────────────────────────────────────────────────────────────
+// ── Nav config ───────────────────────────────────────────────────────────────
 const NAV = [
-  { href: '/dashboard',           label: 'overview',  Icon: IconOverview,  exact: true },
-  { href: '/dashboard/portfolio', label: 'portfolio', Icon: IconPortfolio              },
-  { href: '/dashboard/notes',     label: 'notes',     Icon: IconNotes                  },
-  { href: '/dashboard/todos',     label: 'todos',     Icon: IconTodos                  },
-  { href: '/dashboard/learning',  label: 'learning',  Icon: IconLearning               },
-  { href: '/dashboard/projects',  label: 'projects',  Icon: IconProjects               },
-  { href: '/dashboard/blog',      label: 'blog',      Icon: IconBlog                   },
+  { href: '/dashboard',           label: 'Overview',  Icon: IconOverview,  exact: true },
+  { href: '/dashboard/portfolio', label: 'Portfolio', Icon: IconPortfolio              },
+  { href: '/dashboard/notes',     label: 'Notes',     Icon: IconNotes                  },
+  { href: '/dashboard/todos',     label: 'Todos',     Icon: IconTodos                  },
+  { href: '/dashboard/learning',  label: 'Learning',  Icon: IconLearning               },
+  { href: '/dashboard/projects',  label: 'Projects',  Icon: IconProjects               },
+  { href: '/dashboard/blog',      label: 'Blog',      Icon: IconBlog                   },
 ]
 
-// ── Layout ──────────────────────────────────────────────────────────────────
+// ── Layout ───────────────────────────────────────────────────────────────────
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading, user, logout } = useAuth()
   const router   = useRouter()
@@ -115,6 +114,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (isLoading || !isAuthenticated) return null
 
   const segments = pathname.replace(/^\/dashboard\/?/, '').split('/').filter(Boolean)
+  const initial  = (user?.email?.[0] ?? 'T').toUpperCase()
 
   return (
     <div
@@ -123,79 +123,60 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         position: 'fixed', inset: 0, zIndex: 50,
         display: 'flex', overflow: 'hidden',
         fontFamily: 'var(--font-roboto-flex)',
-        background: 'hsl(222 14% 10%)',
+        background: 'hsl(226 12% 10%)',
       }}
     >
-      <style>{`
-        @keyframes dot-pulse {
-          0%, 100% { opacity: 1; box-shadow: 0 0 0 0 hsl(158 64% 42% / 0.5); }
-          50%       { opacity: 0.5; box-shadow: 0 0 0 4px hsl(158 64% 42% / 0); }
-        }
-      `}</style>
-
       {/* ── Sidebar ───────────────────────────────────────────────────────── */}
       <aside style={{
-        width: 236, minWidth: 236, flexShrink: 0,
-        background: 'hsl(224 16% 7%)',
-        borderRight: '1px solid hsl(222 14% 13%)',
+        width: 240, minWidth: 240, flexShrink: 0,
+        background: 'hsl(228 14% 7%)',
+        borderRight: '1px solid hsl(226 10% 13%)',
         display: 'flex', flexDirection: 'column',
-        position: 'relative', overflow: 'hidden',
       }}>
 
-        {/* Ambient top glow */}
+        {/* Logo */}
         <div style={{
-          position: 'absolute', top: -70, left: -40,
-          width: 220, height: 220,
-          background: 'radial-gradient(circle, hsl(158 64% 36% / 0.13) 0%, transparent 68%)',
-          pointerEvents: 'none', zIndex: 0,
-        }} />
-
-        {/* Branding */}
-        <div style={{
-          padding: '20px 18px 16px',
-          borderBottom: '1px solid hsl(222 14% 12%)',
-          position: 'relative', zIndex: 1,
+          padding: '18px 16px',
+          borderBottom: '1px solid hsl(226 10% 12%)',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{
-              width: 30, height: 30, flexShrink: 0,
+              width: 34, height: 34, flexShrink: 0,
               background: 'hsl(158 64% 36%)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontFamily: 'var(--font-anton)', fontSize: 11, letterSpacing: '0.05em',
-              color: 'hsl(0 0% 98%)',
-              boxShadow: '0 0 20px hsl(158 64% 36% / 0.45)',
+              fontFamily: 'var(--font-anton)', fontSize: 13, letterSpacing: '0.04em',
+              color: '#fff',
+              boxShadow: '0 0 0 1px hsl(158 64% 36% / 0.35), 0 4px 14px hsl(158 64% 36% / 0.28)',
+              borderRadius: 6,
             }}>
               TL
             </div>
             <div>
               <div style={{
-                fontFamily: 'var(--font-anton)', fontSize: 12,
-                letterSpacing: '0.2em', textTransform: 'uppercase',
-                color: 'hsl(220 12% 76%)', lineHeight: 1.2,
+                fontSize: 14, fontWeight: 600, letterSpacing: '-0.02em',
+                color: 'hsl(220 16% 86%)',
+                lineHeight: 1.2,
               }}>
                 thangle.me
               </div>
               <div style={{
-                fontSize: 9, letterSpacing: '0.24em', textTransform: 'uppercase',
-                color: 'hsl(158 64% 40%)', marginTop: 2,
+                fontSize: 11, color: 'hsl(158 55% 48%)',
+                marginTop: 2, letterSpacing: '0.01em',
               }}>
-                admin
+                Dashboard
               </div>
             </div>
           </div>
         </div>
 
         {/* Nav */}
-        <nav data-lenis-prevent style={{
-          flex: 1, paddingTop: 6, paddingBottom: 6,
-          overflowY: 'auto', position: 'relative', zIndex: 1,
-        }}>
+        <nav data-lenis-prevent style={{ flex: 1, padding: '8px 10px', overflowY: 'auto' }}>
           <div style={{
-            padding: '6px 18px 4px',
-            fontSize: 9, letterSpacing: '0.28em', textTransform: 'uppercase',
-            color: 'hsl(220 7% 26%)',
+            fontSize: 10, fontWeight: 600, letterSpacing: '0.07em',
+            textTransform: 'uppercase', color: 'hsl(220 6% 32%)',
+            padding: '4px 8px 6px',
           }}>
-            menu
+            Navigation
           </div>
 
           {NAV.map(({ href, label, Icon, exact }) => {
@@ -207,48 +188,68 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 href={href}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 10,
-                  margin: '1px 8px',
-                  padding: '8px 10px',
-                  fontSize: 12, letterSpacing: '0.04em',
+                  padding: '9px 10px',
+                  marginBottom: 1,
+                  fontSize: 13,
+                  fontWeight: isActive ? 500 : 400,
+                  letterSpacing: '-0.01em',
                   textDecoration: 'none',
-                  borderRadius: 5,
-                  color: isActive ? 'hsl(158 64% 62%)' : isHov ? 'hsl(220 10% 58%)' : 'hsl(220 8% 38%)',
+                  borderRadius: 8,
+                  color: isActive ? 'hsl(158 58% 58%)' : isHov ? 'hsl(220 10% 66%)' : 'hsl(220 8% 42%)',
                   background: isActive
-                    ? 'linear-gradient(90deg, hsl(158 64% 36% / 0.18) 0%, hsl(158 64% 36% / 0.04) 100%)'
-                    : isHov ? 'hsl(222 14% 11%)' : 'transparent',
-                  borderLeft: `2px solid ${isActive ? 'hsl(158 64% 42%)' : 'transparent'}`,
+                    ? 'hsl(158 64% 42% / 0.12)'
+                    : isHov ? 'hsl(226 12% 11%)' : 'transparent',
                   transition: 'color 0.14s, background 0.14s',
                 }}
                 onMouseEnter={() => setHoveredNav(href)}
                 onMouseLeave={() => setHoveredNav(null)}
               >
                 <Icon />
-                <span>{label}</span>
+                <span style={{ flex: 1 }}>{label}</span>
+                {isActive && (
+                  <div style={{
+                    width: 6, height: 6, borderRadius: '50%',
+                    background: 'hsl(158 64% 42%)',
+                    boxShadow: '0 0 6px hsl(158 64% 42% / 0.5)',
+                    flexShrink: 0,
+                  }} />
+                )}
               </Link>
             )
           })}
         </nav>
 
-        {/* User / logout */}
+        {/* User */}
         <div style={{
-          borderTop: '1px solid hsl(222 14% 12%)',
-          padding: '13px 18px',
-          position: 'relative', zIndex: 1,
+          padding: '12px 14px',
+          borderTop: '1px solid hsl(226 10% 12%)',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 10,
+            padding: '10px 10px',
+            borderRadius: 8,
+            background: 'hsl(226 12% 10%)',
+            marginBottom: 8,
+          }}>
             <div style={{
-              width: 6, height: 6, borderRadius: '50%', flexShrink: 0,
-              background: 'hsl(158 64% 42%)',
-              animation: 'dot-pulse 2.5s ease-in-out infinite',
-            }} />
+              width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
+              background: 'hsl(158 64% 36% / 0.18)',
+              border: '1px solid hsl(158 64% 36% / 0.28)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 11, fontWeight: 600,
+              color: 'hsl(158 58% 54%)',
+            }}>
+              {initial}
+            </div>
             <div style={{
-              fontSize: 10, color: 'hsl(220 7% 34%)',
+              fontSize: 11, color: 'hsl(220 8% 48%)',
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-              letterSpacing: '0.02em',
+              letterSpacing: '-0.01em', flex: 1,
             }}>
               {user?.email ?? '—'}
             </div>
           </div>
+
           <button
             onClick={async () => {
               setIsLoggingOut(true)
@@ -256,17 +257,28 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               catch { setIsLoggingOut(false) }
             }}
             style={{
-              display: 'flex', alignItems: 'center', gap: 7,
-              fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase',
-              color: 'hsl(0 62% 52%)',
-              background: 'none', border: 'none', padding: 0, cursor: 'pointer',
-              transition: 'color 0.12s',
+              width: '100%',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+              padding: '8px 12px',
+              borderRadius: 7,
+              fontSize: 12, fontWeight: 500,
+              color: 'hsl(0 62% 55%)',
+              background: 'hsl(0 62% 52% / 0.08)',
+              border: '1px solid hsl(0 62% 52% / 0.15)',
+              cursor: 'pointer',
+              transition: 'background 0.15s, border-color 0.15s',
             }}
-            onMouseEnter={e => (e.currentTarget.style.color = 'hsl(0 62% 68%)')}
-            onMouseLeave={e => (e.currentTarget.style.color = 'hsl(0 62% 52%)')}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = 'hsl(0 62% 52% / 0.14)'
+              e.currentTarget.style.borderColor = 'hsl(0 62% 52% / 0.28)'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = 'hsl(0 62% 52% / 0.08)'
+              e.currentTarget.style.borderColor = 'hsl(0 62% 52% / 0.15)'
+            }}
           >
             <IconLogout />
-            sign out
+            Sign Out
           </button>
         </div>
       </aside>
@@ -277,41 +289,38 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Topbar */}
         <header style={{
           height: 44, minHeight: 44, flexShrink: 0,
-          background: 'hsl(223 15% 8.5%)',
-          borderBottom: '1px solid hsl(222 14% 14%)',
+          background: 'hsl(227 13% 9%)',
+          borderBottom: '1px solid hsl(226 10% 14%)',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '0 28px',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 12 }}>
-            <span style={{ color: 'hsl(158 64% 42%)', fontSize: 8, lineHeight: 1 }}>◆</span>
-            <span style={{ color: 'hsl(222 12% 26%)', fontSize: 11 }}>/</span>
-            {segments.length === 0
-              ? <span style={{ color: 'hsl(220 10% 60%)', letterSpacing: '0.05em' }}>overview</span>
-              : segments.map((seg, i) => (
-                <span key={i} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                  {i > 0 && <span style={{ color: 'hsl(222 12% 24%)', fontSize: 11 }}>/</span>}
-                  <span style={{
-                    letterSpacing: '0.05em',
-                    color: i === segments.length - 1 ? 'hsl(220 10% 60%)' : 'hsl(220 8% 38%)',
-                  }}>
-                    {seg}
-                  </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 13, color: 'hsl(220 6% 30%)', letterSpacing: '-0.01em' }}>
+              Dashboard
+            </span>
+            {segments.map((seg, i) => (
+              <span key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ color: 'hsl(220 6% 24%)', fontSize: 16, lineHeight: 1, fontWeight: 300 }}>›</span>
+                <span style={{
+                  fontSize: 13, letterSpacing: '-0.01em',
+                  color: i === segments.length - 1 ? 'hsl(220 12% 70%)' : 'hsl(220 8% 40%)',
+                  fontWeight: i === segments.length - 1 ? 500 : 400,
+                  textTransform: 'capitalize',
+                }}>
+                  {seg}
                 </span>
-              ))
-            }
+              </span>
+            ))}
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div style={{
-              width: 5, height: 5, borderRadius: '50%',
+              width: 7, height: 7, borderRadius: '50%',
               background: 'hsl(158 64% 42%)',
-              boxShadow: '0 0 6px hsl(158 64% 42% / 0.55)',
+              boxShadow: '0 0 0 2px hsl(158 64% 42% / 0.22)',
             }} />
-            <span style={{
-              fontSize: 9, letterSpacing: '0.22em', textTransform: 'uppercase',
-              color: 'hsl(220 7% 30%)',
-            }}>
-              active
+            <span style={{ fontSize: 12, color: 'hsl(220 6% 34%)', letterSpacing: '-0.01em' }}>
+              Online
             </span>
           </div>
         </header>

@@ -23,16 +23,16 @@ export default function Home() {
             <div className="page- md:pl-24 lg:pl-40 xl:pl-52">
                 <ProjectList />
             </div>
-            <div className="page- md:pl-32 lg:pl-52 xl:pl-72">
+            <div className="page- md:pl-40 lg:pl-64 xl:pl-80">
                 <ITSkills />
             </div>
-            <div className="page- md:pl-24 lg:pl-40 xl:pl-56">
+            <div className="page- md:pl-44 lg:pl-72 xl:pl-96">
                 <Skills />
             </div>
             <div className="page- md:pl-32 lg:pl-52 xl:pl-72">
                 <Certifications />
             </div>
-            <div className="page- md:pl-12 lg:pl-20 xl:pl-28">
+            <div className="page- md:pl-24 lg:pl-40 xl:pl-56">
                 <ContactSection />
             </div>
         </HorizontalScrollLayout>

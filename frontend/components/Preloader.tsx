@@ -7,6 +7,13 @@ gsap.registerPlugin(useGSAP);
 
 const Preloader = () => {
     const preloaderRef = useRef<HTMLDivElement>(null);
+    const leaves = Array.from({ length: 14 }, (_, i) => ({
+        id: i,
+        left: 6 + ((i * 7) % 86),
+        size: 10 + ((i * 3) % 9),
+        duration: 2.2 + ((i * 0.17) % 1.25),
+        delay: -(i * 0.25),
+    }));
 
     useGSAP(
         () => {
@@ -14,33 +21,19 @@ const Preloader = () => {
                 defaults: { ease: 'power2.inOut' },
             });
 
-            tl.from('.preloader-glyph-part', {
-                yPercent: 80,
-                opacity: 0,
-                stagger: 0.08,
-                duration: 0.5,
-                ease: 'power3.out',
-            })
-                .fromTo(
-                    '.preloader-glyph',
-                    { filter: 'blur(8px)' },
-                    { filter: 'blur(0px)', duration: 0.45, ease: 'power2.out' },
-                    '<',
-                )
+            tl.fromTo(
+                '.preloader-flower-wrap',
+                { filter: 'blur(8px)', y: 16, opacity: 0 },
+                { filter: 'blur(0px)', y: 0, opacity: 1, duration: 0.55, ease: 'power2.out' },
+            )
                 .to(
                     '.preloader-bar-fill',
                     { scaleX: 1, duration: 1.1, ease: 'power2.inOut' },
                     '-=0.15',
                 )
-                .to('.preloader-orbit', {
-                    rotate: 360,
-                    transformOrigin: '50% 50%',
-                    duration: 1,
-                    ease: 'none',
-                }, '<')
-                .to('.preloader-glyph-wrap', { y: -22, opacity: 0, duration: 0.35 }, '+=0.2')
+                .to('.preloader-leaf', { opacity: 0, duration: 0.25 }, '+=0.2')
+                .to('.preloader-flower-wrap', { y: -22, opacity: 0, duration: 0.35 }, '<')
                 .to('.preloader-bar', { opacity: 0, duration: 0.25 }, '<')
-                .to('.preloader-orbit', { opacity: 0, duration: 0.2 }, '<')
                 .to(preloaderRef.current, { opacity: 0, duration: 0.4 })
                 .set(preloaderRef.current, { display: 'none' });
         },
@@ -52,58 +45,82 @@ const Preloader = () => {
             ref={preloaderRef}
             className="fixed inset-0 z-[6] bg-background flex flex-col items-center justify-center"
         >
-            <div className="preloader-glyph-wrap -mt-12 md:-mt-16">
+            <div className="preloader-flower-wrap relative -mt-12 md:-mt-16 w-[180px] h-[180px] md:w-[220px] md:h-[220px]">
+                <div className="absolute inset-0 pointer-events-none">
+                    {leaves.map((leaf) => (
+                        <span
+                            key={leaf.id}
+                            className="preloader-leaf absolute"
+                            style={{
+                                left: `${leaf.left}%`,
+                                top: '-12%',
+                                width: `${leaf.size}px`,
+                                height: `${leaf.size + 6}px`,
+                                animationDuration: `${leaf.duration}s`,
+                                animationDelay: `${leaf.delay}s`,
+                            }}
+                        >
+                            <svg
+                                width="100%"
+                                height="100%"
+                                viewBox="0 0 12 18"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path d="M6 1C8.7 4.2 10.6 8.3 10.6 11.2C10.6 14.7 8.5 17 6 17C3.5 17 1.4 14.7 1.4 11.2C1.4 8.3 3.3 4.2 6 1Z" fill="hsl(var(--primary) / 0.9)" />
+                                <path d="M6 3.5V15.5" stroke="hsl(var(--background))" strokeOpacity="0.32" strokeWidth="0.8" strokeLinecap="round" />
+                            </svg>
+                        </span>
+                    ))}
+                </div>
                 <svg
-                    className="preloader-glyph w-[140px] h-[140px] md:w-[170px] md:h-[170px] text-primary"
+                    className="preloader-flower w-full h-full"
                     viewBox="0 0 120 120"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
-                    aria-label="Thang Le monogram"
+                    aria-label="Flower preloader"
                 >
-                    <path
-                        className="preloader-glyph-part"
-                        d="M18 24H102"
-                        stroke="currentColor"
-                        strokeWidth="8"
-                        strokeLinecap="round"
-                    />
-                    <path
-                        className="preloader-glyph-part"
-                        d="M60 24V96"
-                        stroke="currentColor"
-                        strokeWidth="8"
-                        strokeLinecap="round"
-                    />
-                    <path
-                        className="preloader-glyph-part"
-                        d="M60 96H100"
-                        stroke="currentColor"
-                        strokeWidth="8"
-                        strokeLinecap="round"
-                    />
-                    <path
-                        className="preloader-glyph-part"
-                        d="M20 58C20 42 34 30 50 30"
-                        stroke="currentColor"
-                        strokeWidth="8"
-                        strokeLinecap="round"
-                    />
-                    <circle
-                        className="preloader-glyph-part"
-                        cx="20"
-                        cy="58"
-                        r="5"
-                        fill="currentColor"
-                    />
+                    <circle cx="60" cy="42" r="12" fill="hsl(var(--primary))" />
+                    <ellipse cx="60" cy="22" rx="10" ry="14" fill="hsl(var(--foreground) / 0.9)" />
+                    <ellipse cx="60" cy="62" rx="10" ry="14" fill="hsl(var(--foreground) / 0.9)" />
+                    <ellipse cx="40" cy="42" rx="14" ry="10" fill="hsl(var(--foreground) / 0.9)" />
+                    <ellipse cx="80" cy="42" rx="14" ry="10" fill="hsl(var(--foreground) / 0.9)" />
+                    <ellipse cx="46" cy="28" rx="10" ry="8" transform="rotate(-28 46 28)" fill="hsl(var(--foreground) / 0.9)" />
+                    <ellipse cx="74" cy="28" rx="10" ry="8" transform="rotate(28 74 28)" fill="hsl(var(--foreground) / 0.9)" />
+                    <path d="M60 54V106" stroke="hsl(var(--primary) / 0.95)" strokeWidth="6" strokeLinecap="round" />
+                    <path d="M60 78C48 72 42 79 44 88C54 90 60 86 60 78Z" fill="hsl(var(--primary) / 0.8)" />
+                    <path d="M60 84C72 78 78 85 76 94C66 96 60 92 60 84Z" fill="hsl(var(--primary) / 0.75)" />
                 </svg>
             </div>
-            <div className="preloader-bar relative mt-64 md:mt-72 w-44 h-[3px] bg-background-light/60 overflow-hidden rounded-full">
+            <div className="preloader-bar relative mt-10 md:mt-12 w-44 h-[3px] bg-background-light/60 overflow-hidden rounded-full">
                 <div className="preloader-bar-fill absolute inset-0 bg-primary/90 rounded-full origin-left scale-x-0"></div>
             </div>
-            <div className="preloader-orbit pointer-events-none absolute mt-64 md:mt-72 w-24 h-24">
-                <span className="absolute top-0 left-1/2 -translate-x-1/2 size-2 rounded-full bg-primary/70" />
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 size-1.5 rounded-full bg-primary/45" />
-            </div>
+            <style jsx>{`
+                .preloader-leaf {
+                    animation-name: preloaderLeafFall;
+                    animation-timing-function: linear;
+                    animation-iteration-count: infinite;
+                    opacity: 0;
+                    will-change: transform, opacity;
+                }
+                @keyframes preloaderLeafFall {
+                    0% {
+                        transform: translate3d(0, -8px, 0) rotate(-12deg);
+                        opacity: 0;
+                    }
+                    10% {
+                        opacity: 0.95;
+                    }
+                    55% {
+                        transform: translate3d(8px, 110px, 0) rotate(10deg);
+                        opacity: 0.9;
+                    }
+                    100% {
+                        transform: translate3d(-10px, 220px, 0) rotate(28deg);
+                        opacity: 0;
+                    }
+                }
+            `}</style>
         </div>
     );
 };

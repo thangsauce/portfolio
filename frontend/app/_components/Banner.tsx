@@ -153,6 +153,52 @@ const Banner = () => {
                     </div>
 
                     <div className="slide-up-and-fade relative shrink-0 w-full max-w-[300px] sm:max-w-[360px] lg:max-w-[390px] mx-0 mr-auto lg:mx-0 mt-12 lg:mt-0">
+
+                        {/* Speech bubble */}
+                        <div style={{
+                            position: 'absolute',
+                            top: -18,
+                            right: -14,
+                            zIndex: 10,
+                            animation: 'bubble-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 3.8s both',
+                        }}>
+                            <div style={{
+                                background: '#fff',
+                                color: '#111',
+                                borderRadius: 14,
+                                padding: '9px 15px',
+                                boxShadow: '0 8px 28px rgba(0,0,0,0.22), 0 2px 8px rgba(0,0,0,0.1)',
+                                fontSize: 14,
+                                fontWeight: 600,
+                                whiteSpace: 'nowrap',
+                                fontFamily: 'var(--font-roboto-flex)',
+                                letterSpacing: '-0.01em',
+                                lineHeight: 1,
+                            }}>
+                                Hi! I&apos;m Thang 👋
+                            </div>
+                            {/* Tail pointing down-left toward face */}
+                            <div style={{
+                                position: 'absolute',
+                                bottom: -7,
+                                left: 18,
+                                width: 14,
+                                height: 14,
+                                background: '#fff',
+                                transform: 'rotate(45deg)',
+                                boxShadow: '2px 2px 4px rgba(0,0,0,0.08)',
+                                borderRadius: 2,
+                            }} />
+                        </div>
+
+                        <style>{`
+                            @keyframes bubble-pop {
+                                0%   { opacity: 0; transform: scale(0.5) translateY(4px); }
+                                70%  { opacity: 1; transform: scale(1.06) translateY(-1px); }
+                                100% { opacity: 1; transform: scale(1) translateY(0); }
+                            }
+                        `}</style>
+
                         <div className="relative overflow-hidden">
                             <Image
                                 src="/me.png"

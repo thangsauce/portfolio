@@ -111,7 +111,7 @@ export function ContactSection() {
     };
 
     return (
-        <section className="relative pt-28 pb-24 md:pt-40 md:pb-24" id="contact" ref={containerRef}>
+        <section className="relative pt-16 pb-24 md:pt-28 md:pb-24" id="contact" ref={containerRef}>
             <button
                 type="button"
                 onClick={handleBackToHome}

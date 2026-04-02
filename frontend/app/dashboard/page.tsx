@@ -4,53 +4,74 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { apiPrivate } from '@/lib/api'
 
-// ── Types ───────────────────────────────────────────────────────────────────
+// ── Types ────────────────────────────────────────────────────────────────────
 type Stats = { notes: number; pending: number; learning: number; docs: number }
 
-// ── Config ──────────────────────────────────────────────────────────────────
+// ── Config ───────────────────────────────────────────────────────────────────
 const SYSTEM = [
-  { key: 'api',    val: 'api.thangle.me' },
-  { key: 'auth',   val: 'supabase'       },
-  { key: 'db',     val: 'postgresql'     },
-  { key: 'deploy', val: 'cloudflare'     },
+  { key: 'API',    val: 'api.thangle.me' },
+  { key: 'Auth',   val: 'Supabase'       },
+  { key: 'DB',     val: 'PostgreSQL'     },
+  { key: 'Deploy', val: 'Cloudflare'     },
 ]
 
 const QUICK = [
-  { label: 'portfolio',  sub: 'manage cms',   href: '/dashboard/portfolio' },
-  { label: 'new note',   sub: 'open editor',  href: '/dashboard/notes'     },
-  { label: 'todos',      sub: 'task board',   href: '/dashboard/todos'     },
-  { label: 'write post', sub: 'blog editor',  href: '/dashboard/blog'      },
+  { label: 'Portfolio CMS', sub: 'Manage projects',   href: '/dashboard/portfolio' },
+  { label: 'Notes',         sub: 'Open editor',       href: '/dashboard/notes'     },
+  { label: 'Task Board',    sub: 'View todos',        href: '/dashboard/todos'     },
+  { label: 'Write Post',    sub: 'Blog editor',       href: '/dashboard/blog'      },
+]
+
+const STAT_COLORS = [
+  'hsl(158 64% 42%)',
+  'hsl(40 90% 55%)',
+  'hsl(193 80% 50%)',
+  'hsl(280 60% 62%)',
 ]
 
 // ── Stat card ────────────────────────────────────────────────────────────────
-function StatCard({ label, value, cmd, borderGrad, loaded }: {
-  label: string; value: number; cmd: string
-  borderGrad: string; loaded: boolean
+function StatCard({ label, value, sub, color, loaded }: {
+  label: string; value: number; sub: string; color: string; loaded: boolean
 }) {
   return (
-    <div style={{ padding: 1, background: borderGrad }}>
-      <div style={{ background: 'hsl(222 14% 8%)', padding: '20px 18px 16px' }}>
-        <div style={{
-          fontSize: 9, letterSpacing: '0.28em', textTransform: 'uppercase',
-          color: 'hsl(220 7% 32%)', marginBottom: 14,
-        }}>
-          {cmd}
-        </div>
-        <div style={{
-          fontFamily: 'var(--font-anton)',
-          fontSize: 44, letterSpacing: '0.02em', lineHeight: 1,
-          color: loaded ? 'hsl(220 12% 86%)' : 'hsl(220 8% 26%)',
-          marginBottom: 8,
-          transition: 'color 0.4s',
-        }}>
-          {loaded ? value : '—'}
-        </div>
-        <div style={{
-          fontSize: 10, letterSpacing: '0.16em', textTransform: 'lowercase',
-          color: 'hsl(220 7% 34%)',
+    <div style={{
+      background: 'hsl(226 12% 11%)',
+      border: '1px solid hsl(226 10% 16%)',
+      borderRadius: 10,
+      padding: '20px 20px 18px',
+    }}>
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        marginBottom: 18,
+      }}>
+        <span style={{
+          fontSize: 12, fontWeight: 500,
+          color: 'hsl(220 8% 48%)',
+          letterSpacing: '-0.01em',
         }}>
           {label}
-        </div>
+        </span>
+        <div style={{
+          width: 8, height: 8, borderRadius: '50%',
+          background: color, opacity: 0.65,
+        }} />
+      </div>
+
+      <div style={{
+        fontFamily: 'var(--font-anton)',
+        fontSize: 44, letterSpacing: '-0.01em', lineHeight: 1,
+        color: loaded ? 'hsl(220 15% 90%)' : 'hsl(220 8% 24%)',
+        marginBottom: 8,
+        transition: 'color 0.4s',
+      }}>
+        {loaded ? value : '—'}
+      </div>
+
+      <div style={{
+        fontSize: 11, color: color,
+        opacity: 0.75, letterSpacing: '-0.01em',
+      }}>
+        {sub}
       </div>
     </div>
   )
@@ -71,9 +92,9 @@ export default function DashboardPage() {
     function tick() {
       const now = new Date()
       const h   = now.getHours()
-      setGreeting(h < 12 ? 'good morning' : h < 17 ? 'good afternoon' : 'good evening')
+      setGreeting(h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening')
       setTime(now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }))
-      setDate(now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }))
+      setDate(now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }))
     }
     tick()
     const id = setInterval(tick, 1000)
@@ -106,121 +127,116 @@ export default function DashboardPage() {
         marginBottom: 28,
       }}>
         <div>
-          <div style={{
-            fontSize: 9, letterSpacing: '0.35em', textTransform: 'uppercase',
-            color: 'hsl(158 64% 40%)', marginBottom: 8,
-          }}>
-            // session active
-          </div>
           <h1 style={{
-            fontFamily: 'var(--font-anton)',
-            fontSize: 28, letterSpacing: '0.08em', textTransform: 'uppercase',
-            color: 'hsl(220 12% 86%)', lineHeight: 1, margin: '0 0 8px',
+            fontSize: 24, fontWeight: 600, letterSpacing: '-0.02em',
+            color: 'hsl(220 15% 90%)', margin: '0 0 5px',
           }}>
-            {greeting || 'welcome back'}
+            {greeting || 'Welcome back'}
           </h1>
-          <div style={{
-            fontSize: 11, color: 'hsl(220 7% 38%)', letterSpacing: '0.06em',
+          <p style={{
+            fontSize: 13, color: 'hsl(220 6% 42%)', margin: 0,
+            letterSpacing: '-0.01em',
           }}>
             {date}
-          </div>
+          </p>
         </div>
 
-        {/* Live clock */}
+        {/* Clock */}
         <div style={{
-          padding: '12px 18px',
-          border: '1px solid hsl(222 14% 15%)',
-          background: 'hsl(222 14% 8%)',
+          padding: '10px 18px',
+          background: 'hsl(226 12% 11%)',
+          border: '1px solid hsl(226 10% 16%)',
+          borderRadius: 8,
           textAlign: 'right',
         }}>
           <div style={{
             fontFamily: 'var(--font-anton)',
-            fontSize: 26, letterSpacing: '0.08em',
-            color: 'hsl(220 10% 68%)',
+            fontSize: 22, letterSpacing: '0.04em',
+            color: 'hsl(220 10% 62%)',
             fontVariantNumeric: 'tabular-nums', lineHeight: 1,
           }}>
             {time}
           </div>
           <div style={{
-            fontSize: 9, letterSpacing: '0.24em', textTransform: 'uppercase',
-            color: 'hsl(220 7% 28%)', marginTop: 5,
+            fontSize: 10, fontWeight: 500,
+            color: 'hsl(220 6% 30%)', marginTop: 5,
+            letterSpacing: '0.05em', textTransform: 'uppercase',
           }}>
-            local time
+            Local Time
           </div>
         </div>
       </div>
 
       {/* ── Stats ─────────────────────────────────────────────────────────── */}
       <div style={{
-        display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10,
+        display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12,
         marginBottom: 12,
       }}>
-        <StatCard
-          label="total notes"
-          value={stats?.notes ?? 0}
-          cmd="notes.count()"
-          borderGrad="linear-gradient(135deg, hsl(158 64% 36% / 0.55), hsl(222 14% 14%))"
-          loaded={stats !== null}
-        />
-        <StatCard
-          label="active tasks"
-          value={stats?.pending ?? 0}
-          cmd="todos.pending()"
-          borderGrad="linear-gradient(135deg, hsl(40 90% 50% / 0.45), hsl(222 14% 14%))"
-          loaded={stats !== null}
-        />
-        <StatCard
-          label="in progress"
-          value={stats?.learning ?? 0}
-          cmd="learning.active()"
-          borderGrad="linear-gradient(135deg, hsl(193 100% 47% / 0.38), hsl(222 14% 14%))"
-          loaded={stats !== null}
-        />
-        <StatCard
-          label="project docs"
-          value={stats?.docs ?? 0}
-          cmd="docs.count()"
-          borderGrad="linear-gradient(135deg, hsl(280 65% 60% / 0.38), hsl(222 14% 14%))"
-          loaded={stats !== null}
-        />
+        {([
+          { label: 'Notes',        sub: 'Total created',  value: stats?.notes    ?? 0 },
+          { label: 'Active Tasks', sub: 'Not completed',  value: stats?.pending  ?? 0 },
+          { label: 'Learning',     sub: 'In progress',    value: stats?.learning ?? 0 },
+          { label: 'Project Docs', sub: 'Total docs',     value: stats?.docs     ?? 0 },
+        ] as const).map((s, i) => (
+          <StatCard
+            key={s.label}
+            label={s.label}
+            value={s.value}
+            sub={s.sub}
+            color={STAT_COLORS[i]}
+            loaded={stats !== null}
+          />
+        ))}
       </div>
 
       {/* ── Bottom row ────────────────────────────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 10 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 12 }}>
 
         {/* System status */}
         <div style={{
-          border: '1px solid hsl(222 13% 15%)',
-          background: 'hsl(222 14% 8%)',
-          padding: '18px 20px',
+          background: 'hsl(226 12% 11%)',
+          border: '1px solid hsl(226 10% 16%)',
+          borderRadius: 10,
+          padding: '20px',
         }}>
-          <div style={{
-            fontSize: 9, letterSpacing: '0.3em', textTransform: 'uppercase',
-            color: 'hsl(220 7% 28%)', marginBottom: 16,
+          <h3 style={{
+            fontSize: 11, fontWeight: 600, letterSpacing: '0.06em',
+            textTransform: 'uppercase', color: 'hsl(220 6% 36%)',
+            margin: '0 0 16px',
           }}>
-            // system.status
-          </div>
+            System Status
+          </h3>
           {SYSTEM.map(({ key, val }) => (
             <div key={key} style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '7px 0',
-              borderBottom: '1px solid hsl(222 13% 12%)',
+              padding: '8px 0',
+              borderBottom: '1px solid hsl(226 10% 13%)',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <div style={{
-                  width: 5, height: 5, borderRadius: '50%', flexShrink: 0,
+                  width: 6, height: 6, borderRadius: '50%', flexShrink: 0,
                   background: 'hsl(158 64% 42%)',
                   boxShadow: '0 0 5px hsl(158 64% 42% / 0.5)',
                 }} />
-                <span style={{ fontSize: 11, color: 'hsl(220 7% 34%)', letterSpacing: '0.08em' }}>{key}</span>
-                <span style={{ fontSize: 10, color: 'hsl(220 7% 22%)' }}>→</span>
-                <span style={{ fontSize: 11, color: 'hsl(220 8% 50%)', letterSpacing: '0.04em' }}>{val}</span>
+                <span style={{
+                  fontSize: 13, color: 'hsl(220 8% 52%)', letterSpacing: '-0.01em',
+                }}>
+                  {key}
+                </span>
+                <span style={{ fontSize: 13, color: 'hsl(220 6% 28%)' }}>·</span>
+                <span style={{
+                  fontSize: 12, color: 'hsl(220 7% 38%)', letterSpacing: '-0.01em',
+                }}>
+                  {val}
+                </span>
               </div>
               <span style={{
-                fontSize: 9, letterSpacing: '0.22em', textTransform: 'uppercase',
-                color: 'hsl(158 64% 44%)',
+                fontSize: 11, fontWeight: 500,
+                color: 'hsl(158 58% 46%)',
+                background: 'hsl(158 64% 42% / 0.1)',
+                padding: '2px 8px', borderRadius: 4,
               }}>
-                ok
+                Operational
               </span>
             </div>
           ))}
@@ -228,16 +244,18 @@ export default function DashboardPage() {
 
         {/* Quick access */}
         <div style={{
-          border: '1px solid hsl(222 13% 15%)',
-          background: 'hsl(222 14% 8%)',
-          padding: '18px 20px',
+          background: 'hsl(226 12% 11%)',
+          border: '1px solid hsl(226 10% 16%)',
+          borderRadius: 10,
+          padding: '20px',
         }}>
-          <div style={{
-            fontSize: 9, letterSpacing: '0.3em', textTransform: 'uppercase',
-            color: 'hsl(220 7% 28%)', marginBottom: 14,
+          <h3 style={{
+            fontSize: 11, fontWeight: 600, letterSpacing: '0.06em',
+            textTransform: 'uppercase', color: 'hsl(220 6% 36%)',
+            margin: '0 0 14px',
           }}>
-            // quick.access
-          </div>
+            Quick Access
+          </h3>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             {QUICK.map(({ label, sub, href }) => (
               <Link
@@ -245,9 +263,10 @@ export default function DashboardPage() {
                 href={href}
                 style={{
                   display: 'block',
-                  padding: '12px 14px',
-                  border: `1px solid ${hovered === href ? 'hsl(158 64% 36% / 0.35)' : 'hsl(222 13% 14%)'}`,
-                  background: hovered === href ? 'hsl(158 64% 36% / 0.07)' : 'transparent',
+                  padding: '14px',
+                  borderRadius: 8,
+                  border: `1px solid ${hovered === href ? 'hsl(158 64% 42% / 0.3)' : 'hsl(226 10% 15%)'}`,
+                  background: hovered === href ? 'hsl(158 64% 42% / 0.07)' : 'hsl(226 12% 13%)',
                   textDecoration: 'none',
                   transition: 'border-color 0.15s, background 0.15s',
                   cursor: 'pointer',
@@ -256,24 +275,15 @@ export default function DashboardPage() {
                 onMouseLeave={() => setHovered(null)}
               >
                 <div style={{
-                  display: 'flex', alignItems: 'center', gap: 6,
-                  fontSize: 12, letterSpacing: '0.05em',
-                  color: hovered === href ? 'hsl(158 64% 58%)' : 'hsl(220 8% 48%)',
+                  fontSize: 13, fontWeight: 500, letterSpacing: '-0.01em',
+                  color: hovered === href ? 'hsl(158 58% 60%)' : 'hsl(220 10% 62%)',
                   marginBottom: 4,
                   transition: 'color 0.15s',
                 }}>
-                  <span style={{
-                    fontSize: 9,
-                    color: hovered === href ? 'hsl(158 64% 44%)' : 'hsl(220 7% 26%)',
-                    transition: 'color 0.15s',
-                  }}>
-                    →
-                  </span>
                   {label}
                 </div>
                 <div style={{
-                  fontSize: 9, letterSpacing: '0.12em', textTransform: 'uppercase',
-                  color: 'hsl(220 7% 28%)',
+                  fontSize: 11, color: 'hsl(220 6% 34%)', letterSpacing: '-0.01em',
                 }}>
                   {sub}
                 </div>
@@ -281,6 +291,7 @@ export default function DashboardPage() {
             ))}
           </div>
         </div>
+
       </div>
     </div>
   )
