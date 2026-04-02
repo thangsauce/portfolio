@@ -51,6 +51,7 @@ const SOCIAL_MENU_LINKS = [
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+    const [theme, setTheme] = useState<'light' | 'dark'>('dark');
     const router = useRouter();
     const pathname = usePathname();
     const lenis = useLenis();
@@ -137,17 +138,30 @@ const Navbar = () => {
 
     useEffect(() => {
         const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        const applySystemTheme = (isDark: boolean) => {
-            document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+        const saved = window.localStorage.getItem('theme-preference') as 'light' | 'dark' | null;
+        const initialTheme = saved ?? (mediaQuery.matches ? 'dark' : 'light');
+
+        setTheme(initialTheme);
+        document.documentElement.setAttribute('data-theme', initialTheme);
+
+        const handleChange = (e: MediaQueryListEvent) => {
+            const override = window.localStorage.getItem('theme-preference');
+            if (override) return;
+            const nextTheme = e.matches ? 'dark' : 'light';
+            setTheme(nextTheme);
+            document.documentElement.setAttribute('data-theme', nextTheme);
         };
 
-        applySystemTheme(mediaQuery.matches);
-        const handleChange = (e: MediaQueryListEvent) => {
-            applySystemTheme(e.matches);
-        };
         mediaQuery.addEventListener('change', handleChange);
         return () => mediaQuery.removeEventListener('change', handleChange);
     }, []);
+
+    const toggleTheme = () => {
+        const nextTheme = theme === 'dark' ? 'light' : 'dark';
+        setTheme(nextTheme);
+        document.documentElement.setAttribute('data-theme', nextTheme);
+        window.localStorage.setItem('theme-preference', nextTheme);
+    };
 
     useEffect(() => {
         const eye = eyeRef.current;
@@ -371,19 +385,19 @@ const Navbar = () => {
             <div
                 className={cn(
                     'fixed top-20 right-4 z-[3] overflow-hidden gap-y-2 transform transition-all duration-300 ease-linear',
-                    'w-max max-w-[calc(100vw-2rem)] rounded-xl border border-white/10 -translate-y-3 opacity-0 invisible pointer-events-none',
-                    'md:top-5 md:left-1/2 md:right-auto md:w-max md:max-w-[calc(100vw-5rem)] md:h-auto md:min-h-0 md:rounded-xl md:border md:border-white/10 md:-translate-y-full md:-translate-x-1/2',
+                    'w-max max-w-[calc(100vw-2rem)] rounded-xl border border-border/70 -translate-y-3 opacity-0 invisible pointer-events-none',
+                    'md:top-5 md:left-1/2 md:right-auto md:w-max md:max-w-[calc(100vw-5rem)] md:h-auto md:min-h-0 md:rounded-xl md:border md:border-border/70 md:-translate-y-full md:-translate-x-1/2',
                     'flex flex-col py-2 md:py-1',
                     {
                         'translate-y-0 opacity-100 visible pointer-events-auto md:translate-y-0 md:-translate-x-1/2': isMenuOpen,
                     },
                 )}
             >
-                <div className="absolute inset-0 bg-background-light/5 backdrop-blur-sm z-[-1]" />
+                <div className="absolute inset-0 bg-background/85 backdrop-blur-md z-[-1]" />
                 <div className="grow flex md:items-start w-auto px-4 md:px-5 lg:px-6">
                     <div className="flex gap-6 md:gap-6 lg:gap-8 md:justify-center md:items-start md:flex-row flex-col w-auto">
                         <div className="order-2 md:order-2">
-                            <p className="text-primary/85 mb-3 md:mb-2">
+                            <p className="text-primary mb-3 md:mb-2">
                                 SOCIAL
                             </p>
                             <ul className="space-y-1">
@@ -392,7 +406,7 @@ const Navbar = () => {
                                         {'internal' in link && link.internal ? (
                                             <button
                                                 onClick={() => navigateTo(link.url)}
-                                                className="group flex items-center gap-2.5 text-base md:text-lg capitalize text-foreground/85 hover:text-foreground transition-colors duration-200"
+                                            className="group flex items-center gap-2.5 text-base md:text-lg capitalize text-foreground hover:text-primary transition-colors duration-200"
                                             >
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-foreground/75 transition-all duration-200 group-hover:text-primary group-hover:[filter:drop-shadow(0_0_6px_#4ade80)]">
                                                     <path d="M4 19.5V4.5a.5.5 0 0 1 .8-.4L10 8h10a.5.5 0 0 1 .5.5v10.5a.5.5 0 0 1-.5.5H4.5a.5.5 0 0 1-.5-.5Z" />
@@ -406,7 +420,7 @@ const Navbar = () => {
                                                 href={link.url}
                                                 target="_blank"
                                                 rel="noreferrer"
-                                                className="group flex items-center gap-2.5 text-base md:text-lg capitalize text-foreground/85 hover:text-foreground transition-colors duration-200"
+                                                className="group flex items-center gap-2.5 text-base md:text-lg capitalize text-foreground hover:text-primary transition-colors duration-200"
                                             >
                                                 {link.name === 'github' && (
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="text-foreground/75 transition-all duration-200 group-hover:text-green-400 group-hover:[filter:drop-shadow(0_0_6px_#4ade80)]">
@@ -426,7 +440,7 @@ const Navbar = () => {
                             </ul>
                         </div>
                         <div className="order-1 md:order-1">
-                            <p className="text-primary/85 mb-3 md:mb-2">
+                            <p className="text-primary mb-3 md:mb-2">
                                 MENU
                             </p>
                             <ul className="space-y-1 md:space-y-0 md:grid md:grid-rows-3 md:grid-flow-col md:gap-x-8 md:gap-y-1">
@@ -460,16 +474,44 @@ const Navbar = () => {
                             </ul>
                         </div>
                         <div className="order-3">
-                            <p className="text-primary/85 mb-3 md:mb-2">ACTION</p>
-                            <button
-                                onClick={() => {
-                                    navigateTo('/#contact');
-                                }}
-                                className="group flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors duration-200"
-                            >
-                                <span className="text-sm md:text-base uppercase tracking-widest">Let's Connect</span>
-                                <MoveUpRight size={16} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-200" />
-                            </button>
+                            <p className="text-primary mb-3 md:mb-2">ACTION</p>
+                            <div className="flex flex-col gap-2.5">
+                                <button
+                                    onClick={() => {
+                                        navigateTo('/#contact');
+                                    }}
+                                    className="group flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors duration-200"
+                                >
+                                    <span className="text-sm md:text-base uppercase tracking-widest">Let's Connect</span>
+                                    <MoveUpRight size={16} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-200" />
+                                </button>
+
+                                <button
+                                    onClick={toggleTheme}
+                                    className="group inline-flex items-center gap-2.5 text-muted-foreground hover:text-foreground transition-colors duration-200"
+                                >
+                                    {theme === 'dark' ? (
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                            <circle cx="12" cy="12" r="5" />
+                                            <path d="M12 1v2" />
+                                            <path d="M12 21v2" />
+                                            <path d="m4.22 4.22 1.42 1.42" />
+                                            <path d="m18.36 18.36 1.42 1.42" />
+                                            <path d="M1 12h2" />
+                                            <path d="M21 12h2" />
+                                            <path d="m4.22 19.78 1.42-1.42" />
+                                            <path d="m18.36 5.64 1.42-1.42" />
+                                        </svg>
+                                    ) : (
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+                                        </svg>
+                                    )}
+                                    <span className="text-sm md:text-base uppercase tracking-widest">
+                                        {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                                    </span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -141,7 +141,6 @@ export function ContactSection() {
             </button>
             <div className="container">
                 <div className="max-w-2xl">
-                    <p className="text-sm uppercase tracking-widest text-muted-foreground/60 mb-3">Let's Connect</p>
                     <h2 className="text-4xl md:text-5xl font-anton leading-none mb-10">
                         Let&apos;s <span className="text-primary">Connect</span>
                     </h2>

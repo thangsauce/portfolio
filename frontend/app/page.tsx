@@ -29,7 +29,7 @@ export default function Home() {
             <div className="page- md:pl-44 lg:pl-72 xl:pl-96">
                 <Skills />
             </div>
-            <div className="page- md:pl-32 lg:pl-52 xl:pl-72">
+            <div className="page- md:pl-56 lg:pl-80 xl:pl-96">
                 <Certifications />
             </div>
             <div className="page- md:pl-24 lg:pl-40 xl:pl-56">

@@ -21,6 +21,40 @@ const Banner = () => {
     const [bubbleText, setBubbleText] = React.useState('');
     const [showCursor, setShowCursor] = React.useState(false);
     const [showEmoji,  setShowEmoji]  = React.useState(false);
+    const bubblePrefix = "Hi! I'm ";
+
+    const goToContact = () => {
+        if (typeof window === 'undefined') return;
+        const target = document.querySelector('#contact') as HTMLElement | null;
+        if (!target) return;
+
+        const isHorizontalMode =
+            window.innerWidth >= 768 && !!document.querySelector('.horizontal-mode');
+
+        if (isHorizontalMode) {
+            const root = document.querySelector('.horizontal-mode') as HTMLElement | null;
+            const track = root?.firstElementChild as HTMLElement | null;
+            const panel = target.closest('.horizontal-panel') as HTMLElement | null;
+            if (root && track && panel) {
+                const horizontalDistance = Math.max(0, track.scrollWidth - window.innerWidth);
+                const rootTop = root.getBoundingClientRect().top + window.scrollY;
+                const panelOffset = Math.max(0, Math.min(horizontalDistance, panel.offsetLeft));
+                const targetY = rootTop + panelOffset;
+                if (lenis) {
+                    lenis.scrollTo(targetY, { duration: 1.05 });
+                } else {
+                    window.scrollTo({ top: targetY, behavior: 'smooth' });
+                }
+                return;
+            }
+        }
+
+        if (lenis) {
+            lenis.scrollTo('#contact', { duration: 1.05 });
+        } else {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    };
 
     const renderAnimatedWord = (word: string, className?: string) => (
         <span className={className}>
@@ -44,7 +78,7 @@ const Banner = () => {
 
     // Typewriter: starts after bubble pops in (3.9s)
     React.useEffect(() => {
-        const full = "Hi! I'm Thang Le";
+        const full = `${bubblePrefix}Thang Le`;
         let i = 0;
         const start = setTimeout(() => {
             setShowCursor(true);
@@ -114,28 +148,39 @@ const Banner = () => {
                                 className="banner-title slide-up-and-fade leading-[0.92] font-sans font-bold tracking-tight"
                             >
                                 {renderAnimatedWord('IT', 'text-primary block text-[32px] sm:text-[42px] md:text-[48px]')}
-                                {renderAnimatedWord('SPECIALIST', 'block text-[52px] sm:text-[80px] md:text-[96px] lg:text-[102px]')}
+                                <span className="block text-[52px] sm:text-[80px] md:text-[96px] lg:text-[102px]">
+                                    {'SPECIALIST'.split('').map((char, idx) => (
+                                        <span
+                                            key={`specialist-${idx}`}
+                                            className={`hero-letter inline-block will-change-transform ${
+                                                idx === 7 || idx === 9 ? 'text-primary' : ''
+                                            }`}
+                                        >
+                                            {char}
+                                        </span>
+                                    ))}
+                                </span>
                             </h1>
                             <span className="hero-title-sweep absolute left-0 mt-2 block h-1.5 w-[200px] sm:w-[250px] rounded-full bg-primary/70" />
                         </div>
                         <p className="banner-description slide-up-and-fade mt-5 max-w-[52ch] text-base sm:text-lg leading-relaxed text-muted-foreground">
                             For most of the days, I dedicate most of my time to{' '}
-                            <span className="inline-flex items-center gap-1.5 text-foreground">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <span className="inline-flex items-center gap-1.5 text-foreground text-[1.08em] transition-all duration-200 hover:text-primary hover:[text-shadow:0_0_10px_rgba(52,211,153,0.55)] hover:[&>svg]:[filter:drop-shadow(0_0_6px_rgba(52,211,153,0.75))]">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-primary transition-all duration-200">
                                     <polyline points="16 18 22 12 16 6" />
                                     <polyline points="8 6 2 12 8 18" />
                                 </svg>
                                 web development
                             </span>,{' '}
-                            <span className="inline-flex items-center gap-1.5 text-foreground">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <span className="inline-flex items-center gap-1.5 text-foreground text-[1.08em] transition-all duration-200 hover:text-primary hover:[text-shadow:0_0_10px_rgba(52,211,153,0.55)] hover:[&>svg]:[filter:drop-shadow(0_0_6px_rgba(52,211,153,0.75))]">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-primary transition-all duration-200">
                                     <path d="M12 2 4 5v6c0 5 3.4 9.6 8 11 4.6-1.4 8-6 8-11V5l-8-3z" />
                                 </svg>
                                 cybersecurity
                             </span>,{' '}
                             <span className="text-muted-foreground">and</span>{' '}
-                            <span className="inline-flex items-center gap-1.5 text-foreground">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <span className="inline-flex items-center gap-1.5 text-foreground text-[1.08em] transition-all duration-200 hover:text-primary hover:[text-shadow:0_0_10px_rgba(52,211,153,0.55)] hover:[&>svg]:[filter:drop-shadow(0_0_6px_rgba(52,211,153,0.75))]">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-primary transition-all duration-200">
                                     <rect x="3" y="4" width="18" height="12" rx="2" />
                                     <path d="M8 20h8" />
                                     <path d="M12 16v4" />
@@ -147,15 +192,15 @@ const Banner = () => {
                             <Button
                                 as="button"
                                 variant="primary"
-                                onClick={() => lenis?.scrollTo('#contact')}
-                                className="border border-primary/55 shadow-[0_0_0_1px_rgba(52,211,153,0.22)_inset,0_0_18px_rgba(52,211,153,0.18)] before:content-[''] before:absolute before:inset-[5px] before:border before:border-primary/25 before:pointer-events-none"
+                                onClick={goToContact}
+                                className="rounded-full border border-primary/55 shadow-[0_0_0_1px_rgba(52,211,153,0.22)_inset,0_0_18px_rgba(52,211,153,0.18)] before:content-[''] before:absolute before:inset-[5px] before:border before:border-primary/25 before:pointer-events-none before:rounded-full"
                             >
                                 Let's Connect
                             </Button>
                             <a
                                 href={resumeUrl}
                                 download="Thang_Le_Resume.pdf"
-                                className="group h-12 px-8 inline-flex justify-center items-center text-lg uppercase font-anton tracking-widest border border-primary/45 bg-background/40 hover:border-primary hover:text-primary transition-colors overflow-hidden relative shadow-[0_0_0_1px_rgba(52,211,153,0.16)_inset,0_0_14px_rgba(52,211,153,0.12)] before:content-[''] before:absolute before:inset-[5px] before:border before:border-primary/20 before:pointer-events-none"
+                                className="group h-12 px-8 inline-flex justify-center items-center text-lg uppercase font-anton tracking-widest rounded-full border border-primary/45 bg-background/40 hover:border-primary hover:text-primary transition-colors overflow-hidden relative shadow-[0_0_0_1px_rgba(52,211,153,0.16)_inset,0_0_14px_rgba(52,211,153,0.12)] before:content-[''] before:absolute before:inset-[5px] before:border before:border-primary/20 before:pointer-events-none before:rounded-full"
                             >
                                 <span className="transition-all duration-300 group-hover:-translate-y-full group-hover:opacity-0 absolute">Résumé</span>
                                 <span className="transition-all duration-300 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 absolute">Download</span>
@@ -234,12 +279,13 @@ const Banner = () => {
                                     fontFamily: 'var(--font-roboto-flex)',
                                     minHeight: 18,
                                 }}>
-                                    <span style={{
-                                        fontSize: 14, fontWeight: 600,
-                                        color: '#111111',
-                                        letterSpacing: '-0.02em', lineHeight: 1,
-                                    }}>
-                                        {bubbleText}
+                                    <span style={{ fontSize: 14, fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1 }}>
+                                        <span style={{ color: '#111111' }}>
+                                            {bubbleText.slice(0, Math.min(bubbleText.length, bubblePrefix.length))}
+                                        </span>
+                                        <span style={{ color: 'hsl(158 64% 42%)' }}>
+                                            {bubbleText.length > bubblePrefix.length ? bubbleText.slice(bubblePrefix.length) : ''}
+                                        </span>
                                     </span>
                                     {showCursor && (
                                         <span style={{
