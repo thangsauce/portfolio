@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
@@ -104,6 +104,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [mounted,      setMounted]      = useState(false)
   const [hoveredNav,   setHoveredNav]   = useState<string | null>(null)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
+  const logoEyeRef = useRef<SVGSVGElement>(null)
+  const logoPupilRef = useRef<SVGGElement>(null)
 
   useEffect(() => { setMounted(true) }, [])
 
@@ -111,10 +114,54 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (!isLoading && !isAuthenticated && !isLoggingOut) router.push('/triumph')
   }, [isAuthenticated, isLoading, isLoggingOut, router])
 
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    const saved = window.localStorage.getItem('dashboard-theme') as 'dark' | 'light' | null
+    const next = saved ?? (mediaQuery.matches ? 'dark' : 'light')
+    setTheme(next)
+  }, [])
+
+  useEffect(() => {
+    const eye = logoEyeRef.current
+    const pupil = logoPupilRef.current
+    if (!eye || !pupil) return
+
+    const onMove = (e: MouseEvent) => {
+      const rect = eye.getBoundingClientRect()
+      const cx = rect.left + rect.width / 2
+      const cy = rect.top + rect.height / 2
+      const dx = e.clientX - cx
+      const dy = e.clientY - cy
+      const max = 4.2
+      const dist = Math.hypot(dx, dy) || 1
+      const clamped = Math.min(max, dist)
+      const x = (dx / dist) * clamped
+      const y = (dy / dist) * clamped
+      pupil.setAttribute('transform', `translate(${x} ${y})`)
+    }
+
+    const onLeave = () => {
+      pupil.setAttribute('transform', 'translate(0 0)')
+    }
+
+    window.addEventListener('mousemove', onMove, { passive: true })
+    window.addEventListener('mouseleave', onLeave, { passive: true })
+    return () => {
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseleave', onLeave)
+    }
+  }, [])
+
   if (isLoading || !isAuthenticated) return null
 
   const segments = pathname.replace(/^\/dashboard\/?/, '').split('/').filter(Boolean)
   const initial  = (user?.email?.[0] ?? 'T').toUpperCase()
+  const isLight = theme === 'light'
+  const toggleTheme = () => {
+    const next = theme === 'dark' ? 'light' : 'dark'
+    setTheme(next)
+    window.localStorage.setItem('dashboard-theme', next)
+  }
 
   return (
     <div
@@ -123,38 +170,63 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         position: 'fixed', inset: 0, zIndex: 50,
         display: 'flex', overflow: 'hidden',
         fontFamily: 'var(--font-roboto-flex)',
-        background: 'hsl(226 12% 10%)',
+        background: isLight ? 'hsl(0 0% 96%)' : 'hsl(226 12% 10%)',
       }}
     >
       {/* ── Sidebar ───────────────────────────────────────────────────────── */}
       <aside style={{
         width: 240, minWidth: 240, flexShrink: 0,
-        background: 'hsl(228 14% 7%)',
-        borderRight: '1px solid hsl(226 10% 13%)',
+        background: isLight ? 'hsl(0 0% 100%)' : 'hsl(228 14% 7%)',
+        borderRight: `1px solid ${isLight ? 'hsl(0 0% 86%)' : 'hsl(226 10% 13%)'}`,
         display: 'flex', flexDirection: 'column',
       }}>
 
         {/* Logo */}
         <div style={{
           padding: '18px 16px',
-          borderBottom: '1px solid hsl(226 10% 12%)',
+          borderBottom: `1px solid ${isLight ? 'hsl(0 0% 90%)' : 'hsl(226 10% 12%)'}`,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{
-              width: 34, height: 34, flexShrink: 0,
-              background: 'hsl(158 64% 36%)',
+              width: 42, height: 34, flexShrink: 0,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontFamily: 'var(--font-anton)', fontSize: 13, letterSpacing: '0.04em',
-              color: '#fff',
-              boxShadow: '0 0 0 1px hsl(158 64% 36% / 0.35), 0 4px 14px hsl(158 64% 36% / 0.28)',
+              color: 'hsl(158 58% 54%)',
+              boxShadow: '0 0 0 1px hsl(158 64% 36% / 0.28), 0 4px 14px hsl(158 64% 36% / 0.16)',
               borderRadius: 6,
             }}>
-              TL
+              <svg
+                ref={logoEyeRef}
+                width="32"
+                height="20"
+                viewBox="0 0 44 28"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <defs>
+                  <clipPath id="dashboard-eye-clip">
+                    <path d="M3 14C7.8 6 14.8 2.5 22 2.5C29.2 2.5 36.2 6 41 14C36.2 22 29.2 25.5 22 25.5C14.8 25.5 7.8 22 3 14Z" />
+                  </clipPath>
+                </defs>
+                <path
+                  d="M3 14C7.8 6 14.8 2.5 22 2.5C29.2 2.5 36.2 6 41 14C36.2 22 29.2 25.5 22 25.5C14.8 25.5 7.8 22 3 14Z"
+                  fill="hsl(228 14% 7%)"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                />
+                <g clipPath="url(#dashboard-eye-clip)">
+                  <rect x="0" y="0" width="44" height="28" fill={isLight ? 'hsl(0 0% 100%)' : 'hsl(228 14% 7%)'} />
+                  <g ref={logoPupilRef}>
+                    <circle cx="22" cy="14" r="5" fill="currentColor" />
+                    <circle cx="22" cy="14" r="1.5" fill={isLight ? 'hsl(0 0% 100%)' : 'hsl(228 14% 7%)'} />
+                  </g>
+                </g>
+              </svg>
             </div>
             <div>
               <div style={{
                 fontSize: 14, fontWeight: 600, letterSpacing: '-0.02em',
-                color: 'hsl(220 16% 86%)',
+                color: isLight ? 'hsl(220 20% 16%)' : 'hsl(220 16% 86%)',
                 lineHeight: 1.2,
               }}>
                 thangle.me
@@ -173,7 +245,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <nav data-lenis-prevent style={{ flex: 1, padding: '8px 10px', overflowY: 'auto' }}>
           <div style={{
             fontSize: 10, fontWeight: 600, letterSpacing: '0.07em',
-            textTransform: 'uppercase', color: 'hsl(220 6% 32%)',
+            textTransform: 'uppercase', color: isLight ? 'hsl(220 8% 42%)' : 'hsl(220 6% 32%)',
             padding: '4px 8px 6px',
           }}>
             Navigation
@@ -195,10 +267,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   letterSpacing: '-0.01em',
                   textDecoration: 'none',
                   borderRadius: 8,
-                  color: isActive ? 'hsl(158 58% 58%)' : isHov ? 'hsl(220 10% 66%)' : 'hsl(220 8% 42%)',
+                  color: isActive
+                    ? 'hsl(158 58% 42%)'
+                    : isHov
+                      ? (isLight ? 'hsl(220 14% 34%)' : 'hsl(220 10% 66%)')
+                      : (isLight ? 'hsl(220 8% 44%)' : 'hsl(220 8% 42%)'),
                   background: isActive
-                    ? 'hsl(158 64% 42% / 0.12)'
-                    : isHov ? 'hsl(226 12% 11%)' : 'transparent',
+                    ? (isLight ? 'hsl(158 64% 42% / 0.12)' : 'hsl(158 64% 42% / 0.12)')
+                    : isHov
+                      ? (isLight ? 'hsl(0 0% 95%)' : 'hsl(226 12% 11%)')
+                      : 'transparent',
                   transition: 'color 0.14s, background 0.14s',
                 }}
                 onMouseEnter={() => setHoveredNav(href)}
@@ -222,13 +300,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* User */}
         <div style={{
           padding: '12px 14px',
-          borderTop: '1px solid hsl(226 10% 12%)',
+          borderTop: `1px solid ${isLight ? 'hsl(0 0% 90%)' : 'hsl(226 10% 12%)'}`,
         }}>
           <div style={{
             display: 'flex', alignItems: 'center', gap: 10,
             padding: '10px 10px',
             borderRadius: 8,
-            background: 'hsl(226 12% 10%)',
+            background: isLight ? 'hsl(0 0% 97%)' : 'hsl(226 12% 10%)',
             marginBottom: 8,
           }}>
             <div style={{
@@ -289,8 +367,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Topbar */}
         <header style={{
           height: 44, minHeight: 44, flexShrink: 0,
-          background: 'hsl(227 13% 9%)',
-          borderBottom: '1px solid hsl(226 10% 14%)',
+          background: isLight ? 'hsl(0 0% 100%)' : 'hsl(227 13% 9%)',
+          borderBottom: `1px solid ${isLight ? 'hsl(0 0% 88%)' : 'hsl(226 10% 14%)'}`,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '0 28px',
         }}>
@@ -314,6 +392,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button
+              onClick={toggleTheme}
+              style={{
+                marginRight: 10,
+                padding: '4px 10px',
+                borderRadius: 999,
+                border: `1px solid ${isLight ? 'hsl(0 0% 82%)' : 'hsl(0 0% 24%)'}`,
+                background: isLight ? 'hsl(0 0% 96%)' : 'hsl(226 10% 14%)',
+                color: isLight ? 'hsl(220 20% 26%)' : 'hsl(220 14% 78%)',
+                fontSize: 10,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                cursor: 'pointer',
+              }}
+            >
+              {isLight ? 'Dark' : 'Light'}
+            </button>
             <div style={{
               width: 7, height: 7, borderRadius: '50%',
               background: 'hsl(158 64% 42%)',

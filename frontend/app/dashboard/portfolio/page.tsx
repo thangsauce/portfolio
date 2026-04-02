@@ -12,6 +12,7 @@ type Skill      = { id: string; name: string; order_index: number }
 type Cert       = { id: string; name: string; issuer: string | null; issue_date: string | null; credential_id: string | null; url: string | null }
 type Experience = { id: string; company: string; role: string; start_date: string | null; end_date: string | null; description: string[] | null; order_index: number }
 type ResumeInfo = { url: string; hasCustom: boolean }
+type UploadedProjectImage = { url: string; path: string }
 type Tab        = 'projects' | 'stacks' | 'skills' | 'certs' | 'experiences' | 'resume'
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
@@ -81,6 +82,14 @@ export default function PortfolioPage() {
   const [saving, setSaving]         = useState(false)
   const [loading, setLoading]       = useState(false)
   const [uploadingResume, setUploadingResume] = useState(false)
+  const [query, setQuery] = useState('')
+  const [projectCategoryFilter, setProjectCategoryFilter] = useState<'all' | ProjectCategory>('all')
+  const [featuredFilter, setFeaturedFilter] = useState<'all' | 'yes' | 'no'>('all')
+  const [uploadingProjectImage, setUploadingProjectImage] = useState({
+    thumbnail: false,
+    long: false,
+    gallery: false,
+  })
 
   // ── Data ──────────────────────────────────────────────────────────────────
   const [projects,    setProjects]    = useState<Project[]>([])
@@ -319,6 +328,60 @@ export default function PortfolioPage() {
     }
   }
 
+  async function uploadProjectImage(file: File, folder: 'thumbnail' | 'long' | 'gallery') {
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('folder', folder)
+    return apiPrivate<UploadedProjectImage>('/portfolio/project-images', {
+      method: 'POST',
+      body: formData,
+    })
+  }
+
+  async function handleSingleProjectImageUpload(
+    folder: 'thumbnail' | 'long',
+    file: File | null,
+  ) {
+    if (!file) return
+    setUploadingProjectImage((prev) => ({ ...prev, [folder]: true }))
+    try {
+      const uploaded = await uploadProjectImage(file, folder)
+      if (folder === 'thumbnail') {
+        setPf((prev) => ({ ...prev, image_thumbnail: uploaded.url }))
+      } else {
+        setPf((prev) => ({ ...prev, image_long: uploaded.url }))
+      }
+      flash(true, `${folder}_uploaded`)
+    } catch (err) {
+      flash(false, (err as Error).message)
+    } finally {
+      setUploadingProjectImage((prev) => ({ ...prev, [folder]: false }))
+    }
+  }
+
+  async function handleGalleryProjectImageUpload(files: FileList | null) {
+    const picked = files ? Array.from(files) : []
+    if (picked.length === 0) return
+
+    setUploadingProjectImage((prev) => ({ ...prev, gallery: true }))
+    try {
+      const uploaded = await Promise.all(
+        picked.map((file) => uploadProjectImage(file, 'gallery')),
+      )
+      const newUrls = uploaded.map((u) => u.url).filter(Boolean)
+      setPf((prev) => {
+        const existing = parseCsvUrls(prev.image_gallery)
+        const combined = [...existing, ...newUrls]
+        return { ...prev, image_gallery: combined.join(', ') }
+      })
+      flash(true, `gallery_uploaded_${newUrls.length}`)
+    } catch (err) {
+      flash(false, (err as Error).message)
+    } finally {
+      setUploadingProjectImage((prev) => ({ ...prev, gallery: false }))
+    }
+  }
+
   // ── Form render ───────────────────────────────────────────────────────────
   function renderForm() {
     if (tab === 'projects') return (
@@ -350,14 +413,60 @@ export default function PortfolioPage() {
         <Fld label="image_thumbnail (url/path)">
           <input style={iSt} value={pf.image_thumbnail} placeholder="/projects/thumbnail/portfolio-thumbnail.jpg"
             onChange={e => setPf(p => ({ ...p, image_thumbnail: e.target.value }))} />
+          <div style={{ marginTop: 8 }}>
+            <input
+              type="file"
+              accept="image/*"
+              disabled={uploadingProjectImage.thumbnail}
+              onChange={async (e) => {
+                await handleSingleProjectImageUpload('thumbnail', e.target.files?.[0] ?? null)
+                e.currentTarget.value = ''
+              }}
+              style={{ ...iSt, padding: '6px 11px' }}
+            />
+            <div style={{ fontSize: 10, letterSpacing: '0.08em', color: 'hsl(0 0% 32%)', marginTop: 6 }}>
+              {uploadingProjectImage.thumbnail ? 'uploading_thumbnail...' : 'upload thumbnail from computer'}
+            </div>
+          </div>
         </Fld>
         <Fld label="image_long (url/path)">
           <input style={iSt} value={pf.image_long} placeholder="/projects/long/portfolio-long.jpg"
             onChange={e => setPf(p => ({ ...p, image_long: e.target.value }))} />
+          <div style={{ marginTop: 8 }}>
+            <input
+              type="file"
+              accept="image/*"
+              disabled={uploadingProjectImage.long}
+              onChange={async (e) => {
+                await handleSingleProjectImageUpload('long', e.target.files?.[0] ?? null)
+                e.currentTarget.value = ''
+              }}
+              style={{ ...iSt, padding: '6px 11px' }}
+            />
+            <div style={{ fontSize: 10, letterSpacing: '0.08em', color: 'hsl(0 0% 32%)', marginTop: 6 }}>
+              {uploadingProjectImage.long ? 'uploading_long...' : 'upload long image from computer'}
+            </div>
+          </div>
         </Fld>
         <Fld label="image_gallery (comma-separated)">
           <input style={iSt} value={pf.image_gallery} placeholder="/projects/images/p1.jpg, /projects/images/p2.jpg"
             onChange={e => setPf(p => ({ ...p, image_gallery: e.target.value }))} />
+          <div style={{ marginTop: 8 }}>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              disabled={uploadingProjectImage.gallery}
+              onChange={async (e) => {
+                await handleGalleryProjectImageUpload(e.target.files)
+                e.currentTarget.value = ''
+              }}
+              style={{ ...iSt, padding: '6px 11px' }}
+            />
+            <div style={{ fontSize: 10, letterSpacing: '0.08em', color: 'hsl(0 0% 32%)', marginTop: 6 }}>
+              {uploadingProjectImage.gallery ? 'uploading_gallery...' : 'upload one or many gallery images from computer'}
+            </div>
+          </div>
         </Fld>
         {(pf.image_thumbnail || pf.image_long || pf.image_gallery) && (
           <div style={{ marginBottom: 16 }}>
@@ -523,10 +632,26 @@ export default function PortfolioPage() {
 
   function buildRows(): { headers: string[]; rows: Row[] } {
     if (tab === 'resume') return { headers: [], rows: [] }
+    const q = query.trim().toLowerCase()
+    const includesQ = (...values: Array<string | null | undefined>) =>
+      q.length === 0 || values.some((v) => (v ?? '').toLowerCase().includes(q))
 
     if (tab === 'projects') return {
       headers: ['// title', '// slug', '// category', '// tech', '// featured', '// order'],
-      rows: projects.map(p => ({ id: p.id, item: p, cells: [
+      rows: projects
+        .filter((p) => {
+          const categoryPass = projectCategoryFilter === 'all' || (p.category ?? 'web_development') === projectCategoryFilter
+          const featuredPass = featuredFilter === 'all' || (featuredFilter === 'yes' ? p.featured : !p.featured)
+          const queryPass = includesQ(
+            p.title,
+            p.slug,
+            p.description ?? '',
+            p.category ?? 'web_development',
+            toTechStackArray(p.tech_stack).join(' '),
+          )
+          return categoryPass && featuredPass && queryPass
+        })
+        .map(p => ({ id: p.id, item: p, cells: [
         <span style={{ color: 'hsl(0 0% 76%)' }}>{p.title}</span>,
         <span style={{ fontFamily: 'monospace', fontSize: 10, color: 'hsl(0 0% 38%)' }}>{p.slug}</span>,
         <span style={{ color: 'hsl(193 80% 45%)', fontSize: 10, letterSpacing: '0.12em' }}>{p.category ?? 'web_development'}</span>,
@@ -538,7 +663,9 @@ export default function PortfolioPage() {
 
     if (tab === 'stacks') return {
       headers: ['// name', '// category', '// icon', '// order'],
-      rows: stacks.map(s => ({ id: s.id, item: s, cells: [
+      rows: stacks
+        .filter((s) => includesQ(s.name, s.category ?? '', s.icon_url ?? ''))
+        .map(s => ({ id: s.id, item: s, cells: [
         <span style={{ color: 'hsl(0 0% 76%)' }}>{s.name}</span>,
         <span style={{ color: 'hsl(193 80% 45%)', fontSize: 10, letterSpacing: '0.12em' }}>{normalizeSkillCategory(s.category ?? '') || '—'}</span>,
         <span style={{ fontSize: 10, color: s.icon_url ? 'hsl(158 64% 42%)' : 'hsl(0 0% 25%)' }}>{s.icon_url ? '✓ set' : '—'}</span>,
@@ -548,7 +675,9 @@ export default function PortfolioPage() {
 
     if (tab === 'skills') return {
       headers: ['// name', '// order'],
-      rows: skills.map(s => ({ id: s.id, item: s, cells: [
+      rows: skills
+        .filter((s) => includesQ(s.name))
+        .map(s => ({ id: s.id, item: s, cells: [
         <span style={{ color: 'hsl(0 0% 76%)' }}>{s.name}</span>,
         <span style={{ color: 'hsl(0 0% 35%)' }}>{s.order_index}</span>,
       ]})),
@@ -556,7 +685,9 @@ export default function PortfolioPage() {
 
     if (tab === 'certs') return {
       headers: ['// name', '// issuer', '// date', '// id'],
-      rows: certs.map(c => ({ id: c.id, item: c, cells: [
+      rows: certs
+        .filter((c) => includesQ(c.name, c.issuer ?? '', c.credential_id ?? '', c.url ?? ''))
+        .map(c => ({ id: c.id, item: c, cells: [
         <span style={{ color: 'hsl(0 0% 76%)' }}>{c.name}</span>,
         <span>{c.issuer ?? '—'}</span>,
         <span style={{ fontSize: 10, color: 'hsl(0 0% 38%)', fontFamily: 'monospace' }}>{c.issue_date ?? '—'}</span>,
@@ -566,7 +697,9 @@ export default function PortfolioPage() {
 
     return {
       headers: ['// role', '// company', '// start', '// end'],
-      rows: experiences.map(e => ({ id: e.id, item: e, cells: [
+      rows: experiences
+        .filter((e) => includesQ(e.role, e.company, (e.description ?? []).join(' ')))
+        .map(e => ({ id: e.id, item: e, cells: [
         <span style={{ color: 'hsl(0 0% 76%)' }}>{e.role}</span>,
         <span style={{ maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block' }}>{e.company}</span>,
         <span style={{ fontSize: 10, color: 'hsl(0 0% 38%)', fontFamily: 'monospace' }}>{e.start_date ?? '—'}</span>,
@@ -642,9 +775,40 @@ export default function PortfolioPage() {
       <div style={{ border: '1px solid hsl(0 0% 16%)', borderTop: 'none', background: 'hsl(0 0% 8%)' }}>
 
         {/* Toolbar */}
-        <div style={{ padding: '11px 16px', borderBottom: '1px solid hsl(0 0% 14%)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ padding: '11px 16px', borderBottom: '1px solid hsl(0 0% 14%)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="filter records..."
+              style={{ ...iSt, width: 220, padding: '6px 10px', fontSize: 11, letterSpacing: '0.06em' }}
+            />
+            {tab === 'projects' && (
+              <>
+                <select
+                  value={projectCategoryFilter}
+                  onChange={(e) => setProjectCategoryFilter(e.target.value as 'all' | ProjectCategory)}
+                  style={{ ...iSt, width: 170, padding: '6px 10px', fontSize: 11, letterSpacing: '0.05em' }}
+                >
+                  <option value="all">all categories</option>
+                  {PROJECT_CATEGORIES.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+                <select
+                  value={featuredFilter}
+                  onChange={(e) => setFeaturedFilter(e.target.value as 'all' | 'yes' | 'no')}
+                  style={{ ...iSt, width: 130, padding: '6px 10px', fontSize: 11, letterSpacing: '0.05em' }}
+                >
+                  <option value="all">all featured</option>
+                  <option value="yes">featured yes</option>
+                  <option value="no">featured no</option>
+                </select>
+              </>
+            )}
+          </div>
           <span style={{ fontSize: 10, letterSpacing: '0.22em', color: 'hsl(0 0% 26%)' }}>
-            {loading ? '// loading...' : `// ${counts[tab]} records`}
+            {loading ? '// loading...' : `// ${rows.length} shown (${counts[tab]} total)`}
           </span>
           <button onClick={openAdd}
             style={{

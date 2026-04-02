@@ -7,6 +7,7 @@ import type { Env, Variables } from '../../index'
 const r = new Hono<{ Bindings: Env; Variables: Variables }>()
 const RESUME_BUCKET = 'portfolio-assets'
 const RESUME_PATH = 'resume/resume.pdf'
+const PROJECTS_PATH = 'projects'
 const projectCategorySchema = z.enum(['web_development', 'cybersecurity', 'it_systems'])
 
 // ── Projects ──────────────────────────────────────────────────────────────────
@@ -253,6 +254,56 @@ r.post('/resume', async (c) => {
 
   const { data } = supabase.storage.from(RESUME_BUCKET).getPublicUrl(RESUME_PATH)
   return c.json({ url: data.publicUrl, hasCustom: true })
+})
+
+// ── Project image upload ─────────────────────────────────────────────────────
+
+r.post('/project-images', async (c) => {
+  const form = await c.req.formData()
+  const file = form.get('file')
+  const folderRaw = form.get('folder')
+
+  if (!file || typeof file === 'string') {
+    return c.json({ error: 'Expected a file field named "file"' }, 400)
+  }
+
+  const folder = typeof folderRaw === 'string' && ['thumbnail', 'long', 'gallery'].includes(folderRaw)
+    ? folderRaw
+    : 'gallery'
+
+  const uploaded = file as {
+    name?: string
+    type?: string
+    size?: number
+    arrayBuffer: () => Promise<ArrayBuffer>
+  }
+
+  if (!uploaded.type || !uploaded.type.startsWith('image/')) {
+    return c.json({ error: 'Only image files are allowed' }, 400)
+  }
+
+  const maxSizeBytes = 10 * 1024 * 1024
+  if ((uploaded.size ?? 0) > maxSizeBytes) {
+    return c.json({ error: 'Image must be 10MB or smaller' }, 400)
+  }
+
+  const byName = uploaded.name?.split('.').pop()?.toLowerCase() ?? ''
+  const byMime = uploaded.type.split('/')[1]?.toLowerCase().replace('jpeg', 'jpg') ?? ''
+  const ext = /^[a-z0-9]+$/.test(byName) ? byName : (/^[a-z0-9]+$/.test(byMime) ? byMime : 'jpg')
+  const objectPath = `${PROJECTS_PATH}/${folder}/${Date.now()}-${crypto.randomUUID()}.${ext}`
+
+  const bytes = new Uint8Array(await uploaded.arrayBuffer())
+  const supabase = getSupabase(c.env)
+  const { error } = await supabase.storage.from(RESUME_BUCKET).upload(objectPath, bytes, {
+    upsert: false,
+    contentType: uploaded.type,
+    cacheControl: '3600',
+  })
+
+  if (error) return c.json({ error: `${error.message} (bucket "${RESUME_BUCKET}")` }, 500)
+
+  const { data } = supabase.storage.from(RESUME_BUCKET).getPublicUrl(objectPath)
+  return c.json({ url: data.publicUrl, path: objectPath })
 })
 
 export default r
