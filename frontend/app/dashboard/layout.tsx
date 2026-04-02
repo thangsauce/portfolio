@@ -182,9 +182,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       }}>
 
         {/* Logo */}
-        <div style={{
+        <Link href="/" style={{
           padding: '18px 16px',
           borderBottom: `1px solid ${isLight ? 'hsl(0 0% 90%)' : 'hsl(226 10% 12%)'}`,
+          display: 'block',
+          textDecoration: 'none',
+          cursor: 'pointer',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{
@@ -239,7 +242,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </div>
             </div>
           </div>
-        </div>
+        </Link>
 
         {/* Nav */}
         <nav data-lenis-prevent style={{ flex: 1, padding: '8px 10px', overflowY: 'auto' }}>
