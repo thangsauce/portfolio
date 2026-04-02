@@ -105,6 +105,34 @@ r.delete('/skills/:id', async (c) => {
   return c.json({ ok: true })
 })
 
+r.get('/currently_using', async (c) => {
+  const { data, error } = await getSupabase(c.env)
+    .from('skills').select('*').order('order_index')
+  if (error) return c.json({ error: error.message }, 500)
+  return c.json(data)
+})
+
+r.post('/currently_using', zValidator('json', skillSchema), async (c) => {
+  const { data, error } = await getSupabase(c.env)
+    .from('skills').insert(c.req.valid('json')).select().single()
+  if (error) return c.json({ error: error.message }, 500)
+  return c.json(data, 201)
+})
+
+r.put('/currently_using/:id', zValidator('json', skillSchema.partial()), async (c) => {
+  const { data, error } = await getSupabase(c.env)
+    .from('skills').update(c.req.valid('json')).eq('id', c.req.param('id')).select().single()
+  if (error || !data) return c.json({ error: error?.message ?? 'Not found' }, error ? 500 : 404)
+  return c.json(data)
+})
+
+r.delete('/currently_using/:id', async (c) => {
+  const { error } = await getSupabase(c.env)
+    .from('skills').delete().eq('id', c.req.param('id'))
+  if (error) return c.json({ error: error.message }, 500)
+  return c.json({ ok: true })
+})
+
 // ── Stacks ────────────────────────────────────────────────────────────────────
 
 r.get('/stacks', async (c) => {

@@ -101,29 +101,29 @@ const Skills = () => {
                     <span className="text-primary font-mono text-xl leading-none select-none">&gt;</span>
                 </div>
 
-                <div className="space-y-20">
+                <div className="space-y-10 md:max-h-[62vh] md:overflow-y-auto md:pr-2">
                     {entries.map(([category, items]) => (
-                        <div className="grid sm:grid-cols-12" key={category}>
-                            <div className="sm:col-span-5">
-                                <p className="slide-up text-5xl font-anton leading-none text-muted-foreground uppercase">
+                        <div className="grid gap-4 sm:grid-cols-12" key={category}>
+                            <div className="sm:col-span-4">
+                                <p className="slide-up text-3xl md:text-4xl font-anton leading-none text-muted-foreground uppercase">
                                     {formatCategoryLabel(category)}
                                 </p>
                             </div>
-                            <div className="sm:col-span-7 flex gap-x-11 gap-y-9 flex-wrap">
+                            <div className="sm:col-span-8 flex gap-x-6 gap-y-5 flex-wrap">
                                 {items.map((item) => (
-                                    <div className="slide-up flex gap-3.5 items-center leading-none" key={item.id}>
+                                    <div className="slide-up flex gap-2.5 items-center leading-none min-w-0" key={item.id}>
                                         {item.icon_url && (
                                             <div>
                                                 <Image
                                                     src={item.icon_url}
                                                     alt={item.name}
-                                                    width={40}
-                                                    height={40}
-                                                    className="max-h-10"
+                                                    width={30}
+                                                    height={30}
+                                                    className="max-h-[30px]"
                                                 />
                                             </div>
                                         )}
-                                        <span className="text-2xl capitalize">{item.name}</span>
+                                        <span className="text-lg md:text-xl capitalize break-words">{item.name}</span>
                                     </div>
                                 ))}
                             </div>

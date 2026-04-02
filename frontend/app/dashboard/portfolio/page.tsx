@@ -132,7 +132,7 @@ export default function PortfolioPage() {
         setStacks(loaded)
       }
       if (tab === 'skills') {
-        const loaded = await apiPrivate<Skill[]>('/portfolio/skills')
+        const loaded = await apiPrivate<Skill[]>('/portfolio/currently_using')
         setSkills(loaded)
       }
       if (tab === 'certs')       setCerts(await apiPrivate<Cert[]>('/portfolio/certifications'))
@@ -265,7 +265,7 @@ export default function PortfolioPage() {
           name: sf.name,
           order_index: parseInt(sf.order_index) || 0,
         }
-        const path = editingId ? `/portfolio/skills/${editingId}` : '/portfolio/skills'
+        const path = editingId ? `/portfolio/currently_using/${editingId}` : '/portfolio/currently_using'
         const r = await apiPrivate<Skill>(path, { method, body: JSON.stringify(body) })
         setSkills(prev => editingId ? prev.map(s => s.id === editingId ? r : s) : [...prev, r])
 
@@ -294,7 +294,11 @@ export default function PortfolioPage() {
   // ── Delete ────────────────────────────────────────────────────────────────
   async function handleDelete(id: string) {
     try {
-      const ep = tab === 'certs' ? 'certifications' : tab
+      const ep = tab === 'certs'
+        ? 'certifications'
+        : tab === 'skills'
+          ? 'currently_using'
+          : tab
       await apiPrivate(`/portfolio/${ep}/${id}`, { method: 'DELETE' })
       if (tab === 'projects')    setProjects(prev => prev.filter(p => p.id !== id))
       if (tab === 'stacks')      setStacks(prev => prev.filter(s => s.id !== id))
@@ -769,8 +773,8 @@ export default function PortfolioPage() {
   const TABS: Tab[] = ['projects', 'stacks', 'skills', 'certs', 'experiences', 'resume']
   const TAB_LABELS: Record<Tab, string> = {
     projects: 'projects',
-    stacks: 'currently using',
-    skills: 'skills',
+    stacks: 'stacks',
+    skills: 'currently using',
     certs: 'certs',
     experiences: 'experiences',
     resume: 'resume',

@@ -8,14 +8,14 @@ import { apiFetch } from '@/lib/api';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-type Skill = { id: string; name: string; icon_url: string | null }
+type Skill = { id: string; name: string; icon_url?: string | null }
 
 const CurrentlyUsing = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [skills, setSkills] = useState<Skill[]>([]);
 
     useEffect(() => {
-        apiFetch<Skill[]>('/api/portfolio/stacks')
+        apiFetch<Skill[]>('/api/portfolio/currently_using')
             .then(setSkills)
             .catch(() => {});
     }, []);
@@ -73,9 +73,7 @@ const CurrentlyUsing = () => {
             <div className="container">
                 <div className="flex items-center gap-3 mb-10">
                     <span className="text-primary font-mono text-xl leading-none select-none">&lt;</span>
-                    <h2 className="text-xl uppercase leading-none tracking-widest">
-                        IT SKILL
-                    </h2>
+                    <h2 className="text-xl uppercase leading-none tracking-widest">CURRENTLY USING</h2>
                     <span className="text-primary font-mono text-xl leading-none select-none">&gt;</span>
                 </div>
 
