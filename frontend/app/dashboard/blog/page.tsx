@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { apiPrivate } from '@/lib/api'
-import { useDashboardTheme } from '../theme-context'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type PostItem = {
@@ -54,13 +53,11 @@ function PostEditor({
   onSave,
   onDelete,
   onPublishToggle,
-  isLight,
 }: {
   post: Post
   onSave: (id: string, data: Partial<Post>) => Promise<void>
   onDelete: (id: string) => Promise<void>
   onPublishToggle: (id: string, published: boolean) => Promise<void>
-  isLight: boolean
 }) {
   const [title,      setTitle]      = useState(post.title)
   const [slug,       setSlug]       = useState(post.slug)
@@ -78,7 +75,6 @@ function PostEditor({
   const contentRef = useRef(post.content)
   const timerRef   = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Sync when post switches
   useEffect(() => {
     setTitle(post.title);   titleRef.current   = post.title
     setSlug(post.slug);     slugRef.current    = post.slug
@@ -137,13 +133,13 @@ function PostEditor({
       {/* Header */}
       <div style={{
         padding: '18px 36px 0', flexShrink: 0,
-        borderBottom: `1px solid ${isLight ? 'hsl(220 8% 90%)' : 'hsl(0 0% 14%)'}`,
+        borderBottom: '1px solid hsl(var(--dash-border-subtle))',
       }}>
         {/* Save status */}
         <div style={{
           fontSize: 11,
           height: 14, marginBottom: 12,
-          color: status === 'saved' ? 'hsl(158 64% 42%)' : status === 'saving' ? (isLight ? 'hsl(220 8% 60%)' : 'hsl(0 0% 32%)') : 'transparent',
+          color: status === 'saved' ? 'hsl(158 64% 42%)' : status === 'saving' ? 'hsl(var(--dash-fg-dim))' : 'transparent',
           transition: 'color 0.2s',
           fontFamily: 'var(--font-roboto-flex)',
         }}>
@@ -159,7 +155,7 @@ function PostEditor({
             width: '100%', background: 'none', border: 'none', outline: 'none',
             fontFamily: 'var(--font-anton)',
             fontSize: 24, letterSpacing: '0.08em', textTransform: 'uppercase',
-            color: isLight ? 'hsl(220 20% 14%)' : 'hsl(0 0% 87%)', caretColor: 'hsl(158 64% 36%)',
+            color: 'hsl(var(--dash-fg))', caretColor: 'hsl(158 64% 36%)',
             marginBottom: 14,
           }}
         />
@@ -167,7 +163,7 @@ function PostEditor({
         {/* Slug + Tags */}
         <div style={{ display: 'flex', gap: 20, marginBottom: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
-            <span style={{ fontSize: 11, color: isLight ? 'hsl(220 8% 52%)' : 'hsl(0 0% 26%)', flexShrink: 0, fontFamily: 'var(--font-roboto-flex)' }}>Slug</span>
+            <span style={{ fontSize: 11, color: 'hsl(var(--dash-fg-dim))', flexShrink: 0, fontFamily: 'var(--font-roboto-flex)' }}>Slug</span>
             <input
               value={slug}
               onChange={e => handleSlug(e.target.value)}
@@ -181,7 +177,7 @@ function PostEditor({
             />
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
-            <span style={{ fontSize: 11, color: isLight ? 'hsl(220 8% 52%)' : 'hsl(0 0% 26%)', flexShrink: 0, fontFamily: 'var(--font-roboto-flex)' }}>Tags</span>
+            <span style={{ fontSize: 11, color: 'hsl(var(--dash-fg-dim))', flexShrink: 0, fontFamily: 'var(--font-roboto-flex)' }}>Tags</span>
             <input
               value={tags}
               onChange={e => handleTags(e.target.value)}
@@ -189,7 +185,7 @@ function PostEditor({
               style={{
                 background: 'none', border: 'none', outline: 'none',
                 fontFamily: 'var(--font-roboto-flex)', fontSize: 11, letterSpacing: '0.04em',
-                color: isLight ? 'hsl(220 12% 40%)' : 'hsl(0 0% 50%)', caretColor: 'hsl(158 64% 36%)',
+                color: 'hsl(var(--dash-fg-muted))', caretColor: 'hsl(158 64% 36%)',
                 flex: 1, minWidth: 0,
               }}
             />
@@ -206,7 +202,7 @@ function PostEditor({
             width: '100%', boxSizing: 'border-box',
             background: 'none', border: 'none', outline: 'none', resize: 'none',
             fontFamily: 'var(--font-roboto-flex)', fontSize: 12, letterSpacing: '0.03em',
-            color: isLight ? 'hsl(220 10% 44%)' : 'hsl(0 0% 44%)', caretColor: 'hsl(158 64% 36%)',
+            color: 'hsl(var(--dash-fg-muted))', caretColor: 'hsl(158 64% 36%)',
             marginBottom: 16, lineHeight: 1.55,
           }}
         />
@@ -222,7 +218,7 @@ function PostEditor({
             flex: 1, width: '100%', boxSizing: 'border-box',
             background: 'none', border: 'none', outline: 'none', resize: 'none',
             fontFamily: 'monospace', fontSize: 13, letterSpacing: '0.02em',
-            color: isLight ? 'hsl(220 14% 34%)' : 'hsl(0 0% 60%)', caretColor: 'hsl(158 64% 36%)',
+            color: 'hsl(var(--dash-fg-muted))', caretColor: 'hsl(158 64% 36%)',
             lineHeight: 1.7,
           }}
         />
@@ -231,7 +227,7 @@ function PostEditor({
       {/* Bottom bar */}
       <div style={{
         flexShrink: 0, padding: '12px 36px',
-        borderTop: `1px solid ${isLight ? 'hsl(220 8% 90%)' : 'hsl(0 0% 13%)'}`,
+        borderTop: '1px solid hsl(var(--dash-border-subtle))',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
@@ -254,7 +250,7 @@ function PostEditor({
 
           <span style={{
             fontSize: 10,
-            color: post.published ? 'hsl(158 64% 40%)' : (isLight ? 'hsl(220 8% 54%)' : 'hsl(0 0% 26%)'),
+            color: post.published ? 'hsl(158 64% 40%)' : 'hsl(var(--dash-fg-dim))',
             fontFamily: 'var(--font-roboto-flex)',
           }}>
             {post.published ? 'live' : 'draft'}
@@ -265,17 +261,17 @@ function PostEditor({
           {confirmDel ? (
             <span style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
               <button onClick={() => onDelete(post.id)} style={{ color: 'hsl(0 62% 52%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, padding: 0, fontFamily: 'var(--font-roboto-flex)' }}>Delete</button>
-              <button onClick={() => setConfirmDel(false)} style={{ color: isLight ? 'hsl(220 8% 62%)' : 'hsl(0 0% 28%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, padding: 0, fontFamily: 'var(--font-roboto-flex)' }}>Cancel</button>
+              <button onClick={() => setConfirmDel(false)} style={{ color: 'hsl(var(--dash-fg-dim))', background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, padding: 0, fontFamily: 'var(--font-roboto-flex)' }}>Cancel</button>
             </span>
           ) : (
             <button
               onClick={() => setConfirmDel(true)}
               style={{
-                color: isLight ? 'hsl(220 8% 62%)' : 'hsl(0 0% 28%)', background: 'none', border: 'none',
+                color: 'hsl(var(--dash-fg-dim))', background: 'none', border: 'none',
                 cursor: 'pointer', padding: 0, display: 'flex', transition: 'color 0.12s',
               }}
               onMouseEnter={e => e.currentTarget.style.color = 'hsl(0 62% 52%)'}
-              onMouseLeave={e => e.currentTarget.style.color = isLight ? 'hsl(220 8% 62%)' : 'hsl(0 0% 28%)'}
+              onMouseLeave={e => e.currentTarget.style.color = 'hsl(var(--dash-fg-dim))'}
             >
               <IcTrash />
             </button>
@@ -288,7 +284,6 @@ function PostEditor({
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function BlogDashboardPage() {
-  const { isLight } = useDashboardTheme()
   const [posts,       setPosts]       = useState<PostItem[]>([])
   const [activePost,  setActivePost]  = useState<Post | null>(null)
   const [loading,     setLoading]     = useState(true)
@@ -367,8 +362,8 @@ export default function BlogDashboardPage() {
       {/* ── Left panel ──────────────────────────────────── */}
       <div style={{
         width: 280, minWidth: 280, flexShrink: 0,
-        background: isLight ? 'hsl(0 0% 100%)' : 'hsl(0 0% 7%)',
-        borderRight: `1px solid ${isLight ? 'hsl(220 8% 88%)' : 'hsl(0 0% 16%)'}`,
+        background: 'hsl(var(--dash-panel))',
+        borderRight: '1px solid hsl(var(--dash-border))',
         display: 'flex', flexDirection: 'column',
         overflow: 'hidden',
       }}>
@@ -376,18 +371,18 @@ export default function BlogDashboardPage() {
         {/* Header */}
         <div style={{
           padding: '14px 14px 12px',
-          borderBottom: `1px solid ${isLight ? 'hsl(220 8% 92%)' : 'hsl(0 0% 13%)'}`,
+          borderBottom: '1px solid hsl(var(--dash-border-subtle))',
           flexShrink: 0,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 11 }}>
-            <span style={{ fontSize: 11, color: isLight ? 'hsl(220 8% 52%)' : 'hsl(0 0% 26%)' }}>
+            <span style={{ fontSize: 11, color: 'hsl(var(--dash-fg-dim))' }}>
               Posts
             </span>
             <button onClick={createPost} disabled={creating}
               style={{
                 display: 'flex', alignItems: 'center', gap: 5,
                 fontSize: 11,
-                color: creating ? (isLight ? 'hsl(220 8% 62%)' : 'hsl(0 0% 28%)') : 'hsl(158 64% 42%)',
+                color: creating ? 'hsl(var(--dash-fg-dim))' : 'hsl(158 64% 42%)',
                 background: 'none', border: 'none',
                 borderRadius: 6,
                 cursor: creating ? 'not-allowed' : 'pointer',
@@ -405,7 +400,7 @@ export default function BlogDashboardPage() {
           <div style={{ position: 'relative' }}>
             <div style={{
               position: 'absolute', left: 9, top: '50%', transform: 'translateY(-50%)',
-              color: isLight ? 'hsl(220 8% 60%)' : 'hsl(0 0% 26%)',
+              color: 'hsl(var(--dash-fg-dim))',
               pointerEvents: 'none', display: 'flex',
             }}>
               <IcSearch />
@@ -417,10 +412,10 @@ export default function BlogDashboardPage() {
               style={{
                 width: '100%', boxSizing: 'border-box',
                 padding: '6px 10px 6px 28px',
-                background: isLight ? 'hsl(0 0% 97%)' : 'hsl(0 0% 5%)',
-                border: `1px solid ${isLight ? 'hsl(220 8% 88%)' : 'hsl(0 0% 17%)'}`,
+                background: 'hsl(var(--dash-input))',
+                border: '1px solid hsl(var(--dash-border))',
                 borderRadius: 6,
-                color: isLight ? 'hsl(220 14% 32%)' : 'hsl(0 0% 62%)',
+                color: 'hsl(var(--dash-fg))',
                 fontSize: 11, letterSpacing: '0.04em',
                 outline: 'none', fontFamily: 'var(--font-roboto-flex)',
               }}
@@ -431,12 +426,12 @@ export default function BlogDashboardPage() {
         {/* List */}
         <div style={{ flex: 1, overflowY: 'auto' }}>
           {loading && (
-            <div style={{ padding: '16px 14px', fontSize: 11, color: isLight ? 'hsl(220 8% 52%)' : 'hsl(0 0% 24%)' }}>
+            <div style={{ padding: '16px 14px', fontSize: 11, color: 'hsl(var(--dash-fg-dim))' }}>
               Loading...
             </div>
           )}
           {!loading && filtered.length === 0 && (
-            <div style={{ padding: '16px 14px', fontSize: 11, color: isLight ? 'hsl(220 8% 52%)' : 'hsl(0 0% 24%)' }}>
+            <div style={{ padding: '16px 14px', fontSize: 11, color: 'hsl(var(--dash-fg-dim))' }}>
               No posts yet
             </div>
           )}
@@ -450,7 +445,7 @@ export default function BlogDashboardPage() {
                 onMouseLeave={() => setHoveredId(null)}
                 style={{
                   borderLeft: `2px solid ${isActive ? 'hsl(158 64% 36%)' : 'transparent'}`,
-                  background: isActive ? 'hsl(158 64% 36% / 0.07)' : isHov ? (isLight ? 'hsl(220 8% 96%)' : 'hsl(0 0% 10%)') : 'transparent',
+                  background: isActive ? 'hsl(158 64% 36% / 0.07)' : isHov ? 'hsl(var(--dash-bg))' : 'transparent',
                   transition: 'all 0.1s', cursor: 'pointer',
                   padding: '10px 12px 10px 10px',
                 }}
@@ -458,7 +453,7 @@ export default function BlogDashboardPage() {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 3 }}>
                   <div style={{
                     fontSize: 12, letterSpacing: '0.03em',
-                    color: isActive ? (isLight ? 'hsl(220 20% 14%)' : 'hsl(0 0% 82%)') : (isLight ? 'hsl(220 12% 40%)' : 'hsl(0 0% 55%)'),
+                    color: isActive ? 'hsl(var(--dash-fg))' : 'hsl(var(--dash-fg-muted))',
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                     flex: 1, marginRight: 8,
                   }}>
@@ -466,12 +461,12 @@ export default function BlogDashboardPage() {
                   </div>
                   <span style={{
                     fontSize: 9, letterSpacing: '0.06em', flexShrink: 0,
-                    color: post.published ? 'hsl(158 64% 42%)' : (isLight ? 'hsl(220 8% 54%)' : 'hsl(0 0% 26%)'),
+                    color: post.published ? 'hsl(158 64% 42%)' : 'hsl(var(--dash-fg-dim))',
                   }}>
                     {post.published ? 'live' : 'draft'}
                   </span>
                 </div>
-                <div style={{ fontSize: 10, color: isLight ? 'hsl(220 8% 54%)' : 'hsl(0 0% 26%)' }}>
+                <div style={{ fontSize: 10, color: 'hsl(var(--dash-fg-dim))' }}>
                   {reltime(post.updated_at)}
                 </div>
               </div>
@@ -483,12 +478,12 @@ export default function BlogDashboardPage() {
       {/* ── Right panel ─────────────────────────────────── */}
       <div style={{
         flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden',
-        background: isLight ? 'hsl(0 0% 98%)' : 'hsl(0 0% 10%)',
+        background: 'hsl(var(--dash-content))',
       }}>
 
         {!activePost && !loadingPost && (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
-            <div style={{ fontSize: 11, color: isLight ? 'hsl(220 8% 52%)' : 'hsl(0 0% 22%)' }}>
+            <div style={{ fontSize: 11, color: 'hsl(var(--dash-fg-dim))' }}>
               Select a post to start
             </div>
             <button onClick={createPost}
@@ -511,7 +506,7 @@ export default function BlogDashboardPage() {
 
         {loadingPost && (
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ fontSize: 11, color: isLight ? 'hsl(220 8% 52%)' : 'hsl(0 0% 22%)' }}>
+            <div style={{ fontSize: 11, color: 'hsl(var(--dash-fg-dim))' }}>
               Loading...
             </div>
           </div>
@@ -524,7 +519,6 @@ export default function BlogDashboardPage() {
             onSave={savePost}
             onDelete={deletePost}
             onPublishToggle={togglePublish}
-            isLight={isLight}
           />
         )}
       </div>

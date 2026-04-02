@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { apiPrivate } from '@/lib/api'
-import { useDashboardTheme } from '../theme-context'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Status   = 'todo' | 'in_progress' | 'done'
@@ -58,18 +57,16 @@ function TodoRow({
   onUpdate,
   onDelete,
   autoFocus,
-  isLight,
 }: {
   todo: Todo
   onUpdate: (id: string, patch: Partial<Omit<Todo, 'id' | 'created_at' | 'updated_at'>>) => Promise<void>
   onDelete: (id: string) => Promise<void>
   autoFocus?: boolean
-  isLight: boolean
 }) {
   const STATUS_COLOR: Record<Status, string> = {
-    todo:        isLight ? 'hsl(220 8% 54%)' : 'hsl(0 0% 30%)',
+    todo:        'hsl(var(--dash-fg-dim))',
     in_progress: 'hsl(158 64% 42%)',
-    done:        isLight ? 'hsl(220 8% 72%)' : 'hsl(0 0% 22%)',
+    done:        'hsl(var(--dash-border))',
   }
 
   const [title,       setTitle]       = useState(todo.title)
@@ -91,22 +88,10 @@ function TodoRow({
     if (editingDate && dateRef.current) dateRef.current.showPicker?.()
   }, [editingDate])
 
-  // Keep local title in sync if todo updates externally
   useEffect(() => { setTitle(todo.title) }, [todo.title])
 
   const isDone  = todo.status === 'done'
   const overdue = isOverdue(todo.due_date, isDone)
-
-  const trashColor        = isLight ? 'hsl(220 8% 60%)' : 'hsl(0 0% 28%)'
-  const rowDivider        = isLight ? 'hsl(220 8% 92%)' : 'hsl(0 0% 11%)'
-  const titleEditingColor = isLight ? 'hsl(220 18% 14%)' : 'hsl(0 0% 84%)'
-  const titleActiveColor  = isLight ? 'hsl(220 16% 24%)' : 'hsl(0 0% 70%)'
-  const titleDoneColor    = isLight ? 'hsl(220 8% 60%)'  : 'hsl(0 0% 32%)'
-  const dueDateColor      = isLight ? 'hsl(220 10% 50%)' : 'hsl(0 0% 34%)'
-  const dueDateEmpty      = isLight ? 'hsl(220 8% 74%)'  : 'hsl(0 0% 20%)'
-  const dateInputBg       = isLight ? 'hsl(0 0% 97%)'    : 'hsl(0 0% 7%)'
-  const dateInputBorder   = isLight ? 'hsl(220 8% 88%)'  : 'hsl(0 0% 22%)'
-  const dateInputColor    = isLight ? 'hsl(220 14% 34%)' : 'hsl(0 0% 60%)'
 
   async function handleTitleBlur() {
     setEditing(false)
@@ -128,7 +113,7 @@ function TodoRow({
       style={{
         display: 'flex', alignItems: 'center', gap: 12,
         padding: '9px 0',
-        borderBottom: `1px solid ${rowDivider}`,
+        borderBottom: '1px solid hsl(var(--dash-border-subtle))',
         opacity: isDone ? 0.38 : 1,
         transition: 'opacity 0.2s',
       }}
@@ -168,7 +153,7 @@ function TodoRow({
               width: '100%', background: 'none', border: 'none', outline: 'none',
               fontFamily: 'var(--font-roboto-flex)',
               fontSize: 12, letterSpacing: '0.01em',
-              color: titleEditingColor,
+              color: 'hsl(var(--dash-fg))',
               caretColor: 'hsl(158 64% 36%)',
               borderRadius: 6,
             }}
@@ -178,9 +163,9 @@ function TodoRow({
             onClick={() => setEditing(true)}
             style={{
               fontSize: 12, letterSpacing: '0.01em',
-              color: isDone ? titleDoneColor : titleActiveColor,
+              color: isDone ? 'hsl(var(--dash-fg-dim))' : 'hsl(var(--dash-fg-muted))',
               textDecoration: isDone ? 'line-through' : 'none',
-              textDecorationColor: isLight ? 'hsl(220 8% 72%)' : 'hsl(0 0% 28%)',
+              textDecorationColor: 'hsl(var(--dash-border))',
               cursor: 'text',
               display: 'block',
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
@@ -224,13 +209,13 @@ function TodoRow({
               if (e.key === 'Escape') setEditingDate(false)
             }}
             style={{
-              background: dateInputBg,
-              border: `1px solid ${dateInputBorder}`,
+              background: 'hsl(var(--dash-input))',
+              border: '1px solid hsl(var(--dash-border))',
               borderRadius: 6,
-              color: dateInputColor, fontSize: 10,
+              color: 'hsl(var(--dash-fg-muted))', fontSize: 10,
               padding: '2px 5px', outline: 'none',
               fontFamily: 'var(--font-roboto-flex)',
-              colorScheme: isLight ? 'light' : 'dark', width: 110,
+              colorScheme: 'dark', width: 110,
             }}
           />
         ) : (
@@ -238,12 +223,12 @@ function TodoRow({
             onClick={() => setEditingDate(true)}
             style={{
               fontSize: 10, letterSpacing: '0.02em',
-              color: overdue ? 'hsl(0 62% 52%)' : todo.due_date ? dueDateColor : dueDateEmpty,
+              color: overdue ? 'hsl(0 62% 52%)' : todo.due_date ? 'hsl(var(--dash-fg-muted))' : 'hsl(var(--dash-border))',
               cursor: 'pointer', display: 'inline-block',
               transition: 'color 0.12s',
             }}
-            onMouseEnter={e => e.currentTarget.style.color = 'hsl(0 0% 52%)'}
-            onMouseLeave={e => e.currentTarget.style.color = overdue ? 'hsl(0 62% 52%)' : todo.due_date ? dueDateColor : dueDateEmpty}
+            onMouseEnter={e => e.currentTarget.style.color = 'hsl(var(--dash-fg))'}
+            onMouseLeave={e => e.currentTarget.style.color = overdue ? 'hsl(0 62% 52%)' : todo.due_date ? 'hsl(var(--dash-fg-muted))' : 'hsl(var(--dash-border))'}
           >
             {todo.due_date ?? '—'}
           </span>
@@ -262,7 +247,7 @@ function TodoRow({
             </button>
             <button
               onClick={() => setConfirmDel(false)}
-              style={{ color: trashColor, background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, letterSpacing: '-0.01em', padding: 0, fontFamily: 'var(--font-roboto-flex)' }}
+              style={{ color: 'hsl(var(--dash-fg-dim))', background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, letterSpacing: '-0.01em', padding: 0, fontFamily: 'var(--font-roboto-flex)' }}
             >
               Cancel
             </button>
@@ -271,13 +256,13 @@ function TodoRow({
           <button
             onClick={() => setConfirmDel(true)}
             style={{
-              color: trashColor, background: 'none', border: 'none',
+              color: 'hsl(var(--dash-fg-dim))', background: 'none', border: 'none',
               cursor: 'pointer', padding: 0, display: 'flex',
               opacity: hovered ? 1 : 0,
               transition: 'opacity 0.12s, color 0.12s',
             }}
             onMouseEnter={e => e.currentTarget.style.color = 'hsl(0 62% 52%)'}
-            onMouseLeave={e => e.currentTarget.style.color = trashColor}
+            onMouseLeave={e => e.currentTarget.style.color = 'hsl(var(--dash-fg-dim))'}
           >
             <IcTrash />
           </button>
@@ -289,8 +274,6 @@ function TodoRow({
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function TodosPage() {
-  const { isLight } = useDashboardTheme()
-
   const [todos,    setTodos]    = useState<Todo[]>([])
   const [loading,  setLoading]  = useState(true)
   const [filter,   setFilter]   = useState<FilterTab>('all')
@@ -355,19 +338,13 @@ export default function TodosPage() {
 
   const filtered = filter === 'all' ? todos : todos.filter(t => t.status === filter)
 
-  const tabBorder      = isLight ? 'hsl(220 8% 90%)'  : 'hsl(0 0% 14%)'
-  const colHeaderColor = isLight ? 'hsl(220 8% 56%)'  : 'hsl(0 0% 20%)'
-  const tabInactive    = isLight ? 'hsl(220 8% 52%)'  : 'hsl(0 0% 28%)'
-  const badgeInactive  = isLight ? 'hsl(220 8% 68%)'  : 'hsl(0 0% 20%)'
-  const emptyTextColor = isLight ? 'hsl(220 8% 56%)'  : 'hsl(0 0% 22%)'
-
   return (
     <div style={{ maxWidth: 820, margin: '0 auto' }}>
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 22 }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-          <span style={{ fontSize: 11, letterSpacing: '-0.01em', color: isLight ? 'hsl(220 8% 46%)' : 'hsl(0 0% 26%)' }}>
+          <span style={{ fontSize: 11, letterSpacing: '-0.01em', color: 'hsl(var(--dash-fg-dim))' }}>
             Tasks
           </span>
           {counts.todo > 0 && (
@@ -383,7 +360,7 @@ export default function TodosPage() {
           style={{
             display: 'flex', alignItems: 'center', gap: 5,
             fontSize: 11, letterSpacing: '-0.01em',
-            color: creating ? (isLight ? 'hsl(220 8% 52%)' : 'hsl(0 0% 28%)') : 'hsl(158 64% 42%)',
+            color: creating ? 'hsl(var(--dash-fg-dim))' : 'hsl(158 64% 42%)',
             background: 'none', border: 'none',
             borderRadius: 6,
             cursor: creating ? 'not-allowed' : 'pointer',
@@ -398,7 +375,7 @@ export default function TodosPage() {
       </div>
 
       {/* Filter tabs */}
-      <div style={{ display: 'flex', gap: 0, marginBottom: 0, borderBottom: `1px solid ${tabBorder}` }}>
+      <div style={{ display: 'flex', gap: 0, marginBottom: 0, borderBottom: '1px solid hsl(var(--dash-border-subtle))' }}>
         {TABS.map(({ key, label }) => {
           const active = filter === key
           return (
@@ -407,7 +384,7 @@ export default function TodosPage() {
               onClick={() => setFilter(key)}
               style={{
                 fontSize: 11, letterSpacing: '-0.01em',
-                color: active ? 'hsl(158 64% 52%)' : tabInactive,
+                color: active ? 'hsl(158 64% 52%)' : 'hsl(var(--dash-fg-dim))',
                 background: 'none', border: 'none',
                 borderBottom: `1px solid ${active ? 'hsl(158 64% 36%)' : 'transparent'}`,
                 padding: '6px 12px 7px',
@@ -415,11 +392,11 @@ export default function TodosPage() {
                 marginBottom: -1,
                 fontFamily: 'var(--font-roboto-flex)',
               }}
-              onMouseEnter={e => { if (!active) e.currentTarget.style.color = isLight ? 'hsl(220 8% 32%)' : 'hsl(0 0% 48%)' }}
-              onMouseLeave={e => { if (!active) e.currentTarget.style.color = tabInactive }}
+              onMouseEnter={e => { if (!active) e.currentTarget.style.color = 'hsl(var(--dash-fg-muted))' }}
+              onMouseLeave={e => { if (!active) e.currentTarget.style.color = 'hsl(var(--dash-fg-dim))' }}
             >
               {label}
-              <span style={{ marginLeft: 6, color: active ? 'hsl(158 64% 36%)' : badgeInactive }}>
+              <span style={{ marginLeft: 6, color: active ? 'hsl(158 64% 36%)' : 'hsl(var(--dash-border))' }}>
                 {counts[key]}
               </span>
             </button>
@@ -432,8 +409,8 @@ export default function TodosPage() {
         display: 'flex', alignItems: 'center', gap: 12,
         padding: '10px 0 8px',
         fontSize: 11, letterSpacing: '-0.01em',
-        color: colHeaderColor,
-        borderBottom: `1px solid ${tabBorder}`,
+        color: 'hsl(var(--dash-border))',
+        borderBottom: '1px solid hsl(var(--dash-border-subtle))',
       }}>
         <span style={{ minWidth: 30 }}>Status</span>
         <span style={{ flex: 1 }}>Task</span>
@@ -444,13 +421,13 @@ export default function TodosPage() {
 
       {/* List */}
       {loading && (
-        <div style={{ padding: '20px 0', fontSize: 11, letterSpacing: '-0.01em', color: emptyTextColor }}>
+        <div style={{ padding: '20px 0', fontSize: 11, letterSpacing: '-0.01em', color: 'hsl(var(--dash-fg-dim))' }}>
           Loading...
         </div>
       )}
 
       {!loading && filtered.length === 0 && (
-        <div style={{ padding: '20px 0', fontSize: 11, letterSpacing: '-0.01em', color: emptyTextColor }}>
+        <div style={{ padding: '20px 0', fontSize: 11, letterSpacing: '-0.01em', color: 'hsl(var(--dash-fg-dim))' }}>
           {filter === 'all' ? 'No tasks yet' : `No ${filter.replace('_', ' ')} tasks`}
         </div>
       )}
@@ -462,7 +439,6 @@ export default function TodosPage() {
           onUpdate={updateTodo}
           onDelete={deleteTodo}
           autoFocus={todo.id === newId}
-          isLight={isLight}
         />
       ))}
     </div>

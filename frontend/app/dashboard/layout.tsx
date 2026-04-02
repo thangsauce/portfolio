@@ -88,13 +88,13 @@ function IconLogout() {
 
 // ── Nav config ───────────────────────────────────────────────────────────────
 const NAV = [
-  { href: '/dashboard',           label: 'Overview',  Icon: IconOverview,  exact: true },
-  { href: '/dashboard/portfolio', label: 'Portfolio', Icon: IconPortfolio              },
-  { href: '/dashboard/notes',     label: 'Notes',     Icon: IconNotes                  },
-  { href: '/dashboard/todos',     label: 'Todos',     Icon: IconTodos                  },
-  { href: '/dashboard/learning',  label: 'Lesson',  Icon: IconLearning               },
+  { href: '/dashboard',           label: 'Overview',    Icon: IconOverview,  exact: true },
+  { href: '/dashboard/portfolio', label: 'Portfolio',   Icon: IconPortfolio              },
+  { href: '/dashboard/notes',     label: 'Notes',       Icon: IconNotes                  },
+  { href: '/dashboard/todos',     label: 'Todos',       Icon: IconTodos                  },
+  { href: '/dashboard/learning',  label: 'Lesson',      Icon: IconLearning               },
   { href: '/dashboard/projects',  label: 'Projects.md', Icon: IconProjects               },
-  { href: '/dashboard/blog',      label: 'Blog',      Icon: IconBlog                   },
+  { href: '/dashboard/blog',      label: 'Blog',        Icon: IconBlog                   },
 ]
 
 // ── Layout ───────────────────────────────────────────────────────────────────
@@ -103,10 +103,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const router   = useRouter()
   const pathname = usePathname()
   const [mounted,      setMounted]      = useState(false)
-  const [hoveredNav,   setHoveredNav]   = useState<string | null>(null)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
-  const logoEyeRef = useRef<SVGSVGElement>(null)
+  const logoEyeRef   = useRef<SVGSVGElement>(null)
   const logoPupilRef = useRef<SVGGElement>(null)
 
   useEffect(() => { setMounted(true) }, [])
@@ -123,17 +122,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }, [])
 
   useEffect(() => {
-    const eye = logoEyeRef.current
+    const eye   = logoEyeRef.current
     const pupil = logoPupilRef.current
     if (!eye || !pupil) return
 
     const onMove = (e: MouseEvent) => {
       const rect = eye.getBoundingClientRect()
-      const cx = rect.left + rect.width / 2
-      const cy = rect.top + rect.height / 2
-      const dx = e.clientX - cx
-      const dy = e.clientY - cy
-      const max = 4.2
+      const cx   = rect.left + rect.width / 2
+      const cy   = rect.top + rect.height / 2
+      const dx   = e.clientX - cx
+      const dy   = e.clientY - cy
+      const max  = 4.2
       const dist = Math.hypot(dx, dy) || 1
       const clamped = Math.min(max, dist)
       const x = (dx / dist) * clamped
@@ -141,9 +140,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       pupil.setAttribute('transform', `translate(${x} ${y})`)
     }
 
-    const onLeave = () => {
-      pupil.setAttribute('transform', 'translate(0 0)')
-    }
+    const onLeave = () => { pupil.setAttribute('transform', 'translate(0 0)') }
 
     window.addEventListener('mousemove', onMove, { passive: true })
     window.addEventListener('mouseleave', onLeave, { passive: true })
@@ -157,7 +154,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const segments = pathname.replace(/^\/dashboard\/?/, '').split('/').filter(Boolean)
   const initial  = (user?.email?.[0] ?? 'T').toUpperCase()
-  const isLight = theme === 'light'
+  const isLight  = theme === 'light'
   const toggleTheme = () => {
     const next = theme === 'dark' ? 'light' : 'dark'
     setTheme(next)
@@ -166,271 +163,168 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <DashboardThemeContext.Provider value={{ isLight, toggleTheme }}>
-    <div
-      className={`transition-opacity duration-500 ${mounted ? 'opacity-100' : 'opacity-0'}`}
-      style={{
-        position: 'fixed', inset: 0, zIndex: 50,
-        display: 'flex', overflow: 'hidden',
-        fontFamily: 'var(--font-roboto-flex)',
-        background: isLight ? 'hsl(0 0% 96%)' : 'hsl(226 12% 10%)',
-      }}
-    >
-      {/* ── Sidebar ───────────────────────────────────────────────────────── */}
-      <aside style={{
-        width: 240, minWidth: 240, flexShrink: 0,
-        background: isLight ? 'hsl(0 0% 100%)' : 'hsl(228 14% 7%)',
-        borderRight: `1px solid ${isLight ? 'hsl(0 0% 86%)' : 'hsl(226 10% 13%)'}`,
-        display: 'flex', flexDirection: 'column',
-      }}>
+      <div
+        data-theme={theme}
+        className={`transition-opacity duration-500 ${mounted ? 'opacity-100' : 'opacity-0'} fixed inset-0 z-50 flex overflow-hidden font-roboto-flex bg-[hsl(var(--dash-bg))]`}
+      >
+        {/* ── Sidebar ─────────────────────────────────────────────────────── */}
+        <aside className="w-60 min-w-[240px] flex-shrink-0 flex flex-col bg-[hsl(var(--dash-sidebar))] border-r border-border">
 
-        {/* Logo */}
-        <Link href="/#banner" style={{
-          padding: '18px 16px',
-          borderBottom: `1px solid ${isLight ? 'hsl(0 0% 90%)' : 'hsl(226 10% 12%)'}`,
-          display: 'block',
-          textDecoration: 'none',
-          cursor: 'pointer',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{
-              width: 42, height: 34, flexShrink: 0,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: 'hsl(158 58% 54%)',
-              boxShadow: '0 0 0 1px hsl(158 64% 36% / 0.28), 0 4px 14px hsl(158 64% 36% / 0.16)',
-              borderRadius: 14,
-            }}>
-              <svg
-                ref={logoEyeRef}
-                width="32"
-                height="20"
-                viewBox="0 0 44 28"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-              >
-                <defs>
-                  <clipPath id="dashboard-eye-clip">
-                    <path d="M3 14C7.8 6 14.8 2.5 22 2.5C29.2 2.5 36.2 6 41 14C36.2 22 29.2 25.5 22 25.5C14.8 25.5 7.8 22 3 14Z" />
-                  </clipPath>
-                </defs>
-                <path
-                  d="M3 14C7.8 6 14.8 2.5 22 2.5C29.2 2.5 36.2 6 41 14C36.2 22 29.2 25.5 22 25.5C14.8 25.5 7.8 22 3 14Z"
-                  fill="hsl(228 14% 7%)"
-                  stroke="currentColor"
-                  strokeWidth="2.2"
-                />
-                <g clipPath="url(#dashboard-eye-clip)">
-                  <rect x="0" y="0" width="44" height="28" fill={isLight ? 'hsl(0 0% 100%)' : 'hsl(228 14% 7%)'} />
-                  <g ref={logoPupilRef}>
-                    <circle cx="22" cy="14" r="5" fill="currentColor" />
-                    <circle cx="22" cy="14" r="1.5" fill={isLight ? 'hsl(0 0% 100%)' : 'hsl(228 14% 7%)'} />
-                  </g>
-                </g>
-              </svg>
-            </div>
-            <div>
-              <div style={{
-                fontSize: 14, fontWeight: 600, letterSpacing: '-0.02em',
-                color: isLight ? 'hsl(220 20% 16%)' : 'hsl(220 16% 86%)',
-                lineHeight: 1.2,
-              }}>
-                thangle.me
-              </div>
-              <div style={{
-                fontSize: 11, color: 'hsl(158 55% 48%)',
-                marginTop: 2, letterSpacing: '0.01em',
-              }}>
-                Dashboard
-              </div>
-            </div>
-          </div>
-        </Link>
-
-        {/* Nav */}
-        <nav data-lenis-prevent style={{ flex: 1, padding: '8px 10px', overflowY: 'auto' }}>
-          <div style={{
-            fontSize: 11, fontWeight: 500, letterSpacing: '-0.01em',
-            color: isLight ? 'hsl(220 8% 50%)' : 'hsl(220 6% 36%)',
-            padding: '4px 8px 6px',
-          }}>
-            Menu
-          </div>
-
-          {NAV.map(({ href, label, Icon, exact }) => {
-            const isActive = exact ? pathname === href : pathname.startsWith(href)
-            const isHov    = hoveredNav === href && !isActive
-            return (
-              <Link
-                key={href}
-                href={href}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 10,
-                  padding: '9px 10px',
-                  marginBottom: 1,
-                  fontSize: 13,
-                  fontWeight: isActive ? 500 : 400,
-                  letterSpacing: '-0.01em',
-                  textDecoration: 'none',
-                  borderRadius: 12,
-                  color: isActive
-                    ? 'hsl(158 58% 42%)'
-                    : isHov
-                      ? (isLight ? 'hsl(220 14% 34%)' : 'hsl(220 10% 66%)')
-                      : (isLight ? 'hsl(220 8% 44%)' : 'hsl(220 8% 42%)'),
-                  background: isActive
-                    ? (isLight ? 'hsl(158 64% 42% / 0.12)' : 'hsl(158 64% 42% / 0.12)')
-                    : isHov
-                      ? (isLight ? 'hsl(0 0% 95%)' : 'hsl(226 12% 11%)')
-                      : 'transparent',
-                  transition: 'color 0.14s, background 0.14s',
-                }}
-                onMouseEnter={() => setHoveredNav(href)}
-                onMouseLeave={() => setHoveredNav(null)}
-              >
-                <Icon />
-                <span style={{ flex: 1 }}>{label}</span>
-                {isActive && (
-                  <div style={{
-                    width: 6, height: 6, borderRadius: '50%',
-                    background: 'hsl(158 64% 42%)',
-                    flexShrink: 0,
-                  }} />
-                )}
-              </Link>
-            )
-          })}
-        </nav>
-
-        {/* User */}
-        <div style={{
-          padding: '12px 14px',
-          borderTop: `1px solid ${isLight ? 'hsl(0 0% 90%)' : 'hsl(226 10% 12%)'}`,
-        }}>
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 10,
-            padding: '10px 10px',
-            borderRadius: 12,
-            background: isLight ? 'hsl(0 0% 97%)' : 'hsl(226 12% 10%)',
-            marginBottom: 8,
-          }}>
-            <div style={{
-              width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
-              background: 'hsl(158 64% 36% / 0.18)',
-              border: '1px solid hsl(158 64% 36% / 0.28)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 11, fontWeight: 600,
-              color: 'hsl(158 58% 54%)',
-            }}>
-              {initial}
-            </div>
-            <div style={{
-              fontSize: 11, color: 'hsl(220 8% 48%)',
-              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-              letterSpacing: '-0.01em', flex: 1,
-            }}>
-              {user?.email ?? '—'}
-            </div>
-          </div>
-
-          <button
-            onClick={async () => {
-              setIsLoggingOut(true)
-              try { await logout(); router.push('/') }
-              catch { setIsLoggingOut(false) }
-            }}
-            style={{
-              width: '100%',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
-              padding: '8px 12px',
-              borderRadius: 12,
-              fontSize: 12, fontWeight: 500,
-              color: 'hsl(0 62% 55%)',
-              background: 'hsl(0 62% 52% / 0.08)',
-              border: '1px solid hsl(0 62% 52% / 0.15)',
-              cursor: 'pointer',
-              transition: 'background 0.15s, border-color 0.15s',
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.background = 'hsl(0 62% 52% / 0.14)'
-              e.currentTarget.style.borderColor = 'hsl(0 62% 52% / 0.28)'
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.background = 'hsl(0 62% 52% / 0.08)'
-              e.currentTarget.style.borderColor = 'hsl(0 62% 52% / 0.15)'
-            }}
+          {/* Logo */}
+          <Link
+            href="/#banner"
+            className="px-4 py-[18px] border-b border-border block no-underline"
           >
-            <IconLogout />
-            Sign Out
-          </button>
-        </div>
-      </aside>
+            <div className="flex items-center gap-3">
+              <div
+                className="w-[42px] h-[34px] flex-shrink-0 flex items-center justify-center text-primary rounded-[14px]"
+                style={{ boxShadow: '0 0 0 1px hsl(158 64% 36% / 0.28), 0 4px 14px hsl(158 64% 36% / 0.16)' }}
+              >
+                <svg
+                  ref={logoEyeRef}
+                  width="32"
+                  height="20"
+                  viewBox="0 0 44 28"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <defs>
+                    <clipPath id="dashboard-eye-clip">
+                      <path d="M3 14C7.8 6 14.8 2.5 22 2.5C29.2 2.5 36.2 6 41 14C36.2 22 29.2 25.5 22 25.5C14.8 25.5 7.8 22 3 14Z" />
+                    </clipPath>
+                  </defs>
+                  <path
+                    d="M3 14C7.8 6 14.8 2.5 22 2.5C29.2 2.5 36.2 6 41 14C36.2 22 29.2 25.5 22 25.5C14.8 25.5 7.8 22 3 14Z"
+                    fill="hsl(var(--dash-sidebar))"
+                    stroke="currentColor"
+                    strokeWidth="2.2"
+                  />
+                  <g clipPath="url(#dashboard-eye-clip)">
+                    <rect x="0" y="0" width="44" height="28" fill="hsl(var(--dash-sidebar))" />
+                    <g ref={logoPupilRef}>
+                      <circle cx="22" cy="14" r="5" fill="currentColor" />
+                      <circle cx="22" cy="14" r="1.5" fill="hsl(var(--dash-sidebar))" />
+                    </g>
+                  </g>
+                </svg>
+              </div>
+              <div>
+                <div className="text-sm font-semibold tracking-tight text-foreground leading-tight">
+                  thangle.me
+                </div>
+                <div className="text-[11px] text-primary mt-0.5 tracking-wide">
+                  Dashboard
+                </div>
+              </div>
+            </div>
+          </Link>
 
-      {/* ── Content ───────────────────────────────────────────────────────── */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          {/* Nav */}
+          <nav data-lenis-prevent className="flex-1 px-2.5 py-2 overflow-y-auto">
+            <div className="text-[11px] font-medium tracking-tight text-muted-foreground px-2 pb-1.5 pt-1">
+              Menu
+            </div>
 
-        {/* Topbar */}
-        <header style={{
-          height: 44, minHeight: 44, flexShrink: 0,
-          background: isLight ? 'hsl(0 0% 100%)' : 'hsl(227 13% 9%)',
-          borderBottom: `1px solid ${isLight ? 'hsl(0 0% 88%)' : 'hsl(226 10% 14%)'}`,
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '0 28px',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 13, letterSpacing: '-0.01em', color: isLight ? 'hsl(220 14% 42%)' : 'hsl(220 8% 50%)' }}>
-              Dashboard
-            </span>
-            {segments.map((seg, i) => (
-              <span key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontSize: 16, lineHeight: 1, fontWeight: 300, color: isLight ? 'hsl(220 10% 62%)' : 'hsl(220 8% 36%)' }}>›</span>
-                <span style={{
-                  fontSize: 13, letterSpacing: '-0.01em',
-                  color: i === segments.length - 1
-                    ? (isLight ? 'hsl(220 18% 22%)' : 'hsl(220 12% 70%)')
-                    : (isLight ? 'hsl(220 14% 40%)' : 'hsl(220 8% 46%)'),
-                  fontWeight: i === segments.length - 1 ? 500 : 400,
-                  textTransform: 'capitalize',
-                }}>
-                  {seg}
-                </span>
-              </span>
-            ))}
-          </div>
+            {NAV.map(({ href, label, Icon, exact }) => {
+              const isActive = exact ? pathname === href : pathname.startsWith(href)
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={[
+                    'flex items-center gap-2.5 px-2.5 py-[9px] mb-px text-[13px] tracking-tight rounded-xl no-underline transition-colors duration-150',
+                    isActive
+                      ? 'font-medium text-primary bg-primary/[0.12]'
+                      : 'font-normal text-muted-foreground hover:text-foreground hover:bg-muted',
+                  ].join(' ')}
+                >
+                  <Icon />
+                  <span className="flex-1">{label}</span>
+                  {isActive && (
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                  )}
+                </Link>
+              )
+            })}
+          </nav>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {/* User */}
+          <div className="px-3.5 py-3 border-t border-border">
+            <div className="flex items-center gap-2.5 px-2.5 py-2.5 rounded-xl bg-[hsl(var(--dash-bg))] mb-2">
+              <div
+                className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-[11px] font-semibold text-primary"
+                style={{
+                  background: 'hsl(158 64% 36% / 0.18)',
+                  border: '1px solid hsl(158 64% 36% / 0.28)',
+                }}
+              >
+                {initial}
+              </div>
+              <div className="text-[11px] text-muted-foreground overflow-hidden text-ellipsis whitespace-nowrap tracking-tight flex-1">
+                {user?.email ?? '—'}
+              </div>
+            </div>
+
             <button
-              onClick={toggleTheme}
-              style={{
-                marginRight: 10,
-                padding: '5px 12px',
-                borderRadius: 999,
-                border: `1px solid ${isLight ? 'hsl(0 0% 82%)' : 'hsl(0 0% 24%)'}`,
-                background: isLight ? 'hsl(0 0% 96%)' : 'hsl(226 10% 14%)',
-                color: isLight ? 'hsl(220 20% 26%)' : 'hsl(220 14% 78%)',
-                fontSize: 12,
-                letterSpacing: '-0.01em',
-                cursor: 'pointer',
+              onClick={async () => {
+                setIsLoggingOut(true)
+                try { await logout(); router.push('/') }
+                catch { setIsLoggingOut(false) }
               }}
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-destructive bg-destructive/[0.08] border border-destructive/[0.15] cursor-pointer transition-colors duration-150 hover:bg-destructive/[0.14] hover:border-destructive/[0.28]"
             >
-              {isLight ? '🌙 Dark' : '☀ Light'}
+              <IconLogout />
+              Sign Out
             </button>
-            <div style={{
-              width: 7, height: 7, borderRadius: '50%',
-              background: 'hsl(158 64% 42%)',
-              boxShadow: '0 0 0 2px hsl(158 64% 42% / 0.22)',
-            }} />
-            <span style={{ fontSize: 12, letterSpacing: '-0.01em', color: isLight ? 'hsl(220 12% 42%)' : 'hsl(220 8% 50%)' }}>
-              Online
-            </span>
           </div>
-        </header>
+        </aside>
 
-        {/* Main */}
-        <main data-lenis-prevent style={{ flex: 1, overflowY: 'auto', padding: '32px 28px' }}>
-          {children}
-        </main>
+        {/* ── Content ─────────────────────────────────────────────────────── */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+
+          {/* Topbar */}
+          <header className="h-11 min-h-[44px] flex-shrink-0 bg-[hsl(var(--dash-sidebar))] border-b border-border flex items-center justify-between px-7">
+            <div className="flex items-center gap-2">
+              <span className="text-[13px] tracking-tight text-muted-foreground">
+                Dashboard
+              </span>
+              {segments.map((seg, i) => (
+                <span key={i} className="flex items-center gap-2">
+                  <span className="text-base leading-none font-light text-muted-foreground">›</span>
+                  <span className={[
+                    'text-[13px] tracking-tight capitalize',
+                    i === segments.length - 1
+                      ? 'text-foreground font-medium'
+                      : 'text-muted-foreground font-normal',
+                  ].join(' ')}>
+                    {seg}
+                  </span>
+                </span>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={toggleTheme}
+                className="mr-2.5 px-3 py-[5px] rounded-full border border-border bg-muted text-muted-foreground text-xs tracking-tight cursor-pointer"
+              >
+                {isLight ? '🌙 Dark' : '☀ Light'}
+              </button>
+              <div
+                className="w-[7px] h-[7px] rounded-full bg-primary"
+                style={{ boxShadow: '0 0 0 2px hsl(158 64% 42% / 0.22)' }}
+              />
+              <span className="text-xs tracking-tight text-muted-foreground">Online</span>
+            </div>
+          </header>
+
+          {/* Main */}
+          <main data-lenis-prevent className="flex-1 overflow-y-auto py-8 px-7">
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
     </DashboardThemeContext.Provider>
   )
 }

@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { apiPrivate, apiFetch } from '@/lib/api'
-import { useDashboardTheme } from '../theme-context'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type DocItem = {
@@ -47,13 +46,11 @@ function DocEditor({
   projects,
   onSave,
   onDelete,
-  isLight,
 }: {
   doc: Doc
   projects: PortfolioProject[]
   onSave: (id: string, patch: Partial<Doc>) => Promise<void>
   onDelete: (id: string) => Promise<void>
-  isLight: boolean
 }) {
   const [title,      setTitle]      = useState(doc.title)
   const [content,    setContent]    = useState(doc.content)
@@ -101,20 +98,17 @@ function DocEditor({
 
   const linkedProject = projects.find(p => p.id === linkedId)
 
-  const tabInactiveColor = isLight ? 'hsl(220 8% 52%)' : 'hsl(0 0% 28%)'
-  const trashColor       = isLight ? 'hsl(220 8% 62%)' : 'hsl(0 0% 28%)'
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
 
       {/* Header */}
-      <div style={{ padding: '18px 36px 0', flexShrink: 0, borderBottom: `1px solid ${isLight ? 'hsl(220 8% 90%)' : 'hsl(0 0% 14%)'}` }}>
+      <div style={{ padding: '18px 36px 0', flexShrink: 0, borderBottom: '1px solid hsl(var(--dash-border-subtle))' }}>
 
         {/* Top row: save status | tabs | delete */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 20, marginBottom: 12 }}>
           <div style={{
             fontSize: 9,
-            color: status === 'saved' ? 'hsl(158 64% 42%)' : status === 'saving' ? (isLight ? 'hsl(220 8% 60%)' : 'hsl(0 0% 32%)') : 'transparent',
+            color: status === 'saved' ? 'hsl(158 64% 42%)' : status === 'saving' ? 'hsl(var(--dash-fg-dim))' : 'transparent',
             transition: 'color 0.2s',
           }}>
             {status === 'saved' ? 'Saved' : 'Saving...'}
@@ -129,15 +123,15 @@ function DocEditor({
                   onClick={() => setTab(t)}
                   style={{
                     fontSize: 9,
-                    color: tab === t ? 'hsl(158 64% 52%)' : tabInactiveColor,
+                    color: tab === t ? 'hsl(158 64% 52%)' : 'hsl(var(--dash-fg-dim))',
                     background: 'none', border: 'none',
                     borderBottom: `1px solid ${tab === t ? 'hsl(158 64% 36%)' : 'transparent'}`,
                     padding: '3px 10px 4px',
                     cursor: 'pointer', transition: 'color 0.12s',
                     fontFamily: 'var(--font-roboto-flex)',
                   }}
-                  onMouseEnter={e => { if (tab !== t) e.currentTarget.style.color = isLight ? 'hsl(220 8% 36%)' : 'hsl(0 0% 48%)' }}
-                  onMouseLeave={e => { if (tab !== t) e.currentTarget.style.color = tabInactiveColor }}
+                  onMouseEnter={e => { if (tab !== t) e.currentTarget.style.color = 'hsl(var(--dash-fg-muted))' }}
+                  onMouseLeave={e => { if (tab !== t) e.currentTarget.style.color = 'hsl(var(--dash-fg-dim))' }}
                 >
                   {t}
                 </button>
@@ -148,17 +142,17 @@ function DocEditor({
             {confirmDel ? (
               <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                 <button onClick={() => onDelete(doc.id)} style={{ color: 'hsl(0 62% 52%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, padding: 0, fontFamily: 'var(--font-roboto-flex)' }}>Delete</button>
-                <button onClick={() => setConfirmDel(false)} style={{ color: trashColor, background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, padding: 0, fontFamily: 'var(--font-roboto-flex)' }}>Cancel</button>
+                <button onClick={() => setConfirmDel(false)} style={{ color: 'hsl(var(--dash-fg-dim))', background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, padding: 0, fontFamily: 'var(--font-roboto-flex)' }}>Cancel</button>
               </span>
             ) : (
               <button
                 onClick={() => setConfirmDel(true)}
                 style={{
-                  color: trashColor, background: 'none', border: 'none',
+                  color: 'hsl(var(--dash-fg-dim))', background: 'none', border: 'none',
                   cursor: 'pointer', padding: 0, display: 'flex', transition: 'color 0.12s',
                 }}
                 onMouseEnter={e => e.currentTarget.style.color = 'hsl(0 62% 52%)'}
-                onMouseLeave={e => e.currentTarget.style.color = trashColor}
+                onMouseLeave={e => e.currentTarget.style.color = 'hsl(var(--dash-fg-dim))'}
               >
                 <IcTrash />
               </button>
@@ -175,22 +169,22 @@ function DocEditor({
             width: '100%', background: 'none', border: 'none', outline: 'none',
             fontFamily: 'var(--font-anton)',
             fontSize: 24, letterSpacing: '0.08em', textTransform: 'uppercase',
-            color: isLight ? 'hsl(220 20% 14%)' : 'hsl(0 0% 87%)', caretColor: 'hsl(158 64% 36%)',
+            color: 'hsl(var(--dash-fg))', caretColor: 'hsl(158 64% 36%)',
             marginBottom: 14,
           }}
         />
 
         {/* Link to project */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-          <span style={{ fontSize: 10, color: isLight ? 'hsl(220 8% 54%)' : 'hsl(0 0% 26%)', flexShrink: 0 }}>Project</span>
+          <span style={{ fontSize: 10, color: 'hsl(var(--dash-fg-dim))', flexShrink: 0 }}>Project</span>
           <div style={{ position: 'relative' }}>
             <select
               value={linkedId}
               onChange={e => handleLink(e.target.value)}
               style={{
-                background: isLight ? 'hsl(0 0% 97%)' : 'hsl(0 0% 8%)',
-                border: `1px solid ${linkedId ? 'hsl(158 64% 36% / 0.35)' : (isLight ? 'hsl(220 8% 88%)' : 'hsl(0 0% 18%)')}`,
-                color: linkedId ? 'hsl(158 64% 42%)' : (isLight ? 'hsl(220 10% 48%)' : 'hsl(0 0% 34%)'),
+                background: 'hsl(var(--dash-input))',
+                border: `1px solid ${linkedId ? 'hsl(158 64% 36% / 0.35)' : 'hsl(var(--dash-border))'}`,
+                color: linkedId ? 'hsl(158 64% 42%)' : 'hsl(var(--dash-fg-muted))',
                 fontSize: 10,
                 padding: '4px 24px 4px 8px', outline: 'none',
                 fontFamily: 'var(--font-roboto-flex)',
@@ -206,11 +200,11 @@ function DocEditor({
             </select>
             <span style={{
               position: 'absolute', right: 7, top: '50%', transform: 'translateY(-50%)',
-              fontSize: 8, color: isLight ? 'hsl(220 8% 56%)' : 'hsl(0 0% 30%)', pointerEvents: 'none',
+              fontSize: 8, color: 'hsl(var(--dash-fg-dim))', pointerEvents: 'none',
             }}>▾</span>
           </div>
           {linkedProject && (
-            <span style={{ fontSize: 9, color: isLight ? 'hsl(220 8% 54%)' : 'hsl(0 0% 30%)' }}>
+            <span style={{ fontSize: 9, color: 'hsl(var(--dash-fg-dim))' }}>
               → {linkedProject.slug}
             </span>
           )}
@@ -228,25 +222,25 @@ function DocEditor({
               flex: 1, width: '100%', boxSizing: 'border-box',
               background: 'none', border: 'none', outline: 'none', resize: 'none',
               fontFamily: 'var(--font-roboto-flex)', fontSize: 13,
-              color: isLight ? 'hsl(220 14% 34%)' : 'hsl(0 0% 60%)', caretColor: 'hsl(158 64% 36%)',
+              color: 'hsl(var(--dash-fg-muted))', caretColor: 'hsl(158 64% 36%)',
               lineHeight: 1.7, padding: '16px 36px',
             }}
           />
         ) : (
           <div style={{
             flex: 1, overflow: 'auto',
-            background: isLight ? 'hsl(0 0% 99%)' : 'hsl(0 0% 9%)',
+            background: 'hsl(var(--dash-content))',
             padding: '24px 36px',
             fontSize: 14, lineHeight: 1.75,
-            color: isLight ? 'hsl(220 14% 28%)' : 'hsl(0 0% 65%)',
+            color: 'hsl(var(--dash-fg-muted))',
             fontFamily: 'var(--font-roboto-flex)',
           }}>
             {content.trim() ? (
               <ReactMarkdown
                 components={{
-                  h1: ({ children }) => <h1 style={{ fontFamily: 'var(--font-anton)', fontSize: 30, letterSpacing: '0.05em', textTransform: 'uppercase', color: isLight ? 'hsl(220 18% 14%)' : 'hsl(0 0% 86%)', margin: '0 0 18px', lineHeight: 1.1 }}>{children}</h1>,
-                  h2: ({ children }) => <h2 style={{ fontFamily: 'var(--font-anton)', fontSize: 22, letterSpacing: '0.05em', textTransform: 'uppercase', color: isLight ? 'hsl(220 18% 18%)' : 'hsl(0 0% 80%)', margin: '34px 0 14px', lineHeight: 1.15 }}>{children}</h2>,
-                  h3: ({ children }) => <h3 style={{ fontSize: 15, fontWeight: 600, color: isLight ? 'hsl(220 16% 24%)' : 'hsl(0 0% 70%)', margin: '26px 0 10px' }}>{children}</h3>,
+                  h1: ({ children }) => <h1 style={{ fontFamily: 'var(--font-anton)', fontSize: 30, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'hsl(var(--dash-fg))', margin: '0 0 18px', lineHeight: 1.1 }}>{children}</h1>,
+                  h2: ({ children }) => <h2 style={{ fontFamily: 'var(--font-anton)', fontSize: 22, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'hsl(var(--dash-fg))', margin: '34px 0 14px', lineHeight: 1.15 }}>{children}</h2>,
+                  h3: ({ children }) => <h3 style={{ fontSize: 15, fontWeight: 600, color: 'hsl(var(--dash-fg-muted))', margin: '26px 0 10px' }}>{children}</h3>,
                   p: ({ children }) => <p style={{ margin: '0 0 16px' }}>{children}</p>,
                   ul: ({ children }) => <ul style={{ margin: '0 0 16px', paddingLeft: 0, listStyle: 'none' }}>{children}</ul>,
                   ol: ({ children }) => <ol style={{ margin: '0 0 16px', paddingLeft: 20 }}>{children}</ol>,
@@ -256,22 +250,22 @@ function DocEditor({
                       {children}
                     </li>
                   ),
-                  pre: ({ children }) => <pre style={{ background: isLight ? 'hsl(220 8% 96%)' : 'hsl(0 0% 7%)', border: `1px solid ${isLight ? 'hsl(220 8% 90%)' : 'hsl(0 0% 13%)'}`, borderRadius: 6, padding: '13px 16px', margin: '0 0 16px', overflowX: 'auto', lineHeight: 1.6 }}>{children}</pre>,
+                  pre: ({ children }) => <pre style={{ background: 'hsl(var(--dash-input))', border: '1px solid hsl(var(--dash-border-subtle))', borderRadius: 6, padding: '13px 16px', margin: '0 0 16px', overflowX: 'auto', lineHeight: 1.6 }}>{children}</pre>,
                   code: ({ children, className }) => className ? (
-                    <code style={{ fontFamily: 'monospace', fontSize: 12, color: isLight ? 'hsl(220 12% 38%)' : 'hsl(0 0% 56%)', display: 'block' }}>{children}</code>
+                    <code style={{ fontFamily: 'monospace', fontSize: 12, color: 'hsl(var(--dash-fg-muted))', display: 'block' }}>{children}</code>
                   ) : (
-                    <code style={{ background: isLight ? 'hsl(220 8% 94%)' : 'hsl(0 0% 11%)', border: `1px solid ${isLight ? 'hsl(220 8% 88%)' : 'hsl(0 0% 16%)'}`, borderRadius: 4, padding: '1px 5px', fontFamily: 'monospace', fontSize: 12, color: 'hsl(158 64% 44%)' }}>{children}</code>
+                    <code style={{ background: 'hsl(var(--dash-input))', border: '1px solid hsl(var(--dash-border))', borderRadius: 4, padding: '1px 5px', fontFamily: 'monospace', fontSize: 12, color: 'hsl(158 64% 44%)' }}>{children}</code>
                   ),
-                  blockquote: ({ children }) => <blockquote style={{ margin: '0 0 16px', padding: '10px 16px', borderLeft: '2px solid hsl(158 64% 36%)', background: 'hsl(158 64% 36% / 0.05)', color: isLight ? 'hsl(220 10% 46%)' : 'hsl(0 0% 50%)' }}>{children}</blockquote>,
-                  hr: () => <hr style={{ border: 'none', borderTop: `1px solid ${isLight ? 'hsl(220 8% 90%)' : 'hsl(0 0% 13%)'}`, margin: '32px 0' }} />,
+                  blockquote: ({ children }) => <blockquote style={{ margin: '0 0 16px', padding: '10px 16px', borderLeft: '2px solid hsl(158 64% 36%)', background: 'hsl(158 64% 36% / 0.05)', color: 'hsl(var(--dash-fg-muted))' }}>{children}</blockquote>,
+                  hr: () => <hr style={{ border: 'none', borderTop: '1px solid hsl(var(--dash-border-subtle))', margin: '32px 0' }} />,
                   a: ({ href, children }) => <a href={href} target="_blank" rel="noreferrer" style={{ color: 'hsl(158 64% 44%)', textDecoration: 'underline', textDecorationColor: 'hsl(158 64% 36% / 0.35)' }}>{children}</a>,
-                  strong: ({ children }) => <strong style={{ color: isLight ? 'hsl(220 18% 18%)' : 'hsl(0 0% 80%)', fontWeight: 600 }}>{children}</strong>,
+                  strong: ({ children }) => <strong style={{ color: 'hsl(var(--dash-fg))', fontWeight: 600 }}>{children}</strong>,
                 }}
               >
                 {content}
               </ReactMarkdown>
             ) : (
-              <div style={{ fontSize: 10, color: isLight ? 'hsl(220 14% 28%)' : 'hsl(0 0% 20%)' }}>
+              <div style={{ fontSize: 10, color: 'hsl(var(--dash-fg-dim))' }}>
                 Nothing to preview
               </div>
             )}
@@ -284,8 +278,6 @@ function DocEditor({
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function ProjectDocsPage() {
-  const { isLight } = useDashboardTheme()
-
   const [docs,       setDocs]       = useState<DocItem[]>([])
   const [activeDoc,  setActiveDoc]  = useState<Doc | null>(null)
   const [projects,   setProjects]   = useState<PortfolioProject[]>([])
@@ -384,8 +376,6 @@ export default function ProjectDocsPage() {
   const projectMap = Object.fromEntries(projects.map(p => [p.id, p]))
   const filtered   = docs.filter(d => d.title.toLowerCase().includes(search.toLowerCase()))
 
-  const emptyTextColor = isLight ? 'hsl(220 10% 48%)' : 'hsl(0 0% 24%)'
-
   return (
     <div style={{
       display: 'flex',
@@ -398,18 +388,18 @@ export default function ProjectDocsPage() {
       {/* ── Left panel ──────────────────────────────────── */}
       <div style={{
         width: 256, minWidth: 256, flexShrink: 0,
-        background: isLight ? 'hsl(0 0% 100%)' : 'hsl(0 0% 7%)',
-        borderRight: `1px solid ${isLight ? 'hsl(220 8% 88%)' : 'hsl(0 0% 16%)'}`,
+        background: 'hsl(var(--dash-panel))',
+        borderRight: '1px solid hsl(var(--dash-border))',
         display: 'flex', flexDirection: 'column', overflow: 'hidden',
       }}>
-        <div style={{ padding: '14px 14px 12px', borderBottom: `1px solid ${isLight ? 'hsl(220 8% 92%)' : 'hsl(0 0% 13%)'}`, flexShrink: 0 }}>
+        <div style={{ padding: '14px 14px 12px', borderBottom: '1px solid hsl(var(--dash-border-subtle))', flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 11 }}>
-            <span style={{ fontSize: 10, color: isLight ? 'hsl(220 8% 54%)' : 'hsl(0 0% 26%)' }}>Docs</span>
+            <span style={{ fontSize: 10, color: 'hsl(var(--dash-fg-dim))' }}>Docs</span>
             <button onClick={createDoc} disabled={creating}
               style={{
                 display: 'flex', alignItems: 'center', gap: 5,
                 fontSize: 10,
-                color: creating ? (isLight ? 'hsl(220 8% 62%)' : 'hsl(0 0% 28%)') : 'hsl(158 64% 42%)',
+                color: creating ? 'hsl(var(--dash-fg-dim))' : 'hsl(158 64% 42%)',
                 background: 'none', border: 'none',
                 cursor: creating ? 'not-allowed' : 'pointer',
                 padding: 0, transition: 'color 0.12s',
@@ -422,7 +412,7 @@ export default function ProjectDocsPage() {
             </button>
           </div>
           <div style={{ position: 'relative' }}>
-            <div style={{ position: 'absolute', left: 9, top: '50%', transform: 'translateY(-50%)', color: isLight ? 'hsl(220 8% 56%)' : 'hsl(0 0% 26%)', pointerEvents: 'none', display: 'flex' }}>
+            <div style={{ position: 'absolute', left: 9, top: '50%', transform: 'translateY(-50%)', color: 'hsl(var(--dash-fg-dim))', pointerEvents: 'none', display: 'flex' }}>
               <IcSearch />
             </div>
             <input
@@ -432,9 +422,9 @@ export default function ProjectDocsPage() {
               style={{
                 width: '100%', boxSizing: 'border-box',
                 padding: '6px 10px 6px 28px',
-                background: isLight ? 'hsl(0 0% 97%)' : 'hsl(0 0% 5%)',
-                border: `1px solid ${isLight ? 'hsl(220 8% 88%)' : 'hsl(0 0% 17%)'}`,
-                color: isLight ? 'hsl(220 14% 32%)' : 'hsl(0 0% 62%)',
+                background: 'hsl(var(--dash-input))',
+                border: '1px solid hsl(var(--dash-border))',
+                color: 'hsl(var(--dash-fg))',
                 fontSize: 11,
                 outline: 'none', fontFamily: 'var(--font-roboto-flex)',
                 borderRadius: 6,
@@ -445,20 +435,14 @@ export default function ProjectDocsPage() {
           <div
             style={{
               marginTop: 10,
-              border: `1px dashed ${isDropActive ? 'hsl(158 64% 42%)' : (isLight ? 'hsl(220 8% 78%)' : 'hsl(0 0% 24%)')}`,
-              background: isDropActive ? 'hsl(158 64% 36% / 0.08)' : (isLight ? 'hsl(0 0% 97%)' : 'hsl(0 0% 6%)'),
+              border: `1px dashed ${isDropActive ? 'hsl(158 64% 42%)' : 'hsl(var(--dash-border))'}`,
+              background: isDropActive ? 'hsl(158 64% 36% / 0.08)' : 'hsl(var(--dash-input))',
               padding: '9px 10px',
               borderRadius: 6,
               transition: 'all 0.12s',
             }}
-            onDragOver={(e) => {
-              e.preventDefault()
-              setIsDropActive(true)
-            }}
-            onDragLeave={(e) => {
-              e.preventDefault()
-              setIsDropActive(false)
-            }}
+            onDragOver={(e) => { e.preventDefault(); setIsDropActive(true) }}
+            onDragLeave={(e) => { e.preventDefault(); setIsDropActive(false) }}
             onDrop={async (e) => {
               e.preventDefault()
               const file = e.dataTransfer.files?.[0]
@@ -466,10 +450,10 @@ export default function ProjectDocsPage() {
               setIsDropActive(false)
             }}
           >
-            <div style={{ fontSize: 9, color: isLight ? 'hsl(220 10% 48%)' : 'hsl(0 0% 34%)', marginBottom: 6 }}>
+            <div style={{ fontSize: 9, color: 'hsl(var(--dash-fg-dim))', marginBottom: 6 }}>
               Import
             </div>
-            <div style={{ fontSize: 10, color: isLight ? 'hsl(220 10% 44%)' : 'hsl(0 0% 44%)', marginBottom: 7 }}>
+            <div style={{ fontSize: 10, color: 'hsl(var(--dash-fg-muted))', marginBottom: 7 }}>
               drop a `.md` file here
             </div>
             <button
@@ -480,7 +464,7 @@ export default function ProjectDocsPage() {
                 alignItems: 'center',
                 gap: 5,
                 fontSize: 10,
-                color: importingMd ? (isLight ? 'hsl(220 8% 56%)' : 'hsl(0 0% 30%)') : 'hsl(158 64% 46%)',
+                color: importingMd ? 'hsl(var(--dash-fg-dim))' : 'hsl(158 64% 46%)',
                 background: 'none',
                 border: '1px solid hsl(158 64% 22%)',
                 padding: '5px 8px',
@@ -506,12 +490,12 @@ export default function ProjectDocsPage() {
 
         <div style={{ flex: 1, overflowY: 'auto' }}>
           {loading && (
-            <div style={{ padding: '16px 14px', fontSize: 10, color: emptyTextColor }}>
+            <div style={{ padding: '16px 14px', fontSize: 10, color: 'hsl(var(--dash-fg-dim))' }}>
               Loading...
             </div>
           )}
           {!loading && filtered.length === 0 && (
-            <div style={{ padding: '16px 14px', fontSize: 10, color: emptyTextColor }}>
+            <div style={{ padding: '16px 14px', fontSize: 10, color: 'hsl(var(--dash-fg-dim))' }}>
               No docs yet
             </div>
           )}
@@ -526,14 +510,14 @@ export default function ProjectDocsPage() {
                 onMouseLeave={() => setHoveredId(null)}
                 style={{
                   borderLeft: `2px solid ${isActive ? 'hsl(158 64% 36%)' : 'transparent'}`,
-                  background: isActive ? 'hsl(158 64% 36% / 0.07)' : isHov ? (isLight ? 'hsl(220 8% 96%)' : 'hsl(0 0% 10%)') : 'transparent',
+                  background: isActive ? 'hsl(158 64% 36% / 0.07)' : isHov ? 'hsl(var(--dash-bg))' : 'transparent',
                   transition: 'all 0.1s', cursor: 'pointer',
                   padding: '10px 12px 10px 10px',
                 }}
               >
                 <div style={{
                   fontSize: 12,
-                  color: isActive ? (isLight ? 'hsl(220 20% 14%)' : 'hsl(0 0% 82%)') : (isLight ? 'hsl(220 12% 40%)' : 'hsl(0 0% 55%)'),
+                  color: isActive ? 'hsl(var(--dash-fg))' : 'hsl(var(--dash-fg-muted))',
                   overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                   marginBottom: linked ? 2 : 3,
                 }}>
@@ -541,14 +525,14 @@ export default function ProjectDocsPage() {
                 </div>
                 {linked && (
                   <div style={{
-                    fontSize: 9, color: isLight ? 'hsl(158 48% 36%)' : 'hsl(158 64% 28%)',
+                    fontSize: 9, color: 'hsl(158 64% 28%)',
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                     marginBottom: 2,
                   }}>
                     → {linked.title}
                   </div>
                 )}
-                <div style={{ fontSize: 9, color: isLight ? 'hsl(220 8% 54%)' : 'hsl(0 0% 26%)' }}>
+                <div style={{ fontSize: 9, color: 'hsl(var(--dash-fg-dim))' }}>
                   {reltime(doc.updated_at)}
                 </div>
               </div>
@@ -558,11 +542,11 @@ export default function ProjectDocsPage() {
       </div>
 
       {/* ── Right panel ─────────────────────────────────── */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: isLight ? 'hsl(0 0% 98%)' : 'hsl(0 0% 10%)' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'hsl(var(--dash-content))' }}>
 
         {!activeDoc && !loadingDoc && (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
-            <div style={{ fontSize: 10, color: isLight ? 'hsl(220 12% 40%)' : 'hsl(0 0% 22%)' }}>
+            <div style={{ fontSize: 10, color: 'hsl(var(--dash-fg-dim))' }}>
               Select a doc to start
             </div>
             <button onClick={createDoc}
@@ -584,7 +568,7 @@ export default function ProjectDocsPage() {
 
         {loadingDoc && (
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ fontSize: 10, color: isLight ? 'hsl(220 12% 40%)' : 'hsl(0 0% 22%)' }}>
+            <div style={{ fontSize: 10, color: 'hsl(var(--dash-fg-dim))' }}>
               Loading...
             </div>
           </div>
@@ -597,7 +581,6 @@ export default function ProjectDocsPage() {
             projects={projects}
             onSave={saveDoc}
             onDelete={deleteDoc}
-            isLight={isLight}
           />
         )}
       </div>

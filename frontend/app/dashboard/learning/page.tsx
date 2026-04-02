@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { apiPrivate } from '@/lib/api'
-import { useDashboardTheme } from '../theme-context'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type LStatus = 'to_learn' | 'learning' | 'learned'
@@ -19,27 +18,25 @@ type LearningItem = {
 // ─── Config ───────────────────────────────────────────────────────────────────
 const STATUSES: LStatus[] = ['to_learn', 'learning', 'learned']
 
-function getColConfig(isLight: boolean) {
-  return {
-    to_learn: {
-      label: 'To Learn',
-      headerColor: isLight ? 'hsl(220 12% 44%)' : 'hsl(0 0% 30%)',
-      bg: isLight ? 'hsl(220 10% 96%)' : 'hsl(0 0% 8%)',
-      countColor: isLight ? 'hsl(220 8% 56%)' : 'hsl(0 0% 22%)',
-    },
-    learning: {
-      label: 'In Progress',
-      headerColor: isLight ? 'hsl(158 48% 38%)' : 'hsl(158 64% 42%)',
-      bg: isLight ? 'hsl(158 64% 42% / 0.06)' : 'hsl(158 64% 36% / 0.04)',
-      countColor: isLight ? 'hsl(158 48% 36%)' : 'hsl(158 64% 28%)',
-    },
-    learned: {
-      label: 'Learned',
-      headerColor: isLight ? 'hsl(158 40% 36%)' : 'hsl(158 64% 28%)',
-      bg: isLight ? 'hsl(220 10% 96%)' : 'hsl(0 0% 8%)',
-      countColor: isLight ? 'hsl(220 8% 56%)' : 'hsl(0 0% 22%)',
-    },
-  }
+const COL_CONFIG: Record<LStatus, { label: string; headerColor: string; bg: string; countColor: string }> = {
+  to_learn: {
+    label:       'To Learn',
+    headerColor: 'hsl(var(--dash-fg-dim))',
+    bg:          'hsl(var(--dash-bg))',
+    countColor:  'hsl(var(--dash-border))',
+  },
+  learning: {
+    label:       'In Progress',
+    headerColor: 'hsl(158 64% 42%)',
+    bg:          'hsl(158 64% 36% / 0.04)',
+    countColor:  'hsl(158 64% 28%)',
+  },
+  learned: {
+    label:       'Learned',
+    headerColor: 'hsl(158 64% 28%)',
+    bg:          'hsl(var(--dash-bg))',
+    countColor:  'hsl(var(--dash-border))',
+  },
 }
 
 // ─── Icon ─────────────────────────────────────────────────────────────────────
@@ -53,9 +50,8 @@ function IcTrash() { return <svg {...sv}><polyline points="2,5 14,5"/><path d="M
 
 // ─── Inline Add ───────────────────────────────────────────────────────────────
 function InlineAdd({
-  isLight, onSubmit, onCancel,
+  onSubmit, onCancel,
 }: {
-  isLight: boolean
   onSubmit: (t: string) => Promise<void>
   onCancel: () => void
 }) {
@@ -72,7 +68,7 @@ function InlineAdd({
 
   return (
     <div style={{
-      background: isLight ? 'hsl(0 0% 100%)' : 'hsl(0 0% 12%)',
+      background: 'hsl(var(--dash-card))',
       border: '1px solid hsl(158 64% 36% / 0.35)',
       borderRadius: 8,
       padding: '10px 12px', marginBottom: 6,
@@ -88,7 +84,7 @@ function InlineAdd({
           width: '100%', background: 'none', border: 'none', outline: 'none',
           fontFamily: 'var(--font-roboto-flex)',
           fontSize: 12, letterSpacing: '0.03em',
-          color: isLight ? 'hsl(220 18% 14%)' : 'hsl(0 0% 84%)',
+          color: 'hsl(var(--dash-fg))',
           caretColor: 'hsl(158 64% 36%)',
         }}
       />
@@ -98,9 +94,8 @@ function InlineAdd({
 
 // ─── Learning Card ────────────────────────────────────────────────────────────
 function LearningCard({
-  isLight, item, onUpdate, onDelete, canMoveLeft, canMoveRight, onDragStart, onDragEnd,
+  item, onUpdate, onDelete, canMoveLeft, canMoveRight, onDragStart, onDragEnd,
 }: {
-  isLight: boolean
   item: LearningItem
   onUpdate: (id: string, patch: Partial<LearningItem>) => Promise<void>
   onDelete: (id: string) => Promise<void>
@@ -158,9 +153,6 @@ function LearningCard({
     if (idx < STATUSES.length - 1) onUpdate(item.id, { status: STATUSES[idx + 1] })
   }
 
-  const arrowColor = isLight ? 'hsl(220 8% 56%)' : 'hsl(0 0% 26%)'
-  const trashColor = isLight ? 'hsl(220 8% 60%)' : 'hsl(0 0% 28%)'
-
   return (
     <div
       onMouseEnter={() => setHovered(true)}
@@ -169,10 +161,8 @@ function LearningCard({
       onDragStart={() => onDragStart(item)}
       onDragEnd={onDragEnd}
       style={{
-        background: isLight ? 'hsl(0 0% 100%)' : 'hsl(0 0% 12%)',
-        border: `1px solid ${hovered
-          ? (isLight ? 'hsl(220 8% 82%)' : 'hsl(0 0% 22%)')
-          : (isLight ? 'hsl(220 8% 90%)' : 'hsl(0 0% 16%)')}`,
+        background: 'hsl(var(--dash-card))',
+        border: `1px solid ${hovered ? 'hsl(var(--dash-fg-dim) / 0.3)' : 'hsl(var(--dash-border))'}`,
         borderRadius: 8,
         padding: '10px 12px', marginBottom: 6,
         transition: 'border-color 0.12s',
@@ -191,7 +181,7 @@ function LearningCard({
             width: '100%', background: 'none', border: 'none', outline: 'none',
             fontFamily: 'var(--font-roboto-flex)',
             fontSize: 12, letterSpacing: '0.03em',
-            color: isLight ? 'hsl(220 18% 14%)' : 'hsl(0 0% 84%)',
+            color: 'hsl(var(--dash-fg))',
             caretColor: 'hsl(158 64% 36%)', marginBottom: 6,
           }}
         />
@@ -200,7 +190,7 @@ function LearningCard({
           onClick={() => setEditTitle(true)}
           style={{
             fontSize: 12, letterSpacing: '0.03em',
-            color: isLight ? 'hsl(220 18% 22%)' : 'hsl(0 0% 72%)',
+            color: 'hsl(var(--dash-fg-muted))',
             cursor: 'text', marginBottom: 6,
             overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           }}
@@ -231,7 +221,7 @@ function LearningCard({
           onClick={() => setEditCat(true)}
           style={{
             fontSize: 9, letterSpacing: '0.04em',
-            color: item.category ? 'hsl(158 64% 30%)' : (isLight ? 'hsl(220 8% 72%)' : 'hsl(0 0% 18%)'),
+            color: item.category ? 'hsl(158 64% 30%)' : 'hsl(var(--dash-border))',
             cursor: 'text', marginBottom: 6,
           }}
         >
@@ -251,13 +241,13 @@ function LearningCard({
           rows={3}
           style={{
             width: '100%', boxSizing: 'border-box',
-            background: isLight ? 'hsl(0 0% 97%)' : 'hsl(0 0% 8%)',
-            border: `1px solid ${isLight ? 'hsl(220 8% 88%)' : 'hsl(0 0% 18%)'}`,
+            background: 'hsl(var(--dash-input))',
+            border: '1px solid hsl(var(--dash-border))',
             borderRadius: 8,
             outline: 'none', resize: 'none',
             fontFamily: 'var(--font-roboto-flex)',
             fontSize: 10, letterSpacing: '0.03em',
-            color: isLight ? 'hsl(220 12% 40%)' : 'hsl(0 0% 55%)',
+            color: 'hsl(var(--dash-fg-muted))',
             caretColor: 'hsl(158 64% 36%)', padding: '5px 7px',
             marginBottom: 8,
           }}
@@ -267,7 +257,7 @@ function LearningCard({
           onClick={() => setEditNotes(true)}
           style={{
             fontSize: 10, letterSpacing: '0.03em',
-            color: isLight ? 'hsl(220 10% 48%)' : 'hsl(0 0% 34%)',
+            color: 'hsl(var(--dash-fg-dim))',
             cursor: 'text', marginBottom: 8, lineHeight: 1.5,
             display: '-webkit-box', WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical', overflow: 'hidden',
@@ -280,7 +270,7 @@ function LearningCard({
           onClick={() => setEditNotes(true)}
           style={{
             fontSize: 9, letterSpacing: '0.04em',
-            color: isLight ? 'hsl(220 8% 72%)' : 'hsl(0 0% 18%)',
+            color: 'hsl(var(--dash-border))',
             cursor: 'text', marginBottom: 8,
           }}
         >
@@ -296,12 +286,12 @@ function LearningCard({
               onClick={moveLeft}
               style={{
                 fontSize: 11,
-                color: arrowColor, background: 'none', border: 'none',
+                color: 'hsl(var(--dash-fg-dim))', background: 'none', border: 'none',
                 cursor: 'pointer', padding: '0 4px', transition: 'color 0.1s',
                 borderRadius: 4,
               }}
               onMouseEnter={e => e.currentTarget.style.color = 'hsl(158 64% 42%)'}
-              onMouseLeave={e => e.currentTarget.style.color = arrowColor}
+              onMouseLeave={e => e.currentTarget.style.color = 'hsl(var(--dash-fg-dim))'}
             >
               ←
             </button>
@@ -311,12 +301,12 @@ function LearningCard({
               onClick={moveRight}
               style={{
                 fontSize: 11,
-                color: arrowColor, background: 'none', border: 'none',
+                color: 'hsl(var(--dash-fg-dim))', background: 'none', border: 'none',
                 cursor: 'pointer', padding: '0 4px', transition: 'color 0.1s',
                 borderRadius: 4,
               }}
               onMouseEnter={e => e.currentTarget.style.color = 'hsl(158 64% 42%)'}
-              onMouseLeave={e => e.currentTarget.style.color = arrowColor}
+              onMouseLeave={e => e.currentTarget.style.color = 'hsl(var(--dash-fg-dim))'}
             >
               →
             </button>
@@ -339,7 +329,7 @@ function LearningCard({
               <button
                 onClick={() => setConfirmDel(false)}
                 style={{
-                  color: trashColor, background: 'none', border: 'none',
+                  color: 'hsl(var(--dash-fg-dim))', background: 'none', border: 'none',
                   cursor: 'pointer', fontSize: 11, letterSpacing: '0.03em',
                   padding: 0, fontFamily: 'var(--font-roboto-flex)', borderRadius: 4,
                 }}
@@ -351,14 +341,14 @@ function LearningCard({
             <button
               onClick={() => setConfirmDel(true)}
               style={{
-                color: trashColor, background: 'none', border: 'none',
+                color: 'hsl(var(--dash-fg-dim))', background: 'none', border: 'none',
                 cursor: 'pointer', padding: 0, display: 'flex',
                 opacity: hovered ? 1 : 0,
                 transition: 'opacity 0.12s, color 0.12s',
                 borderRadius: 4,
               }}
               onMouseEnter={e => e.currentTarget.style.color = 'hsl(0 62% 52%)'}
-              onMouseLeave={e => e.currentTarget.style.color = trashColor}
+              onMouseLeave={e => e.currentTarget.style.color = 'hsl(var(--dash-fg-dim))'}
             >
               <IcTrash />
             </button>
@@ -371,14 +361,11 @@ function LearningCard({
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function LearningPage() {
-  const { isLight } = useDashboardTheme()
   const [items,    setItems]    = useState<LearningItem[]>([])
   const [loading,  setLoading]  = useState(true)
   const [addingTo, setAddingTo] = useState<LStatus | null>(null)
   const [draggingItem, setDraggingItem] = useState<LearningItem | null>(null)
   const [dragOverStatus, setDragOverStatus] = useState<LStatus | null>(null)
-
-  const COL = getColConfig(isLight)
 
   useEffect(() => {
     apiPrivate<LearningItem[]>('/learning')
@@ -423,13 +410,13 @@ export default function LearningPage() {
   return (
     <div>
       {loading ? (
-        <div style={{ fontSize: 12, color: isLight ? 'hsl(220 8% 56%)' : 'hsl(0 0% 22%)' }}>
+        <div style={{ fontSize: 12, color: 'hsl(var(--dash-fg-dim))' }}>
           Loading...
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, alignItems: 'start' }}>
           {STATUSES.map((status, colIdx) => {
-            const conf = COL[status]
+            const conf = COL_CONFIG[status]
             const colItems = items.filter(i => i.status === status)
             const isDropTarget = dragOverStatus === status && draggingItem !== null
             return (
@@ -488,7 +475,6 @@ export default function LearningPage() {
                 {/* Inline add */}
                 {addingTo === status && (
                   <InlineAdd
-                    isLight={isLight}
                     onSubmit={title => createItem(status, title)}
                     onCancel={() => setAddingTo(null)}
                   />
@@ -498,7 +484,6 @@ export default function LearningPage() {
                 {colItems.map(item => (
                   <LearningCard
                     key={item.id}
-                    isLight={isLight}
                     item={item}
                     onUpdate={updateItem}
                     onDelete={deleteItem}

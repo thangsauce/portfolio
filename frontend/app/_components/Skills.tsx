@@ -114,13 +114,13 @@ const Skills = () => {
                                 {items.map((item) => (
                                     <div className="slide-up flex gap-2.5 items-center leading-none min-w-0" key={item.id}>
                                         {item.icon_url && (
-                                            <div>
+                                            <div className="w-9 h-9 shrink-0 flex items-center justify-center">
                                                 <Image
                                                     src={item.icon_url}
                                                     alt={item.name}
-                                                    width={30}
-                                                    height={30}
-                                                    className="max-h-[30px]"
+                                                    width={32}
+                                                    height={32}
+                                                    className="w-8 h-8 object-contain"
                                                 />
                                             </div>
                                         )}

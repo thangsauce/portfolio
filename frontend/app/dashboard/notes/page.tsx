@@ -98,12 +98,12 @@ function NoteEditor({
       <div style={{
         padding: '18px 36px 0',
         flexShrink: 0,
-        borderBottom: `1px solid ${isLight ? 'hsl(220 8% 90%)' : 'hsl(0 0% 14%)'}`,
+        borderBottom: '1px solid hsl(var(--dash-border-subtle))',
       }}>
         <div style={{
           fontSize: 10, letterSpacing: '-0.01em',
           height: 14, marginBottom: 12,
-          color: status === 'saved' ? 'hsl(158 64% 42%)' : status === 'saving' ? isLight ? 'hsl(220 8% 60%)' : 'hsl(0 0% 32%)' : 'transparent',
+          color: status === 'saved' ? 'hsl(158 64% 42%)' : status === 'saving' ? 'hsl(var(--dash-fg-dim))' : 'transparent',
           transition: 'color 0.2s',
         }}>
           {status === 'saved' ? 'Saved' : 'Saving...'}
@@ -117,17 +117,17 @@ function NoteEditor({
             width: '100%', background: 'none', border: 'none', outline: 'none',
             fontFamily: 'var(--font-anton)',
             fontSize: 26, letterSpacing: '-0.02em',
-            color: isLight ? 'hsl(220 20% 14%)' : 'hsl(0 0% 87%)',
+            color: 'hsl(var(--dash-fg))',
             caretColor: 'hsl(158 64% 36%)',
             marginBottom: 18,
           }}
         />
 
         <div style={{ display: 'flex', gap: 16, marginBottom: 12, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 11, letterSpacing: '-0.01em', color: isLight ? 'hsl(220 10% 48%)' : 'hsl(0 0% 34%)' }}>
+          <span style={{ fontSize: 11, letterSpacing: '-0.01em', color: 'hsl(var(--dash-fg-dim))' }}>
             Created: {formatDateTime(note.created_at)}
           </span>
-          <span style={{ fontSize: 11, letterSpacing: '-0.01em', color: isLight ? 'hsl(220 10% 48%)' : 'hsl(0 0% 34%)' }}>
+          <span style={{ fontSize: 11, letterSpacing: '-0.01em', color: 'hsl(var(--dash-fg-dim))' }}>
             Last edited: {formatDateTime(note.updated_at)}
           </span>
         </div>
@@ -135,7 +135,7 @@ function NoteEditor({
 
       {/* BlockNote */}
       <div style={{ flex: 1, overflow: 'auto' }}>
-        <BlockNoteView editor={editor} theme="dark" />
+        <BlockNoteView editor={editor} theme={isLight ? 'light' : 'dark'} />
       </div>
     </div>
   )
@@ -154,7 +154,6 @@ export default function NotesPage() {
   const [confirmDel,  setConfirmDel]  = useState<string | null>(null)
   const [hoveredId,   setHoveredId]   = useState<string | null>(null)
 
-  // Load list on mount
   useEffect(() => {
     apiPrivate<NoteItem[]>('/notes')
       .then(setNotes)
@@ -222,8 +221,8 @@ export default function NotesPage() {
       {/* ── Left panel ──────────────────────────────────── */}
       <div style={{
         width: 256, minWidth: 256, flexShrink: 0,
-        background: isLight ? 'hsl(0 0% 100%)' : 'hsl(0 0% 7%)',
-        borderRight: `1px solid ${isLight ? 'hsl(220 8% 88%)' : 'hsl(0 0% 16%)'}`,
+        background: 'hsl(var(--dash-panel))',
+        borderRight: '1px solid hsl(var(--dash-border))',
         display: 'flex', flexDirection: 'column',
         overflow: 'hidden',
       }}>
@@ -231,18 +230,18 @@ export default function NotesPage() {
         {/* Header */}
         <div style={{
           padding: '14px 14px 12px',
-          borderBottom: `1px solid ${isLight ? 'hsl(220 8% 92%)' : 'hsl(0 0% 13%)'}`,
+          borderBottom: '1px solid hsl(var(--dash-border-subtle))',
           flexShrink: 0,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 11 }}>
-            <span style={{ fontSize: 12, letterSpacing: '-0.01em', color: isLight ? 'hsl(220 8% 52%)' : 'hsl(0 0% 26%)' }}>
+            <span style={{ fontSize: 12, letterSpacing: '-0.01em', color: 'hsl(var(--dash-fg-dim))' }}>
               Notes
             </span>
             <button onClick={createNote} disabled={creating}
               style={{
                 display: 'flex', alignItems: 'center', gap: 5,
                 fontSize: 11,
-                color: creating ? isLight ? 'hsl(220 8% 64%)' : 'hsl(0 0% 28%)' : 'hsl(158 64% 42%)',
+                color: creating ? 'hsl(var(--dash-fg-dim))' : 'hsl(158 64% 42%)',
                 background: 'none', border: 'none',
                 cursor: creating ? 'not-allowed' : 'pointer',
                 padding: 0, transition: 'color 0.12s',
@@ -259,7 +258,7 @@ export default function NotesPage() {
           <div style={{ position: 'relative' }}>
             <div style={{
               position: 'absolute', left: 9, top: '50%', transform: 'translateY(-50%)',
-              color: isLight ? 'hsl(220 8% 52%)' : 'hsl(0 0% 26%)',
+              color: 'hsl(var(--dash-fg-dim))',
               pointerEvents: 'none', display: 'flex',
             }}>
               <IcSearch />
@@ -271,9 +270,9 @@ export default function NotesPage() {
               style={{
                 width: '100%', boxSizing: 'border-box',
                 padding: '6px 10px 6px 28px',
-                background: isLight ? 'hsl(0 0% 97%)' : 'hsl(0 0% 5%)',
-                border: `1px solid ${isLight ? 'hsl(220 8% 88%)' : 'hsl(0 0% 17%)'}`,
-                color: isLight ? 'hsl(220 14% 32%)' : 'hsl(0 0% 62%)',
+                background: 'hsl(var(--dash-input))',
+                border: '1px solid hsl(var(--dash-border))',
+                color: 'hsl(var(--dash-fg))',
                 fontSize: 11,
                 outline: 'none', fontFamily: 'var(--font-roboto-flex)',
                 borderRadius: 6,
@@ -285,12 +284,12 @@ export default function NotesPage() {
         {/* List */}
         <div style={{ flex: 1, overflowY: 'auto' }}>
           {loading && (
-            <div style={{ padding: '16px 14px', fontSize: 11, color: isLight ? 'hsl(220 8% 54%)' : 'hsl(0 0% 24%)' }}>
+            <div style={{ padding: '16px 14px', fontSize: 11, color: 'hsl(var(--dash-fg-dim))' }}>
               Loading...
             </div>
           )}
           {!loading && filtered.length === 0 && (
-            <div style={{ padding: '16px 14px', fontSize: 11, color: isLight ? 'hsl(220 8% 54%)' : 'hsl(0 0% 24%)' }}>
+            <div style={{ padding: '16px 14px', fontSize: 11, color: 'hsl(var(--dash-fg-dim))' }}>
               No notes yet
             </div>
           )}
@@ -305,9 +304,7 @@ export default function NotesPage() {
                   borderLeft: `2px solid ${isActive ? 'hsl(158 64% 36%)' : 'transparent'}`,
                   background: isActive
                     ? 'hsl(158 64% 36% / 0.07)'
-                    : isHov
-                      ? isLight ? 'hsl(220 8% 96%)' : 'hsl(0 0% 10%)'
-                      : 'transparent',
+                    : isHov ? 'hsl(var(--dash-bg))' : 'transparent',
                   transition: 'all 0.1s', cursor: 'pointer',
                 }}
               >
@@ -317,18 +314,16 @@ export default function NotesPage() {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{
                       fontSize: 12, letterSpacing: '-0.01em',
-                      color: isActive
-                        ? isLight ? 'hsl(220 20% 14%)' : 'hsl(0 0% 82%)'
-                        : isLight ? 'hsl(220 12% 40%)' : 'hsl(0 0% 55%)',
+                      color: isActive ? 'hsl(var(--dash-fg))' : 'hsl(var(--dash-fg-muted))',
                       overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                       marginBottom: 3,
                     }}>
                       {note.title || 'Untitled'}
                     </div>
-                    <div style={{ fontSize: 10, letterSpacing: '-0.01em', color: isLight ? 'hsl(220 8% 52%)' : 'hsl(0 0% 26%)' }}>
+                    <div style={{ fontSize: 10, letterSpacing: '-0.01em', color: 'hsl(var(--dash-fg-dim))' }}>
                       edited {reltime(note.updated_at)}
                     </div>
-                    <div style={{ fontSize: 10, letterSpacing: '-0.01em', color: isLight ? 'hsl(220 8% 50%)' : 'hsl(0 0% 30%)', marginTop: 2 }}>
+                    <div style={{ fontSize: 10, letterSpacing: '-0.01em', color: 'hsl(var(--dash-fg-dim))', marginTop: 2 }}>
                       created {formatDateTime(note.created_at)}
                     </div>
                   </div>
@@ -346,7 +341,7 @@ export default function NotesPage() {
                         </button>
                         <button onClick={() => setConfirmDel(null)}
                           style={{
-                            color: isLight ? 'hsl(220 8% 64%)' : 'hsl(0 0% 28%)',
+                            color: 'hsl(var(--dash-fg-dim))',
                             background: 'none', border: 'none',
                             cursor: 'pointer', fontSize: 11, padding: 0, borderRadius: 6,
                           }}>
@@ -357,7 +352,7 @@ export default function NotesPage() {
                       <button
                         onClick={() => setConfirmDel(note.id)}
                         style={{
-                          color: isLight ? 'hsl(220 8% 64%)' : 'hsl(0 0% 28%)',
+                          color: 'hsl(var(--dash-fg-dim))',
                           background: 'none', border: 'none', cursor: 'pointer',
                           padding: 0, display: 'flex',
                           opacity: isHov ? 1 : 0,
@@ -365,7 +360,7 @@ export default function NotesPage() {
                           borderRadius: 6,
                         }}
                         onMouseEnter={e => e.currentTarget.style.color = 'hsl(0 62% 52%)'}
-                        onMouseLeave={e => e.currentTarget.style.color = isLight ? 'hsl(220 8% 64%)' : 'hsl(0 0% 28%)'}
+                        onMouseLeave={e => e.currentTarget.style.color = 'hsl(var(--dash-fg-dim))'}
                       >
                         <IcTrash />
                       </button>
@@ -381,12 +376,12 @@ export default function NotesPage() {
       {/* ── Right panel ─────────────────────────────────── */}
       <div style={{
         flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden',
-        background: isLight ? 'hsl(0 0% 98%)' : 'hsl(0 0% 10%)',
+        background: 'hsl(var(--dash-content))',
       }}>
 
         {!activeNote && !loadingNote && (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
-            <div style={{ fontSize: 12, letterSpacing: '-0.01em', color: isLight ? 'hsl(220 8% 54%)' : 'hsl(0 0% 22%)' }}>
+            <div style={{ fontSize: 12, letterSpacing: '-0.01em', color: 'hsl(var(--dash-fg-dim))' }}>
               Select a note to start
             </div>
             <button onClick={createNote}
@@ -408,7 +403,7 @@ export default function NotesPage() {
 
         {loadingNote && (
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ fontSize: 12, letterSpacing: '-0.01em', color: isLight ? 'hsl(220 8% 54%)' : 'hsl(0 0% 22%)' }}>
+            <div style={{ fontSize: 12, letterSpacing: '-0.01em', color: 'hsl(var(--dash-fg-dim))' }}>
               Loading...
             </div>
           </div>

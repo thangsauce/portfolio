@@ -98,23 +98,23 @@ const CurrentlyUsing = () => {
                 </div>
 
                 {skills.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-6 items-start">
                         {skills.map((skill) => (
                             <div
                                 key={skill.id}
-                                className="it-skill-item flex gap-3.5 items-center leading-none min-w-0"
+                                className="it-skill-item grid grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-3 leading-none min-w-0"
                             >
-                                {skill.icon_url && (
-                                    <div>
+                                <div className="w-9 h-9 shrink-0 flex items-center justify-center">
+                                    {skill.icon_url ? (
                                         <Image
                                             src={skill.icon_url}
                                             alt={skill.name}
                                             width={40}
                                             height={40}
-                                            className="max-h-10"
+                                            className="w-8 h-8 object-contain"
                                         />
-                                    </div>
-                                )}
+                                    ) : null}
+                                </div>
                                 <span className="text-xl capitalize break-words">{skill.name}</span>
                             </div>
                         ))}
