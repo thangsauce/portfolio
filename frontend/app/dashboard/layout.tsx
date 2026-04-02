@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
+import { DashboardThemeContext } from './theme-context'
 
 // ── Icon base props ──────────────────────────────────────────────────────────
 const ip = {
@@ -164,6 +165,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
+    <DashboardThemeContext.Provider value={{ isLight, toggleTheme }}>
     <div
       className={`transition-opacity duration-500 ${mounted ? 'opacity-100' : 'opacity-0'}`}
       style={{
@@ -427,5 +429,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </main>
       </div>
     </div>
+    </DashboardThemeContext.Provider>
   )
 }
