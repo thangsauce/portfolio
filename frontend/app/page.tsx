@@ -26,7 +26,7 @@ export default function Home() {
             <div className="page- md:pl-32 lg:pl-52 xl:pl-72">
                 <ITSkills />
             </div>
-            <div className="page- md:pl-14 lg:pl-24 xl:pl-32">
+            <div className="page- md:pl-24 lg:pl-40 xl:pl-56">
                 <Skills />
             </div>
             <div className="page- md:pl-32 lg:pl-52 xl:pl-72">

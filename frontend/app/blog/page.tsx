@@ -35,123 +35,70 @@ export default function BlogPage() {
   }, [])
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      fontFamily: 'var(--font-roboto-flex)',
-      padding: '96px 24px 80px',
-    }}>
-      <div style={{ maxWidth: 760, margin: '0 auto' }}>
-
-        {/* Page header */}
-        <div style={{ marginBottom: 72 }}>
-          <div style={{
-            fontSize: 9, letterSpacing: '0.45em', textTransform: 'uppercase',
-            color: 'hsl(158 64% 36%)', marginBottom: 18,
-          }}>
-            // thangle.me
-          </div>
-          <h1 style={{
-            fontFamily: 'var(--font-anton)',
-            fontSize: 'clamp(56px, 10vw, 96px)',
-            letterSpacing: '0.06em', textTransform: 'uppercase',
-            color: 'hsl(0 0% 94%)',
-            lineHeight: 0.9, margin: 0,
-          }}>
-            BLOG
-          </h1>
+    <section className="relative min-h-screen pt-28 pb-20 md:pt-36">
+      <div className="container max-w-5xl">
+        <div className="flex items-center gap-3 mb-4">
+          <span className="text-primary font-mono text-xl leading-none select-none">&lt;</span>
+          <h2 className="text-xl uppercase leading-none tracking-widest">BLOG</h2>
+          <span className="text-primary font-mono text-xl leading-none select-none">&gt;</span>
         </div>
 
-        {/* States */}
+        <h1 className="font-anton text-5xl sm:text-6xl md:text-7xl leading-[0.9] uppercase tracking-[0.08em] text-foreground mb-4">
+          Thoughts & Notes
+        </h1>
+        <p className="max-w-2xl text-sm sm:text-base text-muted-foreground leading-relaxed mb-12">
+          Writing about projects, lessons, and experiments in web development, cybersecurity, and IT systems.
+        </p>
+
         {loading && (
-          <div style={{ fontSize: 10, letterSpacing: '0.3em', color: 'hsl(0 0% 24%)', textTransform: 'uppercase' }}>
-            // loading...
-          </div>
+          <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground/60">
+            Loading posts...
+          </p>
         )}
 
         {!loading && posts.length === 0 && (
-          <div style={{ padding: '48px 0', fontSize: 10, letterSpacing: '0.3em', color: 'hsl(0 0% 24%)', textTransform: 'uppercase' }}>
-            // no posts yet
-          </div>
+          <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground/60">
+            No posts yet.
+          </p>
         )}
 
-        {/* Post list */}
-        {posts.map((post) => (
-          <PostRow key={post.id} post={post} />
-        ))}
-
-        {!loading && posts.length > 0 && (
-          <div style={{ borderTop: '1px solid hsl(0 0% 12%)' }} />
-        )}
+        <div className="flex flex-col gap-4">
+          {posts.map((post) => (
+            <PostRow key={post.id} post={post} />
+          ))}
+        </div>
       </div>
-    </div>
+    </section>
   )
 }
 
 function PostRow({ post }: { post: PostItem }) {
-  const [hovered, setHovered] = useState(false)
-
   return (
-    <Link href={`/blog/${post.slug}`} style={{ display: 'block', textDecoration: 'none' }}>
-      <article
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        style={{
-          borderTop: '1px solid hsl(0 0% 12%)',
-          padding: `28px ${hovered ? '12px' : '0'}`,
-          margin: `0 ${hovered ? '-12px' : '0'}`,
-          display: 'grid',
-          gridTemplateColumns: '100px 1fr',
-          gap: '0 28px',
-          background: hovered ? 'hsl(158 64% 36% / 0.03)' : 'transparent',
-          transition: 'all 0.18s ease',
-          cursor: 'pointer',
-        }}
-      >
-        {/* Date */}
-        <div style={{
-          fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase',
-          color: 'hsl(0 0% 28%)', paddingTop: 5, lineHeight: 1.4,
-        }}>
-          {post.published_at ? formatDate(post.published_at) : ''}
+    <Link href={`/blog/${post.slug}`} className="block text-inherit no-underline">
+      <article className="group rounded-xl border border-border bg-background-light/35 px-5 py-5 sm:px-6 sm:py-6 transition-all duration-300 hover:border-primary/45 hover:bg-background-light/55">
+        <div className="flex flex-wrap items-center gap-3 text-[11px] uppercase tracking-[0.2em] text-muted-foreground/70 mb-3">
+          {post.published_at ? <span>{formatDate(post.published_at)}</span> : <span>Draft</span>}
         </div>
 
-        {/* Content */}
-        <div>
-          <h2 style={{
-            fontFamily: 'var(--font-anton)',
-            fontSize: 'clamp(20px, 3vw, 27px)',
-            letterSpacing: '0.05em', textTransform: 'uppercase',
-            color: hovered ? 'hsl(0 0% 95%)' : 'hsl(0 0% 87%)',
-            margin: '0 0 10px', lineHeight: 1.1,
-            transition: 'color 0.18s',
-          }}>
-            {post.title}
-          </h2>
+        <h3 className="font-anton text-2xl sm:text-3xl uppercase tracking-[0.06em] leading-tight text-foreground transition-colors duration-300 group-hover:text-primary mb-3">
+          {post.title}
+        </h3>
 
-          {post.excerpt && (
-            <p style={{
-              fontSize: 14, lineHeight: 1.65,
-              color: 'hsl(0 0% 46%)', margin: '0 0 12px',
-            }}>
-              {post.excerpt}
-            </p>
-          )}
+        {post.excerpt && (
+          <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-4 max-w-3xl">
+            {post.excerpt}
+          </p>
+        )}
 
-          {post.tags.length > 0 && (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-              {post.tags.map(tag => (
-                <span key={tag} style={{
-                  fontSize: 9, letterSpacing: '0.22em', textTransform: 'uppercase',
-                  color: 'hsl(158 64% 36%)',
-                  border: '1px solid hsl(158 64% 36% / 0.22)',
-                  padding: '2px 8px',
-                }}>
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
+        {post.tags.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {post.tags.map(tag => (
+              <span key={tag} className="text-[10px] uppercase tracking-[0.2em] text-primary border border-primary/25 px-2.5 py-1">
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
       </article>
     </Link>
   )

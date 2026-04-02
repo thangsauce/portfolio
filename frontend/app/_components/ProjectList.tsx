@@ -48,7 +48,9 @@ const ProjectList = () => {
     useEffect(() => {
         apiFetch<ApiProject[]>('/api/portfolio/projects')
             .then((data) => {
-                const mapped = data.map(mapProject);
+                const mapped = data
+                    .filter((project) => project.featured)
+                    .map(mapProject);
                 setProjects(mapped);
                 if (mapped.length > 0 && window.innerWidth >= 768) {
                     setSelectedProject(mapped[0].slug);
