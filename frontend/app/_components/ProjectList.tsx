@@ -28,13 +28,19 @@ type GroupedProjects = Record<ProjectGroupKey, IProject[]>;
 type CategoryOption = { key: ProjectGroupKey; title: string };
 
 function mapProject(p: ApiProject): IProject {
+    const slug = p.slug.toLowerCase();
+    const title = p.title.toLowerCase();
+    const isCampusLabSiem =
+        (slug.includes('campuslab') && slug.includes('siem')) ||
+        (title.includes('campuslab') && title.includes('siem'));
+
     return {
         title: p.title,
         slug: p.slug,
         year: new Date().getFullYear(),
         description: p.description ?? '',
         role: '',
-        category: p.category ?? 'web_development',
+        category: isCampusLabSiem ? 'cybersecurity' : (p.category ?? 'web_development'),
         techStack: p.tech_stack ?? [],
         thumbnail: p.images?.thumbnail ?? '',
         longThumbnail: p.images?.long || undefined,
@@ -58,11 +64,14 @@ const ProjectList = () => {
     const projectListRef  = useRef<HTMLDivElement>(null);
     const imageContainer  = useRef<HTMLDivElement>(null);
     const imageRef        = useRef<HTMLImageElement>(null);
+    const pagePanelRef    = useRef<HTMLDivElement>(null);
+    const hasAnimatedPage = useRef(false);
 
     const [projects, setProjects] = useState<IProject[]>([]);
     const [selectedProject, setSelectedProject] = useState<string | null>(null);
     const [activeCategory, setActiveCategory] = useState<ProjectGroupKey>('web_development');
-    const [activeIndex, setActiveIndex] = useState<Record<ProjectGroupKey, number>>({
+    const [flipDirection, setFlipDirection] = useState<1 | -1>(1);
+    const [activePage, setActivePage] = useState<Record<ProjectGroupKey, number>>({
         web_development: 0,
         cybersecurity: 0,
         it_systems: 0,
@@ -163,9 +172,13 @@ const ProjectList = () => {
         { key: 'cybersecurity', title: 'Cybersecurity' },
         { key: 'it_systems', title: 'IT Systems' },
     ];
+    const currentCategoryIndex = categories.findIndex((c) => c.key === activeCategory);
     const activeProjects = grouped[activeCategory];
-    const currentIndex = Math.min(activeIndex[activeCategory], Math.max(0, activeProjects.length - 1));
-    const currentProject = activeProjects[currentIndex];
+    const totalPages = Math.max(1, Math.ceil(activeProjects.length / 2));
+    const currentPage = Math.min(activePage[activeCategory], totalPages - 1);
+    const startIndex = currentPage * 2;
+    const currentProjects = activeProjects.slice(startIndex, startIndex + 2);
+    const currentProject = currentProjects[0];
 
     useEffect(() => {
         if (!currentProject) {
@@ -177,11 +190,39 @@ const ProjectList = () => {
         }
     }, [currentProject?.slug]);
 
+    useGSAP(
+        () => {
+            if (!pagePanelRef.current || currentProjects.length === 0) return;
+
+            if (!hasAnimatedPage.current) {
+                hasAnimatedPage.current = true;
+                return;
+            }
+
+            gsap.fromTo(
+                pagePanelRef.current,
+                { x: flipDirection * 52, autoAlpha: 0, filter: 'blur(4px)' },
+                {
+                    x: 0,
+                    autoAlpha: 1,
+                    filter: 'blur(0px)',
+                    duration: 0.45,
+                    ease: 'power2.out',
+                    clearProps: 'filter',
+                },
+            );
+        },
+        {
+            scope: containerRef,
+            dependencies: [activeCategory, currentPage, currentProjects.length, flipDirection],
+        },
+    );
+
     const flipProject = (direction: 1 | -1) => {
-        if (activeProjects.length <= 1) return;
-        setActiveIndex((prev) => {
-            const count = activeProjects.length;
-            const next = (prev[activeCategory] + direction + count) % count;
+        if (totalPages <= 1) return;
+        setFlipDirection(direction);
+        setActivePage((prev) => {
+            const next = (prev[activeCategory] + direction + totalPages) % totalPages;
             return { ...prev, [activeCategory]: next };
         });
     };
@@ -228,11 +269,15 @@ const ProjectList = () => {
                                 <button
                                     key={category.key}
                                     type="button"
-                                    onClick={() => setActiveCategory(category.key)}
+                                    onClick={() => {
+                                        const nextCategoryIndex = categories.findIndex((c) => c.key === category.key);
+                                        setFlipDirection(nextCategoryIndex >= currentCategoryIndex ? 1 : -1);
+                                        setActiveCategory(category.key);
+                                    }}
                                     className={cn(
                                         'rounded-full border px-4 py-1.5 text-xs sm:text-sm uppercase tracking-[0.16em] transition-all',
                                         activeCategory === category.key
-                                            ? 'border-primary/55 bg-primary/15 text-primary'
+                                            ? 'border-primary/55 text-primary'
                                             : 'border-border text-muted-foreground hover:border-primary/35 hover:text-foreground',
                                     )}
                                 >
@@ -245,19 +290,19 @@ const ProjectList = () => {
                             <button
                                 type="button"
                                 onClick={() => flipProject(-1)}
-                                disabled={activeProjects.length <= 1}
+                                disabled={totalPages <= 1}
                                 className="h-9 w-9 rounded-full border border-border text-foreground disabled:opacity-35 disabled:cursor-not-allowed hover:border-primary/45 hover:text-primary transition-colors"
                                 aria-label="Previous project"
                             >
                                 ‹
                             </button>
                             <span className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
-                                {activeProjects.length > 0 ? `${currentIndex + 1} / ${activeProjects.length}` : '0 / 0'}
+                                {activeProjects.length > 0 ? `${currentPage + 1} / ${totalPages}` : '0 / 0'}
                             </span>
                             <button
                                 type="button"
                                 onClick={() => flipProject(1)}
-                                disabled={activeProjects.length <= 1}
+                                disabled={totalPages <= 1}
                                 className="h-9 w-9 rounded-full border border-border text-foreground disabled:opacity-35 disabled:cursor-not-allowed hover:border-primary/45 hover:text-primary transition-colors"
                                 aria-label="Next project"
                             >
@@ -265,14 +310,22 @@ const ProjectList = () => {
                             </button>
                         </div>
 
-                        {currentProject ? (
-                            <Project
-                                index={currentIndex}
-                                project={currentProject}
-                                selectedProject={selectedProject}
-                                onMouseEnter={handleMouseEnter}
-                                key={`${activeCategory}-${currentProject.slug}`}
-                            />
+                        {currentProjects.length > 0 ? (
+                            <div
+                                className="flex flex-col"
+                                ref={pagePanelRef}
+                                key={`${activeCategory}-${currentPage}`}
+                            >
+                                {currentProjects.map((project, i) => (
+                                    <Project
+                                        index={startIndex + i}
+                                        project={project}
+                                        selectedProject={selectedProject}
+                                        onMouseEnter={handleMouseEnter}
+                                        key={`${activeCategory}-${project.slug}`}
+                                    />
+                                ))}
+                            </div>
                         ) : (
                             <p className="text-sm text-muted-foreground">No projects in this category yet.</p>
                         )}
