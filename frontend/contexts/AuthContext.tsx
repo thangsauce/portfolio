@@ -1,6 +1,6 @@
 'use client'
 import { createContext, useContext, useEffect, useState } from 'react'
-import type { User, Session } from '@supabase/supabase-js'
+import type { User, Session, Provider } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
 
 type AuthContextType = {
@@ -9,6 +9,7 @@ type AuthContextType = {
   isLoading: boolean
   isAuthenticated: boolean
   login: (email: string, password: string) => Promise<void>
+  loginWithOAuth: (provider: Provider) => Promise<void>
   logout: () => Promise<void>
 }
 
@@ -41,6 +42,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (error) throw error
   }
 
+  const loginWithOAuth = async (provider: Provider) => {
+    const redirectTo = `${window.location.origin}/triumph`
+    const { error } = await createClient().auth.signInWithOAuth({
+      provider,
+      options: { redirectTo },
+    })
+    if (error) throw error
+  }
+
   const logout = async () => {
     await createClient().auth.signOut()
   }
@@ -52,6 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isLoading,
       isAuthenticated: !!user,
       login,
+      loginWithOAuth,
       logout,
     }}>
       {children}

@@ -10,7 +10,7 @@ export default function LoginPage() {
   const [error,     setError]     = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [mounted,   setMounted]   = useState(false)
-  const { login, isAuthenticated, isLoading: authLoading } = useAuth()
+  const { login, loginWithOAuth, isAuthenticated, isLoading: authLoading } = useAuth()
   const router = useRouter()
 
   useEffect(() => { setMounted(true) }, [])
@@ -29,6 +29,17 @@ export default function LoginPage() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Invalid email or password')
     } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleOAuth = async (provider: 'google' | 'github') => {
+    setError(null)
+    setIsLoading(true)
+    try {
+      await loginWithOAuth(provider)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'OAuth sign-in failed')
       setIsLoading(false)
     }
   }
@@ -86,6 +97,59 @@ export default function LoginPage() {
           padding: '28px 28px 24px',
         }}>
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+            {/* OAuth */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <button
+                type="button"
+                disabled={isLoading}
+                onClick={() => handleOAuth('google')}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  background: 'hsl(226 12% 10%)',
+                  color: 'hsl(220 12% 88%)',
+                  border: '1px solid hsl(226 10% 20%)',
+                  borderRadius: 10,
+                  fontSize: 13,
+                  letterSpacing: '-0.01em',
+                  cursor: isLoading ? 'not-allowed' : 'pointer',
+                  opacity: isLoading ? 0.7 : 1,
+                  fontFamily: 'var(--font-roboto-flex)',
+                }}
+              >
+                Continue with Google
+              </button>
+              <button
+                type="button"
+                disabled={isLoading}
+                onClick={() => handleOAuth('github')}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  background: 'hsl(226 12% 10%)',
+                  color: 'hsl(220 12% 88%)',
+                  border: '1px solid hsl(226 10% 20%)',
+                  borderRadius: 10,
+                  fontSize: 13,
+                  letterSpacing: '-0.01em',
+                  cursor: isLoading ? 'not-allowed' : 'pointer',
+                  opacity: isLoading ? 0.7 : 1,
+                  fontFamily: 'var(--font-roboto-flex)',
+                }}
+              >
+                Continue with GitHub
+              </button>
+            </div>
+
+            <div style={{
+              fontSize: 10,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              color: 'hsl(220 6% 30%)',
+              textAlign: 'center',
+            }}>
+              or use email and password
+            </div>
 
             {/* Email */}
             <div>

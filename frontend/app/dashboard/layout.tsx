@@ -91,7 +91,7 @@ const NAV = [
   { href: '/dashboard/portfolio', label: 'Portfolio', Icon: IconPortfolio              },
   { href: '/dashboard/notes',     label: 'Notes',     Icon: IconNotes                  },
   { href: '/dashboard/todos',     label: 'Todos',     Icon: IconTodos                  },
-  { href: '/dashboard/learning',  label: 'Learning',  Icon: IconLearning               },
+  { href: '/dashboard/learning',  label: 'Lesson',  Icon: IconLearning               },
   { href: '/dashboard/projects',  label: 'Projects.md', Icon: IconProjects               },
   { href: '/dashboard/blog',      label: 'Blog',      Icon: IconBlog                   },
 ]
@@ -192,7 +192,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               color: 'hsl(158 58% 54%)',
               boxShadow: '0 0 0 1px hsl(158 64% 36% / 0.28), 0 4px 14px hsl(158 64% 36% / 0.16)',
-              borderRadius: 10,
+              borderRadius: 14,
             }}>
               <svg
                 ref={logoEyeRef}
@@ -244,11 +244,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Nav */}
         <nav data-lenis-prevent style={{ flex: 1, padding: '8px 10px', overflowY: 'auto' }}>
           <div style={{
-            fontSize: 10, fontWeight: 600, letterSpacing: '0.07em',
-            textTransform: 'uppercase', color: isLight ? 'hsl(220 8% 42%)' : 'hsl(220 6% 32%)',
+            fontSize: 11, fontWeight: 500, letterSpacing: '-0.01em',
+            color: isLight ? 'hsl(220 8% 50%)' : 'hsl(220 6% 36%)',
             padding: '4px 8px 6px',
           }}>
-            Navigation
+            Menu
           </div>
 
           {NAV.map(({ href, label, Icon, exact }) => {
@@ -266,7 +266,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   fontWeight: isActive ? 500 : 400,
                   letterSpacing: '-0.01em',
                   textDecoration: 'none',
-                  borderRadius: 10,
+                  borderRadius: 12,
                   color: isActive
                     ? 'hsl(158 58% 42%)'
                     : isHov
@@ -304,7 +304,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div style={{
             display: 'flex', alignItems: 'center', gap: 10,
             padding: '10px 10px',
-            borderRadius: 10,
+            borderRadius: 12,
             background: isLight ? 'hsl(0 0% 97%)' : 'hsl(226 12% 10%)',
             marginBottom: 8,
           }}>
@@ -337,7 +337,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               width: '100%',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
               padding: '8px 12px',
-              borderRadius: 10,
+              borderRadius: 12,
               fontSize: 12, fontWeight: 500,
               color: 'hsl(0 62% 55%)',
               background: 'hsl(0 62% 52% / 0.08)',
@@ -395,18 +395,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               onClick={toggleTheme}
               style={{
                 marginRight: 10,
-                padding: '4px 10px',
+                padding: '5px 12px',
                 borderRadius: 999,
                 border: `1px solid ${isLight ? 'hsl(0 0% 82%)' : 'hsl(0 0% 24%)'}`,
                 background: isLight ? 'hsl(0 0% 96%)' : 'hsl(226 10% 14%)',
                 color: isLight ? 'hsl(220 20% 26%)' : 'hsl(220 14% 78%)',
-                fontSize: 10,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
+                fontSize: 12,
+                letterSpacing: '-0.01em',
                 cursor: 'pointer',
               }}
             >
-              {isLight ? 'Dark' : 'Light'}
+              {isLight ? '🌙 Dark' : '☀ Light'}
             </button>
             <div style={{
               width: 7, height: 7, borderRadius: '50%',

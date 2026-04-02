@@ -158,11 +158,11 @@ export default function DashboardPage() {
             {time}
           </div>
           <div style={{
-            fontSize: 10, fontWeight: 500,
-            color: 'hsl(220 6% 30%)', marginTop: 5,
-            letterSpacing: '0.05em', textTransform: 'uppercase',
+            fontSize: 11, fontWeight: 400,
+            color: 'hsl(220 6% 34%)', marginTop: 5,
+            letterSpacing: '-0.01em',
           }}>
-            Local Time
+            Local time
           </div>
         </div>
       </div>
@@ -200,8 +200,8 @@ export default function DashboardPage() {
           padding: '20px',
         }}>
           <h3 style={{
-            fontSize: 11, fontWeight: 600, letterSpacing: '0.06em',
-            textTransform: 'uppercase', color: 'hsl(220 6% 36%)',
+            fontSize: 13, fontWeight: 600, letterSpacing: '-0.01em',
+            color: 'hsl(220 10% 58%)',
             margin: '0 0 16px',
           }}>
             System Status
@@ -250,8 +250,8 @@ export default function DashboardPage() {
           padding: '20px',
         }}>
           <h3 style={{
-            fontSize: 11, fontWeight: 600, letterSpacing: '0.06em',
-            textTransform: 'uppercase', color: 'hsl(220 6% 36%)',
+            fontSize: 13, fontWeight: 600, letterSpacing: '-0.01em',
+            color: 'hsl(220 10% 58%)',
             margin: '0 0 14px',
           }}>
             Quick Access
