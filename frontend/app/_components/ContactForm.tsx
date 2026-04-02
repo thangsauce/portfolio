@@ -151,6 +151,10 @@ export function ContactSection() {
                             className="pointer-events-auto group inline-flex items-center gap-2 bg-transparent px-0 py-0 text-[12px] uppercase tracking-[0.22em] text-primary/90 transition-colors hover:text-foreground"
                         >
                             <span className="text-primary/90 group-hover:text-foreground transition-colors">&lt;</span>
+                            <span className="relative inline-flex size-2.5 items-center justify-center">
+                                <span className="absolute inline-flex size-2.5 animate-ping rounded-full bg-primary/70 opacity-75" />
+                                <span className="relative inline-flex size-1.5 rounded-full bg-primary" />
+                            </span>
                             <span>BLOG</span>
                             <span className="text-primary/90 group-hover:text-foreground transition-colors">&gt;</span>
                         </button>
