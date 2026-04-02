@@ -98,7 +98,7 @@ const NAV = [
   { href: '/dashboard/portfolio', label: 'portfolio', Icon: IconPortfolio              },
   { href: '/dashboard/notes',     label: 'notes',     Icon: IconNotes                  },
   { href: '/dashboard/todos',     label: 'todos',     Icon: IconTodos                  },
-  { href: '/dashboard/learning',  label: 'learning',  Icon: IconLearning               },
+  { href: '/dashboard/learning',  label: 'lesson',    Icon: IconLearning               },
   { href: '/dashboard/projects',  label: 'projects',  Icon: IconProjects               },
   { href: '/dashboard/blog',      label: 'blog',      Icon: IconBlog                   },
 ]

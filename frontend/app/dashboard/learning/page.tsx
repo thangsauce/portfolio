@@ -20,7 +20,7 @@ const STATUSES: LStatus[] = ['to_learn', 'learning', 'learned']
 
 const COL: Record<LStatus, { label: string; headerColor: string; bg: string; countColor: string }> = {
   to_learn: { label: '// to learn', headerColor: 'hsl(0 0% 30%)',      bg: 'hsl(0 0% 8%)',               countColor: 'hsl(0 0% 22%)' },
-  learning: { label: '// learning', headerColor: 'hsl(158 64% 42%)',   bg: 'hsl(158 64% 36% / 0.04)',    countColor: 'hsl(158 64% 28%)' },
+  learning: { label: '// lesson',   headerColor: 'hsl(158 64% 42%)',   bg: 'hsl(158 64% 36% / 0.04)',    countColor: 'hsl(158 64% 28%)' },
   learned:  { label: '// learned',  headerColor: 'hsl(158 64% 28%)',   bg: 'hsl(0 0% 8%)',               countColor: 'hsl(0 0% 22%)' },
 }
 

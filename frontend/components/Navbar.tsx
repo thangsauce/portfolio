@@ -37,6 +37,10 @@ const MENU_LINKS = [
         name: 'Certifications',
         url: '/#certifications',
     },
+    {
+        name: 'Blog',
+        url: '/blog',
+    },
 ];
 
 const Navbar = () => {

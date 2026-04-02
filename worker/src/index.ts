@@ -6,6 +6,9 @@ import privatePortfolio from './routes/private/portfolio'
 import privateNotes from './routes/private/notes'
 import privateTodos from './routes/private/todos'
 import privateLearning from './routes/private/learning'
+import blog from './routes/blog'
+import privateBlog from './routes/private/blog'
+import privateProjectDocs from './routes/private/project-docs'
 
 export type Env = {
   SUPABASE_URL: string
@@ -47,6 +50,7 @@ app.onError((err, c) => {
 app.get('/health', (c) => c.json({ ok: true }))
 
 app.route('/api/portfolio', portfolio)
+app.route('/api/blog', blog)
 
 // All /api/private/* routes require a valid Supabase JWT
 app.use('/api/private/*', authMiddleware)
@@ -54,5 +58,7 @@ app.route('/api/private/portfolio', privatePortfolio)
 app.route('/api/private/notes', privateNotes)
 app.route('/api/private/todos', privateTodos)
 app.route('/api/private/learning', privateLearning)
+app.route('/api/private/blog', privateBlog)
+app.route('/api/private/project-docs', privateProjectDocs)
 
 export default app

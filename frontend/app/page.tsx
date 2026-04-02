@@ -20,7 +20,7 @@ export default function Home() {
             <div className="page- md:pl-12 lg:pl-20 xl:pl-28">
                 <Experiences />
             </div>
-            <div className="page- md:pl-16 lg:pl-28 xl:pl-36">
+            <div className="page- md:pl-20 lg:pl-32 xl:pl-44">
                 <ProjectList />
             </div>
             <div className="page- md:pl-10 lg:pl-16 xl:pl-20">

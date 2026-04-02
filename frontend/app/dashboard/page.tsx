@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 const STATS = [
   { label: 'notes',        value: '--', cmd: 'notes.list()',     accent: 'hsl(158 64% 36%)' },
   { label: 'todos',        value: '--', cmd: 'todos.pending()',  accent: 'hsl(40 90% 50%)'  },
-  { label: 'learning',     value: '--', cmd: 'learning.active()',accent: 'hsl(193 100% 47%)'},
+  { label: 'lesson',       value: '--', cmd: 'lesson.active()',  accent: 'hsl(193 100% 47%)'},
   { label: 'project docs', value: '--', cmd: 'docs.count()',     accent: 'hsl(280 65% 60%)' },
 ]
 
