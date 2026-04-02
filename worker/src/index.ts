@@ -5,6 +5,7 @@ import portfolio from './routes/portfolio'
 import privatePortfolio from './routes/private/portfolio'
 import privateNotes from './routes/private/notes'
 import privateTodos from './routes/private/todos'
+import privateLearning from './routes/private/learning'
 
 export type Env = {
   SUPABASE_URL: string
@@ -52,5 +53,6 @@ app.use('/api/private/*', authMiddleware)
 app.route('/api/private/portfolio', privatePortfolio)
 app.route('/api/private/notes', privateNotes)
 app.route('/api/private/todos', privateTodos)
+app.route('/api/private/learning', privateLearning)
 
 export default app
