@@ -77,13 +77,33 @@ export function ContactSection() {
     }
 
     const handleBackToHome = () => {
+        if (typeof window === 'undefined') return;
+
+        const scrollToY = (y: number) => {
+            if (lenis) {
+                lenis.scrollTo(y, { duration: 1.2 });
+                return;
+            }
+            window.scrollTo({ top: y, behavior: 'smooth' });
+        };
+
+        const isHorizontalMode =
+            window.innerWidth >= 768 && !!document.querySelector('.horizontal-mode');
+
+        if (isHorizontalMode) {
+            const root = document.querySelector('.horizontal-mode') as HTMLElement | null;
+            if (root) {
+                const rootTop = root.getBoundingClientRect().top + window.scrollY;
+                scrollToY(rootTop);
+                return;
+            }
+        }
+
         if (lenis) {
             lenis.scrollTo('#banner', { duration: 1.2 });
             return;
         }
-        if (typeof window !== 'undefined') {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     return (

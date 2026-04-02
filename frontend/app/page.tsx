@@ -20,16 +20,16 @@ export default function Home() {
             <div className="page- md:pl-12 lg:pl-20 xl:pl-28">
                 <Experiences />
             </div>
-            <div className="page- md:pl-20 lg:pl-32 xl:pl-44">
+            <div className="page- md:pl-24 lg:pl-40 xl:pl-52">
                 <ProjectList />
             </div>
-            <div className="page- md:pl-10 lg:pl-16 xl:pl-20">
+            <div className="page- md:pl-32 lg:pl-52 xl:pl-72">
                 <ITSkills />
             </div>
             <div className="page- md:pl-14 lg:pl-24 xl:pl-32">
                 <Skills />
             </div>
-            <div className="page- md:pl-20 lg:pl-32 xl:pl-44">
+            <div className="page- md:pl-32 lg:pl-52 xl:pl-72">
                 <Certifications />
             </div>
             <div className="page- md:pl-12 lg:pl-20 xl:pl-28">

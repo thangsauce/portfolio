@@ -5,20 +5,14 @@ import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
 
-// ── SVG icon props ──────────────────────────────────────────
+// ── Icon base props ─────────────────────────────────────────────────────────
 const ip = {
-  width: 14,
-  height: 14,
-  viewBox: '0 0 16 16',
-  fill: 'none',
-  stroke: 'currentColor',
-  strokeWidth: '1.5',
-  strokeLinecap: 'round' as const,
-  strokeLinejoin: 'round' as const,
+  width: 14, height: 14, viewBox: '0 0 16 16',
+  fill: 'none', stroke: 'currentColor', strokeWidth: '1.5',
+  strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const,
   style: { flexShrink: 0 as const },
 }
 
-// ── Icons ───────────────────────────────────────────────────
 function IconOverview() {
   return (
     <svg {...ip}>
@@ -92,45 +86,24 @@ function IconLogout() {
   )
 }
 
-// ── Nav config ──────────────────────────────────────────────
+// ── Nav config ──────────────────────────────────────────────────────────────
 const NAV = [
   { href: '/dashboard',           label: 'overview',  Icon: IconOverview,  exact: true },
   { href: '/dashboard/portfolio', label: 'portfolio', Icon: IconPortfolio              },
   { href: '/dashboard/notes',     label: 'notes',     Icon: IconNotes                  },
   { href: '/dashboard/todos',     label: 'todos',     Icon: IconTodos                  },
-  { href: '/dashboard/learning',  label: 'lesson',    Icon: IconLearning               },
+  { href: '/dashboard/learning',  label: 'learning',  Icon: IconLearning               },
   { href: '/dashboard/projects',  label: 'projects',  Icon: IconProjects               },
   { href: '/dashboard/blog',      label: 'blog',      Icon: IconBlog                   },
 ]
 
-// ── Session indicator ───────────────────────────────────────
-function SessionDot() {
-  return (
-    <div style={{
-      display: 'flex', alignItems: 'center', gap: 7,
-      fontSize: 9, letterSpacing: '0.25em', color: 'hsl(0 0% 30%)',
-      textTransform: 'uppercase',
-    }}>
-      <span style={{
-        display: 'inline-block', width: 5, height: 5, borderRadius: '50%',
-        background: 'hsl(158 64% 40%)',
-        animation: 'session-blink 2.5s ease-in-out infinite',
-      }} />
-      session active
-      <style jsx>{`
-        @keyframes session-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.15; } }
-      `}</style>
-    </div>
-  )
-}
-
-// ── Layout ──────────────────────────────────────────────────
+// ── Layout ──────────────────────────────────────────────────────────────────
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading, user, logout } = useAuth()
-  const router = useRouter()
+  const router   = useRouter()
   const pathname = usePathname()
-  const [mounted, setMounted] = useState(false)
-  const [hoveredNav, setHoveredNav] = useState<string | null>(null)
+  const [mounted,      setMounted]      = useState(false)
+  const [hoveredNav,   setHoveredNav]   = useState<string | null>(null)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   useEffect(() => { setMounted(true) }, [])
@@ -150,77 +123,101 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         position: 'fixed', inset: 0, zIndex: 50,
         display: 'flex', overflow: 'hidden',
         fontFamily: 'var(--font-roboto-flex)',
-        background: 'hsl(0 0% 10%)',
+        background: 'hsl(222 14% 10%)',
       }}
     >
-      {/* ── Sidebar ─────────────────────────────────────── */}
+      <style>{`
+        @keyframes dot-pulse {
+          0%, 100% { opacity: 1; box-shadow: 0 0 0 0 hsl(158 64% 42% / 0.5); }
+          50%       { opacity: 0.5; box-shadow: 0 0 0 4px hsl(158 64% 42% / 0); }
+        }
+      `}</style>
+
+      {/* ── Sidebar ───────────────────────────────────────────────────────── */}
       <aside style={{
-        width: 232, minWidth: 232, flexShrink: 0,
-        background: 'hsl(0 0% 7%)',
-        borderRight: '1px solid hsl(0 0% 16%)',
+        width: 236, minWidth: 236, flexShrink: 0,
+        background: 'hsl(224 16% 7%)',
+        borderRight: '1px solid hsl(222 14% 13%)',
         display: 'flex', flexDirection: 'column',
+        position: 'relative', overflow: 'hidden',
       }}>
+
+        {/* Ambient top glow */}
+        <div style={{
+          position: 'absolute', top: -70, left: -40,
+          width: 220, height: 220,
+          background: 'radial-gradient(circle, hsl(158 64% 36% / 0.13) 0%, transparent 68%)',
+          pointerEvents: 'none', zIndex: 0,
+        }} />
 
         {/* Branding */}
         <div style={{
-          padding: '20px 20px 14px',
-          borderBottom: '1px solid hsl(0 0% 14%)',
+          padding: '20px 18px 16px',
+          borderBottom: '1px solid hsl(222 14% 12%)',
+          position: 'relative', zIndex: 1,
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 5 }}>
-            {/* TL badge */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
             <div style={{
-              width: 28, height: 28, flexShrink: 0,
+              width: 30, height: 30, flexShrink: 0,
               background: 'hsl(158 64% 36%)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontFamily: 'var(--font-anton)',
-              fontSize: 11, letterSpacing: '0.05em',
+              fontFamily: 'var(--font-anton)', fontSize: 11, letterSpacing: '0.05em',
               color: 'hsl(0 0% 98%)',
+              boxShadow: '0 0 20px hsl(158 64% 36% / 0.45)',
             }}>
               TL
             </div>
-            <div style={{
-              fontFamily: 'var(--font-anton)',
-              fontSize: 13, letterSpacing: '0.2em', textTransform: 'uppercase',
-              color: 'hsl(0 0% 78%)',
-            }}>
-              thangle.me
+            <div>
+              <div style={{
+                fontFamily: 'var(--font-anton)', fontSize: 12,
+                letterSpacing: '0.2em', textTransform: 'uppercase',
+                color: 'hsl(220 12% 76%)', lineHeight: 1.2,
+              }}>
+                thangle.me
+              </div>
+              <div style={{
+                fontSize: 9, letterSpacing: '0.24em', textTransform: 'uppercase',
+                color: 'hsl(158 64% 40%)', marginTop: 2,
+              }}>
+                admin
+              </div>
             </div>
-          </div>
-          <div style={{
-            paddingLeft: 38,
-            fontSize: 9, letterSpacing: '0.3em', textTransform: 'uppercase',
-            color: 'hsl(158 64% 36%)',
-          }}>
-            // admin
           </div>
         </div>
 
         {/* Nav */}
-        <nav data-lenis-prevent style={{ flex: 1, paddingTop: 6, overflowY: 'auto' }}>
+        <nav data-lenis-prevent style={{
+          flex: 1, paddingTop: 6, paddingBottom: 6,
+          overflowY: 'auto', position: 'relative', zIndex: 1,
+        }}>
           <div style={{
-            padding: '8px 18px 6px',
-            fontSize: 9, letterSpacing: '0.3em', textTransform: 'uppercase',
-            color: 'hsl(0 0% 26%)',
+            padding: '6px 18px 4px',
+            fontSize: 9, letterSpacing: '0.28em', textTransform: 'uppercase',
+            color: 'hsl(220 7% 26%)',
           }}>
-            // nav
+            menu
           </div>
 
           {NAV.map(({ href, label, Icon, exact }) => {
             const isActive = exact ? pathname === href : pathname.startsWith(href)
-            const isHov = hoveredNav === href && !isActive
+            const isHov    = hoveredNav === href && !isActive
             return (
               <Link
                 key={href}
                 href={href}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 10,
-                  padding: '9px 18px',
-                  fontSize: 11, letterSpacing: '0.12em', textTransform: 'lowercase',
+                  margin: '1px 8px',
+                  padding: '8px 10px',
+                  fontSize: 12, letterSpacing: '0.04em',
                   textDecoration: 'none',
-                  color: isActive ? 'hsl(158 64% 58%)' : isHov ? 'hsl(0 0% 62%)' : 'hsl(0 0% 40%)',
-                  background: isActive ? 'hsl(158 64% 36% / 0.08)' : isHov ? 'hsl(0 0% 10%)' : 'transparent',
-                  borderLeft: `2px solid ${isActive ? 'hsl(158 64% 36%)' : 'transparent'}`,
-                  transition: 'color 0.12s, background 0.12s',
+                  borderRadius: 5,
+                  color: isActive ? 'hsl(158 64% 62%)' : isHov ? 'hsl(220 10% 58%)' : 'hsl(220 8% 38%)',
+                  background: isActive
+                    ? 'linear-gradient(90deg, hsl(158 64% 36% / 0.18) 0%, hsl(158 64% 36% / 0.04) 100%)'
+                    : isHov ? 'hsl(222 14% 11%)' : 'transparent',
+                  borderLeft: `2px solid ${isActive ? 'hsl(158 64% 42%)' : 'transparent'}`,
+                  transition: 'color 0.14s, background 0.14s',
                 }}
                 onMouseEnter={() => setHoveredNav(href)}
                 onMouseLeave={() => setHoveredNav(null)}
@@ -233,61 +230,70 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </nav>
 
         {/* User / logout */}
-        <div style={{ borderTop: '1px solid hsl(0 0% 14%)', padding: '14px 18px' }}>
-          <div style={{
-            fontSize: 10, color: 'hsl(0 0% 30%)', letterSpacing: '0.08em',
-            marginBottom: 11,
-            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-          }}>
-            {user?.email ?? '—'}
+        <div style={{
+          borderTop: '1px solid hsl(222 14% 12%)',
+          padding: '13px 18px',
+          position: 'relative', zIndex: 1,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+            <div style={{
+              width: 6, height: 6, borderRadius: '50%', flexShrink: 0,
+              background: 'hsl(158 64% 42%)',
+              animation: 'dot-pulse 2.5s ease-in-out infinite',
+            }} />
+            <div style={{
+              fontSize: 10, color: 'hsl(220 7% 34%)',
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+              letterSpacing: '0.02em',
+            }}>
+              {user?.email ?? '—'}
+            </div>
           </div>
           <button
             onClick={async () => {
               setIsLoggingOut(true)
-              try {
-                await logout()
-                router.push('/')
-              } catch {
-                setIsLoggingOut(false)
-              }
+              try { await logout(); router.push('/') }
+              catch { setIsLoggingOut(false) }
             }}
             style={{
               display: 'flex', alignItems: 'center', gap: 7,
-              fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase',
+              fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase',
               color: 'hsl(0 62% 52%)',
-              background: 'none', border: 'none', padding: 0,
+              background: 'none', border: 'none', padding: 0, cursor: 'pointer',
               transition: 'color 0.12s',
             }}
             onMouseEnter={e => (e.currentTarget.style.color = 'hsl(0 62% 68%)')}
             onMouseLeave={e => (e.currentTarget.style.color = 'hsl(0 62% 52%)')}
           >
             <IconLogout />
-            exit_session
+            sign out
           </button>
         </div>
       </aside>
 
-      {/* ── Content ─────────────────────────────────────── */}
+      {/* ── Content ───────────────────────────────────────────────────────── */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
         {/* Topbar */}
         <header style={{
           height: 44, minHeight: 44, flexShrink: 0,
-          background: 'hsl(0 0% 8.5%)',
-          borderBottom: '1px solid hsl(0 0% 15%)',
+          background: 'hsl(223 15% 8.5%)',
+          borderBottom: '1px solid hsl(222 14% 14%)',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '0 28px',
         }}>
-          {/* Breadcrumb */}
-          <div style={{ fontSize: 11, letterSpacing: '0.15em', color: 'hsl(0 0% 35%)' }}>
-            <span style={{ color: 'hsl(158 64% 36%)' }}>~</span>
-            {' / '}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 12 }}>
+            <span style={{ color: 'hsl(158 64% 42%)', fontSize: 8, lineHeight: 1 }}>◆</span>
+            <span style={{ color: 'hsl(222 12% 26%)', fontSize: 11 }}>/</span>
             {segments.length === 0
-              ? <span style={{ color: 'hsl(0 0% 62%)' }}>overview</span>
+              ? <span style={{ color: 'hsl(220 10% 60%)', letterSpacing: '0.05em' }}>overview</span>
               : segments.map((seg, i) => (
-                <span key={i}>
-                  {i > 0 && <span style={{ color: 'hsl(0 0% 28%)' }}> / </span>}
-                  <span style={{ color: i === segments.length - 1 ? 'hsl(0 0% 62%)' : 'hsl(0 0% 35%)' }}>
+                <span key={i} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                  {i > 0 && <span style={{ color: 'hsl(222 12% 24%)', fontSize: 11 }}>/</span>}
+                  <span style={{
+                    letterSpacing: '0.05em',
+                    color: i === segments.length - 1 ? 'hsl(220 10% 60%)' : 'hsl(220 8% 38%)',
+                  }}>
                     {seg}
                   </span>
                 </span>
@@ -295,7 +301,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             }
           </div>
 
-          <SessionDot />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{
+              width: 5, height: 5, borderRadius: '50%',
+              background: 'hsl(158 64% 42%)',
+              boxShadow: '0 0 6px hsl(158 64% 42% / 0.55)',
+            }} />
+            <span style={{
+              fontSize: 9, letterSpacing: '0.22em', textTransform: 'uppercase',
+              color: 'hsl(220 7% 30%)',
+            }}>
+              active
+            </span>
+          </div>
         </header>
 
         {/* Main */}
