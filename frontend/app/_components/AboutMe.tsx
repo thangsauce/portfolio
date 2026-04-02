@@ -14,7 +14,7 @@ const AboutMe = () => {
 
     useGSAP(
         () => {
-            const isHorizontalMode = window.innerWidth >= 1024 && !!document.querySelector('.horizontal-mode');
+            const isHorizontalMode = window.innerWidth >= 768 && !!document.querySelector('.horizontal-mode');
             if (isHorizontalMode) {
                 gsap.from('.slide-up-and-fade', {
                     y: 80,
@@ -46,7 +46,7 @@ const AboutMe = () => {
 
     useGSAP(
         () => {
-            const isHorizontalMode = window.innerWidth >= 1024 && !!document.querySelector('.horizontal-mode');
+            const isHorizontalMode = window.innerWidth >= 768 && !!document.querySelector('.horizontal-mode');
             if (isHorizontalMode) return;
             const tl = gsap.timeline({
                 scrollTrigger: {

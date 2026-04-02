@@ -48,7 +48,7 @@ const Experiences = () => {
     useGSAP(
         () => {
             if (experiences.length === 0) return;
-            const isHorizontalMode = window.innerWidth >= 1024 && !!document.querySelector('.horizontal-mode');
+            const isHorizontalMode = window.innerWidth >= 768 && !!document.querySelector('.horizontal-mode');
             if (isHorizontalMode) {
                 gsap.from('.experience-item', {
                     y: 50,
@@ -75,7 +75,7 @@ const Experiences = () => {
 
     useGSAP(
         () => {
-            const isHorizontalMode = window.innerWidth >= 1024 && !!document.querySelector('.horizontal-mode');
+            const isHorizontalMode = window.innerWidth >= 768 && !!document.querySelector('.horizontal-mode');
             if (isHorizontalMode) return;
             const tl = gsap.timeline({
                 scrollTrigger: {

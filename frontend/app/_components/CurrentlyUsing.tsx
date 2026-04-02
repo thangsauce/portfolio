@@ -50,7 +50,7 @@ const CurrentlyUsing = () => {
     useGSAP(
         () => {
             if (skills.length === 0) return;
-            const isHorizontalMode = window.innerWidth >= 1024 && !!document.querySelector('.horizontal-mode');
+            const isHorizontalMode = window.innerWidth >= 768 && !!document.querySelector('.horizontal-mode');
             if (isHorizontalMode) {
                 gsap.from('.it-skill-item', {
                     opacity: 0,
@@ -77,7 +77,7 @@ const CurrentlyUsing = () => {
 
     useGSAP(
         () => {
-            const isHorizontalMode = window.innerWidth >= 1024 && !!document.querySelector('.horizontal-mode');
+            const isHorizontalMode = window.innerWidth >= 768 && !!document.querySelector('.horizontal-mode');
             if (isHorizontalMode) return;
             gsap.to(containerRef.current, {
                 y: -150,

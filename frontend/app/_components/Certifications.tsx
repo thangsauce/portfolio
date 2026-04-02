@@ -34,7 +34,7 @@ const Certifications = () => {
     useGSAP(
         () => {
             if (certs.length === 0) return;
-            const isHorizontalMode = window.innerWidth >= 1024 && !!document.querySelector('.horizontal-mode');
+            const isHorizontalMode = window.innerWidth >= 768 && !!document.querySelector('.horizontal-mode');
             if (isHorizontalMode) {
                 gsap.from('.cert-item', {
                     opacity: 0,

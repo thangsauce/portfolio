@@ -138,7 +138,7 @@ const Banner = () => {
 
     useGSAP(
         () => {
-            const isHorizontalMode = window.innerWidth >= 1024 && !!document.querySelector('.horizontal-mode');
+            const isHorizontalMode = window.innerWidth >= 768 && !!document.querySelector('.horizontal-mode');
             if (isHorizontalMode) return;
             const tl = gsap.timeline({
                 scrollTrigger: {

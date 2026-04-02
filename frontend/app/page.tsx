@@ -14,7 +14,7 @@ export default function Home() {
             <div className="page-">
                 <Banner />
             </div>
-            <div className="page-">
+            <div className="page- md:pl-16 lg:pl-24 xl:pl-32">
                 <AboutMe />
             </div>
             <div className="page- md:pl-24 lg:pl-40 xl:pl-52">
