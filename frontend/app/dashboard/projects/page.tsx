@@ -283,8 +283,11 @@ export default function ProjectDocsPage() {
   const [loading,    setLoading]    = useState(true)
   const [loadingDoc, setLoadingDoc] = useState(false)
   const [creating,   setCreating]   = useState(false)
+  const [importingMd, setImportingMd] = useState(false)
+  const [isDropActive, setIsDropActive] = useState(false)
   const [search,     setSearch]     = useState('')
   const [hoveredId,  setHoveredId]  = useState<string | null>(null)
+  const mdInputRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
     Promise.all([
@@ -318,6 +321,41 @@ export default function ProjectDocsPage() {
       setActiveDoc(doc)
     } catch {}
     setCreating(false)
+  }
+
+  function fileNameToTitle(name: string) {
+    const noExt = name.replace(/\.md$/i, '')
+    const spaced = noExt.replace(/[-_]+/g, ' ').trim()
+    return spaced || 'Untitled'
+  }
+
+  async function importMarkdownFile(file: File) {
+    const isMd = /\.md$/i.test(file.name) || file.type === 'text/markdown' || file.type === 'text/plain'
+    if (!isMd) return
+
+    setImportingMd(true)
+    try {
+      const content = await file.text()
+      const title = fileNameToTitle(file.name)
+      const doc = await apiPrivate<Doc>('/project-docs', {
+        method: 'POST',
+        body: JSON.stringify({ title, content }),
+      })
+      const item: DocItem = {
+        id: doc.id,
+        title: doc.title,
+        portfolio_project_id: doc.portfolio_project_id,
+        created_at: doc.created_at,
+        updated_at: doc.updated_at,
+      }
+      setDocs((prev) => [item, ...prev])
+      setActiveDoc(doc)
+    } catch {
+      // silent for consistency with existing page interactions
+    } finally {
+      setImportingMd(false)
+      setIsDropActive(false)
+    }
   }
 
   const saveDoc = useCallback(async (id: string, patch: Partial<Doc>) => {
@@ -386,6 +424,67 @@ export default function ProjectDocsPage() {
                 background: 'hsl(0 0% 5%)', border: '1px solid hsl(0 0% 17%)',
                 color: 'hsl(0 0% 62%)', fontSize: 11, letterSpacing: '0.04em',
                 outline: 'none', fontFamily: 'var(--font-roboto-flex)',
+              }}
+            />
+          </div>
+
+          <div
+            style={{
+              marginTop: 10,
+              border: `1px dashed ${isDropActive ? 'hsl(158 64% 42%)' : 'hsl(0 0% 24%)'}`,
+              background: isDropActive ? 'hsl(158 64% 36% / 0.08)' : 'hsl(0 0% 6%)',
+              padding: '9px 10px',
+              transition: 'all 0.12s',
+            }}
+            onDragOver={(e) => {
+              e.preventDefault()
+              setIsDropActive(true)
+            }}
+            onDragLeave={(e) => {
+              e.preventDefault()
+              setIsDropActive(false)
+            }}
+            onDrop={async (e) => {
+              e.preventDefault()
+              const file = e.dataTransfer.files?.[0]
+              if (file) await importMarkdownFile(file)
+              setIsDropActive(false)
+            }}
+          >
+            <div style={{ fontSize: 9, letterSpacing: '0.18em', color: 'hsl(0 0% 34%)', textTransform: 'uppercase', marginBottom: 6 }}>
+              // import markdown
+            </div>
+            <div style={{ fontSize: 10, letterSpacing: '0.06em', color: 'hsl(0 0% 44%)', marginBottom: 7 }}>
+              drop a `.md` file here
+            </div>
+            <button
+              onClick={() => mdInputRef.current?.click()}
+              disabled={importingMd}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
+                fontSize: 10,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: importingMd ? 'hsl(0 0% 30%)' : 'hsl(158 64% 46%)',
+                background: 'none',
+                border: '1px solid hsl(158 64% 22%)',
+                padding: '5px 8px',
+                cursor: importingMd ? 'not-allowed' : 'pointer',
+              }}
+            >
+              {importingMd ? 'importing...' : 'choose .md'}
+            </button>
+            <input
+              ref={mdInputRef}
+              type="file"
+              accept=".md,text/markdown,text/plain"
+              style={{ display: 'none' }}
+              onChange={async (e) => {
+                const file = e.target.files?.[0]
+                if (file) await importMarkdownFile(file)
+                e.currentTarget.value = ''
               }}
             />
           </div>
