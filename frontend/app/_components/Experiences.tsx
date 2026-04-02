@@ -28,6 +28,7 @@ function formatDuration(start: string | null, end: string | null): string {
 const Experiences = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [experiences, setExperiences] = useState<Experience[]>([]);
+    const visibleExperiences = experiences.filter((item) => !!item.featured);
 
     useEffect(() => {
         apiFetch<Experience[]>('/api/portfolio/experiences')
@@ -89,7 +90,7 @@ const Experiences = () => {
         { scope: containerRef },
     );
 
-    if (experiences.length === 0) return null;
+    if (visibleExperiences.length === 0) return null;
 
     return (
         <section className="-mt-4 md:mt-0 pb-section" id="my-experience">
@@ -103,17 +104,10 @@ const Experiences = () => {
                 </div>
 
                 <div className="grid gap-14">
-                    {experiences.map((item) => (
+                    {visibleExperiences.map((item) => (
                         <div key={item.id} className="experience-item">
                             <p className="text-xl text-muted-foreground">{item.company}</p>
-                            <div className="mt-3.5 mb-2.5 flex items-center gap-3 flex-wrap">
-                                <p className="text-5xl font-anton leading-none">{item.role}</p>
-                                {item.featured ? (
-                                    <span className="inline-flex items-center px-2.5 py-1 rounded-md border border-primary/50 text-primary text-[10px] tracking-[0.22em] uppercase leading-none">
-                                        Featured
-                                    </span>
-                                ) : null}
-                            </div>
+                            <p className="text-5xl font-anton leading-none mt-3.5 mb-2.5">{item.role}</p>
                             <p className="text-lg text-muted-foreground">{formatDuration(item.start_date, item.end_date)}</p>
                             {!!item.description?.length && (
                                 <ul className="mt-4 space-y-2 text-sm md:text-base text-muted-foreground max-w-3xl">
