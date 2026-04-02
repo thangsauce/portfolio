@@ -306,7 +306,7 @@ const Navbar = () => {
             <div className="sticky top-0 z-[4]">
                 {!isProjectPage && (
                     <Link
-                        href="/"
+                        href="/#banner"
                         aria-label="Go to homepage"
                         className="absolute top-5 left-5 md:left-6 z-[2] h-16 w-24 flex items-center justify-center text-primary/80"
                     >

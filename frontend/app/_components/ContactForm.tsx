@@ -1,9 +1,10 @@
 'use client';
 
-import { FormEvent, useRef, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import { GENERAL_INFO } from '@/lib/data';
 import { useLenis } from 'lenis/react';
 import { usePathname, useRouter } from 'next/navigation';
+import { createPortal } from 'react-dom';
 
 export function ContactSection() {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -14,9 +15,32 @@ export function ContactSection() {
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
     const [sending, setSending] = useState(false);
+    const [showBlogDrop, setShowBlogDrop] = useState(false);
+    const [canPortal, setCanPortal] = useState(false);
     const [status, setStatus] = useState<{ ok: boolean; msg: string } | null>(
         null,
     );
+
+    useEffect(() => {
+        setCanPortal(true);
+    }, []);
+
+    useEffect(() => {
+        const node = containerRef.current;
+        if (!node) return;
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                setShowBlogDrop(entry.isIntersecting && entry.intersectionRatio > 0.28);
+            },
+            {
+                threshold: [0, 0.18, 0.28, 0.5, 0.8, 1],
+            },
+        );
+
+        observer.observe(node);
+        return () => observer.disconnect();
+    }, []);
 
     async function handleEmailJsSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -111,7 +135,29 @@ export function ContactSection() {
     };
 
     return (
-        <section className="relative pt-16 pb-24 md:pt-28 md:pb-24" id="contact" ref={containerRef}>
+        <>
+            {canPortal &&
+                createPortal(
+                    <div
+                        className={`pointer-events-none fixed left-1/2 top-10 z-[7] -translate-x-1/2 transition-all duration-500 ease-out ${
+                            showBlogDrop
+                                ? 'translate-y-0 opacity-100'
+                                : '-translate-y-8 opacity-0'
+                        }`}
+                    >
+                        <button
+                            type="button"
+                            onClick={() => router.push('/blog')}
+                            className="pointer-events-auto group inline-flex items-center gap-2 rounded-full border border-primary/35 bg-background/85 px-4 py-2 text-[11px] uppercase tracking-[0.18em] text-primary shadow-[0_8px_24px_rgba(0,0,0,0.22)] backdrop-blur-sm transition-all hover:border-primary hover:bg-background hover:text-foreground"
+                        >
+                            <span className="text-primary group-hover:text-foreground transition-colors">&lt;</span>
+                            Blog
+                            <span className="text-primary group-hover:text-foreground transition-colors">&gt;</span>
+                        </button>
+                    </div>,
+                    document.body,
+                )}
+            <section className="relative pt-16 pb-24 md:pt-28 md:pb-24" id="contact" ref={containerRef}>
             <button
                 type="button"
                 onClick={handleBackToHome}
@@ -260,7 +306,8 @@ export function ContactSection() {
                     </div>
                 </div>
             </div>
-        </section>
+            </section>
+        </>
     );
 }
 

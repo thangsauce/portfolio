@@ -184,7 +184,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       }}>
 
         {/* Logo */}
-        <Link href="/" style={{
+        <Link href="/#banner" style={{
           padding: '18px 16px',
           borderBottom: `1px solid ${isLight ? 'hsl(0 0% 90%)' : 'hsl(226 10% 12%)'}`,
           display: 'block',

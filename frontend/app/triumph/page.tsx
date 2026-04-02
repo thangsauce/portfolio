@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
 
 export default function LoginPage() {
@@ -85,16 +86,21 @@ export default function LoginPage() {
 
         {/* Logo + heading */}
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <div style={{
-            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            width: 44, height: 44,
-            background: 'hsl(226 12% 13%)',
-            border: '1px solid hsl(158 64% 36% / 0.32)',
-            boxShadow: '0 6px 18px hsl(158 64% 36% / 0.22)',
-            borderRadius: 14,
-            color: 'hsl(158 64% 54%)',
-            marginBottom: 18,
-          }}>
+          <Link
+            href="/#banner"
+            aria-label="Go to homepage"
+            style={{
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              width: 44, height: 44,
+              background: 'hsl(226 12% 13%)',
+              border: '1px solid hsl(158 64% 36% / 0.32)',
+              boxShadow: '0 6px 18px hsl(158 64% 36% / 0.22)',
+              borderRadius: 14,
+              color: 'hsl(158 64% 54%)',
+              marginBottom: 18,
+              textDecoration: 'none',
+            }}
+          >
             <svg
               ref={logoEyeRef}
               width="30"
@@ -123,7 +129,7 @@ export default function LoginPage() {
                 </g>
               </g>
             </svg>
-          </div>
+          </Link>
           <h1 style={{
             fontSize: 22, fontWeight: 600, letterSpacing: '-0.02em',
             color: 'hsl(220 15% 90%)', margin: '0 0 6px',

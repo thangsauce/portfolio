@@ -47,7 +47,7 @@ export default function BlogPage() {
           Thoughts & Notes
         </h1>
         <p className="max-w-2xl text-sm sm:text-base text-muted-foreground leading-relaxed mb-12">
-          Writing about projects, lessons, and experiments in web development, cybersecurity, and IT systems.
+          Writing about projects, lessons, and experiments in web development, cybersecurity, and network.
         </p>
 
         {loading && (
