@@ -17,6 +17,11 @@ const Banner = () => {
     const [resumeUrl, setResumeUrl] = React.useState('/resume.pdf');
     const titleRef = React.useRef<HTMLHeadingElement>(null);
 
+    // ── Speech bubble typewriter ─────────────────────────────────────────
+    const [bubbleText, setBubbleText] = React.useState('');
+    const [showCursor, setShowCursor] = React.useState(false);
+    const [showEmoji,  setShowEmoji]  = React.useState(false);
+
     const renderAnimatedWord = (word: string, className?: string) => (
         <span className={className}>
             {word.split('').map((char, idx) => (
@@ -33,15 +38,32 @@ const Banner = () => {
             .then((r) => {
                 if (mounted && r?.url) setResumeUrl(r.url);
             })
-            .catch(() => {
-                // Keep /resume.pdf fallback if API is unavailable.
-            });
-        return () => {
-            mounted = false;
-        };
+            .catch(() => {});
+        return () => { mounted = false; };
     }, []);
 
-    // move the content a little up on scroll
+    // Typewriter: starts after bubble pops in (3.9s)
+    React.useEffect(() => {
+        const full = "Hi! I'm Thang Le";
+        let i = 0;
+        const start = setTimeout(() => {
+            setShowCursor(true);
+            const interval = setInterval(() => {
+                i++;
+                setBubbleText(full.slice(0, i));
+                if (i >= full.length) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        setShowEmoji(true);
+                        setTimeout(() => setShowCursor(false), 900);
+                    }, 150);
+                }
+            }, 58);
+            return () => clearInterval(interval);
+        }, 3900);
+        return () => clearTimeout(start);
+    }, []);
+
     useGSAP(
         () => {
             const isHorizontalMode = window.innerWidth >= 1024 && !!document.querySelector('.horizontal-mode');
@@ -54,12 +76,7 @@ const Banner = () => {
                     scrub: 1,
                 },
             });
-
-            tl.fromTo(
-                '.slide-up-and-fade',
-                { y: 0 },
-                { y: -150, opacity: 0, stagger: 0.02 },
-            );
+            tl.fromTo('.slide-up-and-fade', { y: 0 }, { y: -150, opacity: 0, stagger: 0.02 });
         },
         { scope: containerRef },
     );
@@ -68,35 +85,15 @@ const Banner = () => {
         () => {
             const title = titleRef.current;
             if (!title) return;
-
-            // Delay start so it plays after initial page/preloader reveal.
             const tl = gsap.timeline({ defaults: { ease: 'power3.out' }, delay: 1.8 });
-
             tl.set('.hero-letter', { transformOrigin: '50% 100%' })
                 .fromTo(
                     '.hero-letter',
                     { yPercent: 130, opacity: 0, rotateX: -70, filter: 'blur(8px)' },
-                    {
-                        yPercent: 0,
-                        opacity: 1,
-                        rotateX: 0,
-                        filter: 'blur(0px)',
-                        duration: 1.2,
-                        stagger: { each: 0.045, from: 'start' },
-                    },
+                    { yPercent: 0, opacity: 1, rotateX: 0, filter: 'blur(0px)', duration: 1.2, stagger: { each: 0.045, from: 'start' } },
                 )
-                .fromTo(
-                    '.banner-title',
-                    { scale: 0.985 },
-                    { scale: 1, duration: 0.5, ease: 'power2.out' },
-                    '-=0.85',
-                )
-                .fromTo(
-                    '.hero-title-sweep',
-                    { scaleX: 0, opacity: 0, transformOrigin: '0% 50%' },
-                    { scaleX: 1, opacity: 1, duration: 0.55 },
-                    '-=0.5',
-                )
+                .fromTo('.banner-title', { scale: 0.985 }, { scale: 1, duration: 0.5, ease: 'power2.out' }, '-=0.85')
+                .fromTo('.hero-title-sweep', { scaleX: 0, opacity: 0, transformOrigin: '0% 50%' }, { scaleX: 1, opacity: 1, duration: 0.55 }, '-=0.5')
                 .to('.hero-title-sweep', { opacity: 0.35, duration: 0.25 });
         },
         { scope: containerRef },
@@ -110,40 +107,55 @@ const Banner = () => {
                 ref={containerRef}
             >
                 <div className="flex flex-col lg:flex-row items-start lg:items-end gap-10 lg:gap-12">
-                    <div className="flex flex-col items-start max-w-[620px]">
-                        <div className="relative w-full max-w-[560px]">
+                    <div className="flex flex-col items-start max-w-[760px]">
+                        <div className="relative w-full max-w-[700px]">
                             <h1
                                 ref={titleRef}
-                                className="banner-title slide-up-and-fade leading-[0.95] text-5xl sm:text-[76px] md:text-[84px] font-sans font-bold tracking-tight"
+                                className="banner-title slide-up-and-fade leading-[0.92] font-sans font-bold tracking-tight"
                             >
-                                {renderAnimatedWord('IT', 'text-primary block')}
-                                {renderAnimatedWord('SPECIALIST', 'block')}
+                                {renderAnimatedWord('IT', 'text-primary block text-[32px] sm:text-[42px] md:text-[48px]')}
+                                {renderAnimatedWord('SPECIALIST', 'block text-[52px] sm:text-[80px] md:text-[96px] lg:text-[102px]')}
                             </h1>
-                            <span className="hero-title-sweep absolute left-0 mt-2 block h-1.5 w-[180px] rounded-full bg-primary/70" />
+                            <span className="hero-title-sweep absolute left-0 mt-2 block h-1.5 w-[200px] sm:w-[250px] rounded-full bg-primary/70" />
                         </div>
                         <p className="banner-description slide-up-and-fade mt-5 max-w-[52ch] text-base sm:text-lg leading-relaxed text-muted-foreground">
-                            Hi! I&apos;m{' '}
-                            <span className="font-medium text-foreground">
-                                Thang Le
-                            </span>
-                            . For most of the days, I dedicate most of my time to{' '}
-                            <span className="text-foreground">web development</span>,{' '}
-                            <span className="text-foreground">cybersecurity</span>,{' '}
+                            For most of the days, I dedicate most of my time to{' '}
+                            <span className="inline-flex items-center gap-1.5 text-foreground">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                    <polyline points="16 18 22 12 16 6" />
+                                    <polyline points="8 6 2 12 8 18" />
+                                </svg>
+                                web development
+                            </span>,{' '}
+                            <span className="inline-flex items-center gap-1.5 text-foreground">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                    <path d="M12 2 4 5v6c0 5 3.4 9.6 8 11 4.6-1.4 8-6 8-11V5l-8-3z" />
+                                </svg>
+                                cybersecurity
+                            </span>,{' '}
                             <span className="text-muted-foreground">and</span>{' '}
-                            <span className="text-foreground">IT systems</span>. I love taking ideas and build it into something that solve a genuine problem.
+                            <span className="inline-flex items-center gap-1.5 text-foreground">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                    <rect x="3" y="4" width="18" height="12" rx="2" />
+                                    <path d="M8 20h8" />
+                                    <path d="M12 16v4" />
+                                </svg>
+                                IT systems
+                            </span>. I love taking ideas and build it into something that solve a genuine problem.
                         </p>
                         <div className="flex gap-4 flex-wrap mt-9 banner-button slide-up-and-fade">
                             <Button
                                 as="button"
                                 variant="primary"
                                 onClick={() => lenis?.scrollTo('#contact')}
+                                className="border border-primary/55 shadow-[0_0_0_1px_rgba(52,211,153,0.22)_inset,0_0_18px_rgba(52,211,153,0.18)] before:content-[''] before:absolute before:inset-[5px] before:border before:border-primary/25 before:pointer-events-none"
                             >
                                 Let's Connect
                             </Button>
                             <a
                                 href={resumeUrl}
                                 download="Thang_Le_Resume.pdf"
-                                className="group h-12 px-8 inline-flex justify-center items-center text-lg uppercase font-anton tracking-widest border border-border hover:border-primary hover:text-primary transition-colors overflow-hidden relative"
+                                className="group h-12 px-8 inline-flex justify-center items-center text-lg uppercase font-anton tracking-widest border border-primary/45 bg-background/40 hover:border-primary hover:text-primary transition-colors overflow-hidden relative shadow-[0_0_0_1px_rgba(52,211,153,0.16)_inset,0_0_14px_rgba(52,211,153,0.12)] before:content-[''] before:absolute before:inset-[5px] before:border before:border-primary/20 before:pointer-events-none"
                             >
                                 <span className="transition-all duration-300 group-hover:-translate-y-full group-hover:opacity-0 absolute">Résumé</span>
                                 <span className="transition-all duration-300 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 absolute">Download</span>
@@ -154,50 +166,118 @@ const Banner = () => {
 
                     <div className="slide-up-and-fade relative shrink-0 w-full max-w-[300px] sm:max-w-[360px] lg:max-w-[390px] mx-0 mr-auto lg:mx-0 mt-12 lg:mt-0">
 
-                        {/* Speech bubble */}
-                        <div style={{
-                            position: 'absolute',
-                            top: -18,
-                            right: -14,
-                            zIndex: 10,
-                            animation: 'bubble-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 3.8s both',
-                        }}>
-                            <div style={{
-                                background: '#fff',
-                                color: '#111',
-                                borderRadius: 14,
-                                padding: '9px 15px',
-                                boxShadow: '0 8px 28px rgba(0,0,0,0.22), 0 2px 8px rgba(0,0,0,0.1)',
-                                fontSize: 14,
-                                fontWeight: 600,
-                                whiteSpace: 'nowrap',
-                                fontFamily: 'var(--font-roboto-flex)',
-                                letterSpacing: '-0.01em',
-                                lineHeight: 1,
-                            }}>
-                                Hi! I&apos;m Thang 👋
-                            </div>
-                            {/* Tail pointing down-left toward face */}
-                            <div style={{
-                                position: 'absolute',
-                                bottom: -7,
-                                left: 18,
-                                width: 14,
-                                height: 14,
-                                background: '#fff',
-                                transform: 'rotate(45deg)',
-                                boxShadow: '2px 2px 4px rgba(0,0,0,0.08)',
-                                borderRadius: 2,
-                            }} />
-                        </div>
-
+                        {/* ── Speech bubble ──────────────────────────── */}
                         <style>{`
-                            @keyframes bubble-pop {
-                                0%   { opacity: 0; transform: scale(0.5) translateY(4px); }
-                                70%  { opacity: 1; transform: scale(1.06) translateY(-1px); }
-                                100% { opacity: 1; transform: scale(1) translateY(0); }
+                            @keyframes bubble-in {
+                                0%   { opacity: 0; transform: scale(0.3) rotate(-8deg); }
+                                55%  { opacity: 1; transform: scale(1.07) rotate(1.5deg); }
+                                75%  { transform: scale(0.96) rotate(-0.5deg); }
+                                100% { opacity: 1; transform: scale(1) rotate(0deg); }
+                            }
+                            @keyframes cursor-blink {
+                                0%, 100% { opacity: 1; }
+                                50%       { opacity: 0; }
+                            }
+                            @keyframes emoji-pop {
+                                0%   { opacity: 0; transform: scale(0) rotate(-20deg); }
+                                60%  { transform: scale(1.4) rotate(10deg); }
+                                100% { opacity: 1; transform: scale(1) rotate(0deg); }
+                            }
+                            @keyframes online-pulse {
+                                0%, 100% { box-shadow: 0 0 0 0 hsl(158 64% 44% / 0.6); }
+                                60%       { box-shadow: 0 0 0 5px hsl(158 64% 44% / 0); }
                             }
                         `}</style>
+
+                        <div style={{
+                            position: 'absolute',
+                            top: -30,
+                            right: -38,
+                            zIndex: 10,
+                            transformOrigin: 'bottom right',
+                            animation: 'bubble-in 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) 3.8s both',
+                        }}>
+                            {/* Bubble body */}
+                            <div style={{
+                                background: '#ffffff',
+                                backdropFilter: 'blur(28px)',
+                                WebkitBackdropFilter: 'blur(28px)',
+                                borderRadius: 14,
+                                padding: '8px 10px 10px',
+                                boxShadow: '0 12px 34px rgba(0,0,0,0.28)',
+                                width: 'fit-content',
+                                maxWidth: 220,
+                                position: 'relative',
+                            }}>
+                                {/* Header row: timestamp */}
+                                <div style={{
+                                    display: 'flex',
+                                    justifyContent: 'flex-end',
+                                    alignItems: 'center',
+                                    marginBottom: 4,
+                                    paddingBottom: 4,
+                                    borderBottom: '1px solid hsl(158 64% 42% / 0.12)',
+                                }}>
+                                    <span style={{
+                                        fontSize: 7,
+                                        color: '#5f5f5f',
+                                        fontFamily: 'var(--font-roboto-flex)',
+                                        letterSpacing: '0.04em',
+                                    }}>
+                                        now
+                                    </span>
+                                </div>
+
+                                {/* Typed message */}
+                                <div style={{
+                                    display: 'flex', alignItems: 'center',
+                                    fontFamily: 'var(--font-roboto-flex)',
+                                    minHeight: 18,
+                                }}>
+                                    <span style={{
+                                        fontSize: 14, fontWeight: 600,
+                                        color: '#111111',
+                                        letterSpacing: '-0.02em', lineHeight: 1,
+                                    }}>
+                                        {bubbleText}
+                                    </span>
+                                    {showCursor && (
+                                        <span style={{
+                                            display: 'inline-block',
+                                            width: 2, height: 13,
+                                            background: 'hsl(158 64% 44%)',
+                                            borderRadius: 1,
+                                            marginLeft: 2, flexShrink: 0,
+                                            animation: 'cursor-blink 0.65s ease-in-out infinite',
+                                        }} />
+                                    )}
+                                    {showEmoji && (
+                                        <span style={{
+                                            display: 'inline-block',
+                                            marginLeft: 4, fontSize: 14, lineHeight: 1,
+                                            animation: 'emoji-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both',
+                                        }}>
+                                            👋
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Tail — points down-left from bubble border */}
+                            <div
+                                style={{
+                                    position: 'absolute',
+                                    left: 8,
+                                    bottom: -4,
+                                    width: 12,
+                                    height: 12,
+                                    background: '#ffffff',
+                                    transform: 'rotate(-35deg)',
+                                    borderRadius: 2,
+                                    boxShadow: '-3px 3px 8px rgba(0,0,0,0.12)',
+                                }}
+                            />
+                        </div>
 
                         <div className="relative overflow-hidden">
                             <Image

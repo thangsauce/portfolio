@@ -243,7 +243,7 @@ const AboutMe = () => {
                         </div>
                         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/75 via-background/20 to-transparent" />
 
-                        <div className="absolute left-4 top-4 rounded-full border border-border/70 bg-background/70 px-3 py-1 text-xs sm:text-sm tracking-wide text-muted-foreground/85">
+                        <div className="absolute left-4 top-4 rounded-full border border-primary/45 bg-primary/10 px-3 py-1 text-xs sm:text-sm tracking-wide text-primary shadow-[0_0_14px_rgba(52,211,153,0.25)]">
                             Based in Orlando, FL
                         </div>
 
