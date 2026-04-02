@@ -9,9 +9,9 @@ type ProjectCategory = 'web_development' | 'cybersecurity' | 'network'
 type LegacyProjectCategory = ProjectCategory | 'it_systems'
 type Project    = { id: string; title: string; slug: string; description: string | null; done_for?: string | null; category: LegacyProjectCategory | null; tech_stack: string[] | string | null; source_code_url?: string | null; live_url?: string | null; images: ProjectImages | null; featured: boolean; order_index: number }
 type Stack      = { id: string; name: string; category: string | null; icon_url: string | null; order_index: number }
-type Skill      = { id: string; name: string; order_index: number }
+type Skill      = { id: string; name: string; icon_url: string | null; order_index: number }
 type Cert       = { id: string; name: string; issuer: string | null; issue_date: string | null; credential_id: string | null; url: string | null }
-type Experience = { id: string; company: string; role: string; start_date: string | null; end_date: string | null; description: string[] | null; order_index: number }
+type Experience = { id: string; company: string; role: string; start_date: string | null; end_date: string | null; description: string[] | null; featured: boolean; order_index: number }
 type ResumeInfo = { url: string; hasCustom: boolean }
 type UploadedProjectImage = { url: string; path: string }
 type Tab        = 'projects' | 'stacks' | 'skills' | 'certs' | 'experiences' | 'resume'
@@ -117,10 +117,10 @@ export default function PortfolioPage() {
     order_index: '0',
     featured: false,
   })
-  const [stf, setStf] = useState({ name: '', icon_url: '', order_index: '0' })
-  const [sf, setSf] = useState({ name: '', order_index: '0' })
+  const [stf, setStf] = useState({ name: '', category: '', icon_url: '', order_index: '0' })
+  const [sf, setSf] = useState({ name: '', icon_url: '', order_index: '0' })
   const [cf, setCf] = useState({ name: '', issuer: '', issue_date: '', credential_id: '', url: '' })
-  const [ef, setEf] = useState({ company: '', role: '', start_date: '', end_date: '', description: '', order_index: '0' })
+  const [ef, setEf] = useState({ company: '', role: '', start_date: '', end_date: '', description: '', featured: false, order_index: '0' })
 
   // ── Load ──────────────────────────────────────────────────────────────────
   const load = useCallback(async () => {
@@ -169,10 +169,10 @@ export default function PortfolioPage() {
       order_index: '0',
       featured: false,
     })
-    setStf({ name: '', icon_url: '', order_index: '0' })
-    setSf({ name: '', order_index: '0' })
+    setStf({ name: '', category: '', icon_url: '', order_index: '0' })
+    setSf({ name: '', icon_url: '', order_index: '0' })
     setCf({ name: '', issuer: '', issue_date: '', credential_id: '', url: '' })
-    setEf({ company: '', role: '', start_date: '', end_date: '', description: '', order_index: '0' })
+    setEf({ company: '', role: '', start_date: '', end_date: '', description: '', featured: false, order_index: '0' })
   }
 
   function openAdd() {
@@ -203,16 +203,16 @@ export default function PortfolioPage() {
       })
     } else if (tab === 'stacks') {
       const s = item as Stack
-      setStf({ name: s.name, icon_url: s.icon_url ?? '', order_index: String(s.order_index) })
+      setStf({ name: s.name, category: s.category ?? '', icon_url: s.icon_url ?? '', order_index: String(s.order_index) })
     } else if (tab === 'skills') {
       const s = item as Skill
-      setSf({ name: s.name, order_index: String(s.order_index) })
+      setSf({ name: s.name, icon_url: s.icon_url ?? '', order_index: String(s.order_index) })
     } else if (tab === 'certs') {
       const c = item as Cert
       setCf({ name: c.name, issuer: c.issuer ?? '', issue_date: c.issue_date ?? '', credential_id: c.credential_id ?? '', url: c.url ?? '' })
     } else {
       const e = item as Experience
-      setEf({ company: e.company, role: e.role, start_date: e.start_date ?? '', end_date: e.end_date ?? '', description: (e.description ?? []).join('\n'), order_index: String(e.order_index) })
+      setEf({ company: e.company, role: e.role, start_date: e.start_date ?? '', end_date: e.end_date ?? '', description: (e.description ?? []).join('\n'), featured: !!e.featured, order_index: String(e.order_index) })
     }
     setPanelOpen(true)
   }
@@ -253,6 +253,7 @@ export default function PortfolioPage() {
       } else if (tab === 'stacks') {
         const body = {
           name: stf.name,
+          category: stf.category.trim() || null,
           icon_url: stf.icon_url || null,
           order_index: parseInt(stf.order_index) || 0,
         }
@@ -263,6 +264,7 @@ export default function PortfolioPage() {
       } else if (tab === 'skills') {
         const body = {
           name: sf.name,
+          icon_url: sf.icon_url.trim() || null,
           order_index: parseInt(sf.order_index) || 0,
         }
         const path = editingId ? `/portfolio/currently_using/${editingId}` : '/portfolio/currently_using'
@@ -276,7 +278,7 @@ export default function PortfolioPage() {
         setCerts(prev => editingId ? prev.map(c => c.id === editingId ? r : c) : [...prev, r])
 
       } else {
-        const body = { company: ef.company, role: ef.role, start_date: ef.start_date || null, end_date: ef.end_date || null, description: ef.description ? ef.description.split('\n').filter(Boolean) : null, order_index: parseInt(ef.order_index) || 0 }
+        const body = { company: ef.company, role: ef.role, start_date: ef.start_date || null, end_date: ef.end_date || null, description: ef.description ? ef.description.split('\n').filter(Boolean) : null, featured: ef.featured, order_index: parseInt(ef.order_index) || 0 }
         const path = editingId ? `/portfolio/experiences/${editingId}` : '/portfolio/experiences'
         const r = await apiPrivate<Experience>(path, { method, body: JSON.stringify(body) })
         setExperiences(prev => editingId ? prev.map(e => e.id === editingId ? r : e) : [...prev, r])
@@ -566,6 +568,10 @@ export default function PortfolioPage() {
           <input style={iSt} value={stf.name} placeholder="Stack item name"
             onChange={e => setStf(p => ({ ...p, name: e.target.value }))} />
         </Fld>
+        <Fld label="category">
+          <input style={iSt} value={stf.category} placeholder="frontend / backend / database / tools"
+            onChange={e => setStf(p => ({ ...p, category: e.target.value }))} />
+        </Fld>
         <Fld label="icon_url">
           <input style={iSt} value={stf.icon_url} placeholder="/logo/react.png"
             onChange={e => setStf(p => ({ ...p, icon_url: e.target.value }))} />
@@ -582,6 +588,10 @@ export default function PortfolioPage() {
         <Fld label="name">
           <input style={iSt} value={sf.name} placeholder="Skill name"
             onChange={e => setSf(p => ({ ...p, name: e.target.value }))} />
+        </Fld>
+        <Fld label="icon_url">
+          <input style={iSt} value={sf.icon_url} placeholder="/logo/react.png"
+            onChange={e => setSf(p => ({ ...p, icon_url: e.target.value }))} />
         </Fld>
         <Fld label="order_index">
           <input style={iSt} type="number" value={sf.order_index}
@@ -637,6 +647,17 @@ export default function PortfolioPage() {
           <textarea style={{ ...iSt, resize: 'vertical' }} rows={4} value={ef.description}
             placeholder={"Led the team...\nBuilt the system..."}
             onChange={e => setEf(p => ({ ...p, description: e.target.value }))} />
+        </Fld>
+        <Fld label="featured">
+          <label style={{ display: 'flex', alignItems: 'center', gap: 9, cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={ef.featured}
+              style={{ accentColor: 'hsl(158 64% 36%)', width: 13, height: 13 }}
+              onChange={e => setEf(p => ({ ...p, featured: e.target.checked }))}
+            />
+            <span style={{ fontSize: 11, color: 'hsl(0 0% 45%)', letterSpacing: '0.08em' }}>pin as featured experience</span>
+          </label>
         </Fld>
         <Fld label="order_index">
           <input style={iSt} type="number" value={ef.order_index}
@@ -716,22 +737,24 @@ export default function PortfolioPage() {
     }
 
     if (tab === 'stacks') return {
-      headers: ['// name', '// icon', '// order'],
+      headers: ['// name', '// category', '// icon', '// order'],
       rows: stacks
-        .filter((s) => includesQ(s.name, s.icon_url ?? ''))
+        .filter((s) => includesQ(s.name, s.category ?? '', s.icon_url ?? ''))
         .map(s => ({ id: s.id, item: s, cells: [
         <span style={{ color: 'hsl(0 0% 76%)' }}>{s.name}</span>,
+        <span style={{ color: 'hsl(193 80% 45%)', fontSize: 10, letterSpacing: '0.12em' }}>{s.category ?? '—'}</span>,
         <span style={{ fontSize: 10, color: s.icon_url ? 'hsl(158 64% 42%)' : 'hsl(0 0% 25%)' }}>{s.icon_url ? '✓ set' : '—'}</span>,
         <span style={{ color: 'hsl(0 0% 35%)' }}>{s.order_index}</span>,
       ]})),
     }
 
     if (tab === 'skills') return {
-      headers: ['// name', '// order'],
+      headers: ['// name', '// icon', '// order'],
       rows: skills
-        .filter((s) => includesQ(s.name))
+        .filter((s) => includesQ(s.name, s.icon_url ?? ''))
         .map(s => ({ id: s.id, item: s, cells: [
         <span style={{ color: 'hsl(0 0% 76%)' }}>{s.name}</span>,
+        <span style={{ fontSize: 10, color: s.icon_url ? 'hsl(158 64% 42%)' : 'hsl(0 0% 25%)' }}>{s.icon_url ? '✓ set' : '—'}</span>,
         <span style={{ color: 'hsl(0 0% 35%)' }}>{s.order_index}</span>,
       ]})),
     }
@@ -749,12 +772,13 @@ export default function PortfolioPage() {
     }
 
     return {
-      headers: ['// role', '// company', '// start', '// end'],
+      headers: ['// role', '// company', '// featured', '// start', '// end'],
       rows: experiences
         .filter((e) => includesQ(e.role, e.company, (e.description ?? []).join(' ')))
         .map(e => ({ id: e.id, item: e, cells: [
         <span style={{ color: 'hsl(0 0% 76%)' }}>{e.role}</span>,
         <span style={{ maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block' }}>{e.company}</span>,
+        <span style={{ color: e.featured ? 'hsl(158 64% 45%)' : 'hsl(0 0% 26%)', fontSize: 10, letterSpacing: '0.15em' }}>{e.featured ? 'yes' : 'no'}</span>,
         <span style={{ fontSize: 10, color: 'hsl(0 0% 38%)', fontFamily: 'monospace' }}>{e.start_date ?? '—'}</span>,
         <span style={{ fontSize: 10, color: e.end_date ? 'hsl(0 0% 38%)' : 'hsl(158 64% 38%)', fontFamily: 'monospace' }}>{e.end_date ?? 'Present'}</span>,
       ]})),

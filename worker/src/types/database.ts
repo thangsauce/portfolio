@@ -120,6 +120,27 @@ export type Database = {
         }
         Relationships: []
       }
+      currently_using: {
+        Row: {
+          id: string
+          name: string
+          icon_url: string | null
+          order_index: number
+        }
+        Insert: {
+          id?: string
+          name: string
+          icon_url?: string | null
+          order_index?: number
+        }
+        Update: {
+          id?: string
+          name?: string
+          icon_url?: string | null
+          order_index?: number
+        }
+        Relationships: []
+      }
       certifications: {
         Row: {
           id: string
@@ -158,6 +179,7 @@ export type Database = {
           start_date: string | null
           end_date: string | null
           description: string[]
+          featured: boolean
           order_index: number
         }
         Insert: {
@@ -167,6 +189,7 @@ export type Database = {
           start_date?: string | null
           end_date?: string | null
           description?: string[]
+          featured?: boolean
           order_index?: number
         }
         Update: {
@@ -176,6 +199,7 @@ export type Database = {
           start_date?: string | null
           end_date?: string | null
           description?: string[]
+          featured?: boolean
           order_index?: number
         }
         Relationships: []

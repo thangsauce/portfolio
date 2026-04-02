@@ -71,7 +71,8 @@ portfolio.get('/certifications', async (c) => {
 portfolio.get('/experiences', async (c) => {
   const { data, error } = await getSupabase(c.env)
     .from('experiences')
-    .select('id, company, role, start_date, end_date, description, order_index')
+    .select('id, company, role, start_date, end_date, description, featured, order_index')
+    .order('featured', { ascending: false })
     .order('order_index')
   if (error) return c.json({ error: 'Failed to fetch experiences' }, 500)
   return c.json(data)

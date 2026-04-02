@@ -216,6 +216,7 @@ const expSchema = z.object({
   start_date: z.string().optional(),
   end_date: z.string().nullable().optional(),
   description: z.array(z.string()).default([]),
+  featured: z.boolean().default(false),
   order_index: z.number().int().default(0),
 })
 
