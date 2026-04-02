@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import TransitionLink from '@/components/TransitionLink';
 import { cn } from '@/lib/utils';
 import { IProject } from '@/types';

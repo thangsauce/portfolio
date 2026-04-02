@@ -1,4 +1,5 @@
 'use client';
+/* eslint-disable @next/next/no-img-element */
 import { cn } from '@/lib/utils';
 import { apiFetch } from '@/lib/api';
 import { normalizeProjectAssetUrl } from '@/lib/projectAssets';
@@ -96,7 +97,10 @@ const ProjectList = () => {
                     .map(mapProject);
                 setProjects(mapped);
                 if (mapped.length > 0 && window.innerWidth >= 768) {
-                    setSelectedProject(mapped[0].slug);
+                    const initialWithImage = mapped.find(
+                        (project) => project.thumbnail || project.longThumbnail,
+                    );
+                    setSelectedProject(initialWithImage ? initialWithImage.slug : null);
                 }
             })
             .catch(() => {});
@@ -227,9 +231,12 @@ const ProjectList = () => {
             return;
         }
         if (window.innerWidth >= 768) {
-            setSelectedProject(currentProject.slug);
+            const firstWithImage = currentProjects.find(
+                (project) => project.thumbnail || project.longThumbnail,
+            );
+            setSelectedProject(firstWithImage ? firstWithImage.slug : null);
         }
-    }, [currentProject?.slug]);
+    }, [currentProject?.slug, currentProjects]);
 
     useGSAP(
         () => {
@@ -282,14 +289,16 @@ const ProjectList = () => {
                 </div>
 
                 <div className="group/projects relative" ref={containerRef}>
-                    {selectedProject !== null && (
+                    {selectedProject !== null && projects.some((p) => p.thumbnail || p.longThumbnail) && (
                         <div
                             className="max-md:hidden absolute -right-20 xl:-right-28 top-0 z-[1] pointer-events-none w-[200px] xl:w-[350px] aspect-[3/4] overflow-hidden opacity-100"
                             ref={imageContainer}
                         >
-                            {projects.filter(p => p.thumbnail).map((project) => (
+                            {projects
+                                .filter((project) => project.thumbnail || project.longThumbnail)
+                                .map((project) => (
                                 <img
-                                    src={project.longThumbnail ?? project.thumbnail}
+                                    src={project.longThumbnail ?? project.thumbnail ?? ''}
                                     alt="Project"
                                     className={cn(
                                         'absolute inset-0 transition-all duration-500 w-full h-full object-cover',
