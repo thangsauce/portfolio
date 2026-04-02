@@ -105,7 +105,11 @@ const Navbar = () => {
 
             const horizontalDistance = Math.max(0, track.scrollWidth - window.innerWidth);
             const rootTop = root.getBoundingClientRect().top + window.scrollY;
-            const panelOffset = Math.max(0, Math.min(horizontalDistance, panel.offsetLeft));
+            const panelRect = panel.getBoundingClientRect();
+            const targetRect = target.getBoundingClientRect();
+            const sectionOffsetInsidePanel = Math.max(0, targetRect.left - panelRect.left);
+            const targetOffset = panel.offsetLeft + sectionOffsetInsidePanel;
+            const panelOffset = Math.max(0, Math.min(horizontalDistance, targetOffset));
             const targetY = rootTop + panelOffset;
             setTimeout(() => scrollToY(targetY), 120);
             return;

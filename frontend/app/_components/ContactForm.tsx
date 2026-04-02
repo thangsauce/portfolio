@@ -2,9 +2,14 @@
 
 import { FormEvent, useRef, useState } from 'react';
 import { GENERAL_INFO } from '@/lib/data';
+import { useLenis } from 'lenis/react';
+import { usePathname, useRouter } from 'next/navigation';
 
 export function ContactSection() {
     const containerRef = useRef<HTMLDivElement>(null);
+    const lenis = useLenis();
+    const router = useRouter();
+    const pathname = usePathname();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
@@ -12,6 +17,78 @@ export function ContactSection() {
     const [status, setStatus] = useState<{ ok: boolean; msg: string } | null>(
         null,
     );
+    const PENDING_HASH_KEY = 'pending-home-hash';
+
+    const scrollToY = (y: number) => {
+        if (lenis) {
+            lenis.scrollTo(y, { duration: 1.05 });
+            return;
+        }
+        window.scrollTo({ top: y, behavior: 'smooth' });
+    };
+
+    const scrollToElement = (target: HTMLElement) => {
+        if (lenis) {
+            lenis.scrollTo(target, { duration: 1.05 });
+            return;
+        }
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    const scrollToHash = (hash: string) => {
+        const target = document.querySelector(hash) as HTMLElement | null;
+        if (!target) return;
+
+        const isHorizontalMode =
+            window.innerWidth >= 768 && !!document.querySelector('.horizontal-mode');
+
+        if (isHorizontalMode) {
+            const root = document.querySelector('.horizontal-mode') as HTMLElement | null;
+            const track = root?.firstElementChild as HTMLElement | null;
+            const panel = target.closest('.horizontal-panel') as HTMLElement | null;
+            if (!root || !track || !panel) {
+                setTimeout(() => scrollToElement(target), 120);
+                return;
+            }
+
+            const horizontalDistance = Math.max(0, track.scrollWidth - window.innerWidth);
+            const rootTop = root.getBoundingClientRect().top + window.scrollY;
+            const panelRect = panel.getBoundingClientRect();
+            const targetRect = target.getBoundingClientRect();
+            const sectionOffsetInsidePanel = Math.max(0, targetRect.left - panelRect.left);
+            const targetOffset = panel.offsetLeft + sectionOffsetInsidePanel;
+            const panelOffset = Math.max(0, Math.min(horizontalDistance, targetOffset));
+            const targetY = rootTop + panelOffset;
+            setTimeout(() => scrollToY(targetY), 120);
+            return;
+        }
+
+        setTimeout(() => scrollToElement(target), 120);
+    };
+
+    const navigateTo = (url: string) => {
+        if (url === '/') {
+            if (pathname === '/') {
+                setTimeout(() => scrollToY(0), 120);
+            } else {
+                router.push('/');
+            }
+            return;
+        }
+
+        if (!url.startsWith('/#')) {
+            router.push(url);
+            return;
+        }
+
+        const hash = url.slice(1);
+        if (pathname !== '/') {
+            window.sessionStorage.setItem(PENDING_HASH_KEY, hash);
+            router.push('/');
+            return;
+        }
+        scrollToHash(hash);
+    };
 
     async function handleEmailJsSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -223,11 +300,15 @@ export function ContactSection() {
                             aria-label="Footer links"
                             className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] uppercase tracking-[0.16em] text-muted-foreground"
                         >
-                            <a href="#banner" className="hover:text-foreground transition-colors">Home</a>
-                            <a href="#about-me" className="hover:text-foreground transition-colors">About Me</a>
-                            <a href="#selected-projects" className="hover:text-foreground transition-colors">Projects</a>
-                            <a href="/blog" className="hover:text-foreground transition-colors">Blog</a>
-                            <a href="#contact" className="hover:text-foreground transition-colors">Contact</a>
+                            <button type="button" onClick={() => navigateTo('/#banner')} className="hover:text-foreground transition-colors">Home</button>
+                            <button type="button" onClick={() => navigateTo('/#about-me')} className="hover:text-foreground transition-colors">About Me</button>
+                            <button type="button" onClick={() => navigateTo('/#currently-using')} className="hover:text-foreground transition-colors">Currently Using</button>
+                            <button type="button" onClick={() => navigateTo('/#selected-projects')} className="hover:text-foreground transition-colors">Projects</button>
+                            <button type="button" onClick={() => navigateTo('/#my-experience')} className="hover:text-foreground transition-colors">Experience</button>
+                            <button type="button" onClick={() => navigateTo('/#my-stack')} className="hover:text-foreground transition-colors">My Stack</button>
+                            <button type="button" onClick={() => navigateTo('/#certifications')} className="hover:text-foreground transition-colors">Certifications</button>
+                            <button type="button" onClick={() => navigateTo('/#contact')} className="hover:text-foreground transition-colors">Contact</button>
+                            <button type="button" onClick={() => navigateTo('/blog')} className="hover:text-foreground transition-colors">Blog</button>
                         </nav>
 
                         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
