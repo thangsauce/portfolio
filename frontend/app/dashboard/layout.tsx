@@ -92,7 +92,7 @@ const NAV = [
   { href: '/dashboard/notes',     label: 'Notes',     Icon: IconNotes                  },
   { href: '/dashboard/todos',     label: 'Todos',     Icon: IconTodos                  },
   { href: '/dashboard/learning',  label: 'Learning',  Icon: IconLearning               },
-  { href: '/dashboard/projects',  label: 'Projects',  Icon: IconProjects               },
+  { href: '/dashboard/projects',  label: 'Projects.md',  Icon: IconProjects               },
   { href: '/dashboard/blog',      label: 'Blog',      Icon: IconBlog                   },
 ]
 
