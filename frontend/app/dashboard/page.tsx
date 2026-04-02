@@ -37,7 +37,7 @@ function StatCard({ label, value, sub, color, loaded }: {
     <div style={{
       background: 'hsl(226 12% 11%)',
       border: '1px solid hsl(226 10% 16%)',
-      borderRadius: 10,
+      borderRadius: 14,
       padding: '20px 20px 18px',
     }}>
       <div style={{
@@ -146,7 +146,7 @@ export default function DashboardPage() {
           padding: '10px 18px',
           background: 'hsl(226 12% 11%)',
           border: '1px solid hsl(226 10% 16%)',
-          borderRadius: 8,
+          borderRadius: 12,
           textAlign: 'right',
         }}>
           <div style={{
@@ -196,7 +196,7 @@ export default function DashboardPage() {
         <div style={{
           background: 'hsl(226 12% 11%)',
           border: '1px solid hsl(226 10% 16%)',
-          borderRadius: 10,
+          borderRadius: 14,
           padding: '20px',
         }}>
           <h3 style={{
@@ -246,7 +246,7 @@ export default function DashboardPage() {
         <div style={{
           background: 'hsl(226 12% 11%)',
           border: '1px solid hsl(226 10% 16%)',
-          borderRadius: 10,
+          borderRadius: 14,
           padding: '20px',
         }}>
           <h3 style={{
@@ -264,7 +264,7 @@ export default function DashboardPage() {
                 style={{
                   display: 'block',
                   padding: '14px',
-                  borderRadius: 8,
+                  borderRadius: 12,
                   border: `1px solid ${hovered === href ? 'hsl(158 64% 42% / 0.3)' : 'hsl(226 10% 15%)'}`,
                   background: hovered === href ? 'hsl(158 64% 42% / 0.07)' : 'hsl(226 12% 13%)',
                   textDecoration: 'none',

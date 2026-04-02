@@ -13,6 +13,7 @@ type ApiProject = {
     images: { thumbnail: string; long: string; gallery: string[] } | null;
     year: number | null;
     source_code_url?: string | null;
+    live_url?: string | null;
 };
 
 async function fetchProjects(): Promise<ApiProject[]> {
@@ -53,6 +54,7 @@ function mapProject(p: ApiProject): IProject {
         longThumbnail: normalizeProjectAssetUrl(p.images?.long) || undefined,
         images: (p.images?.gallery ?? []).map((img) => normalizeProjectAssetUrl(img)),
         sourceCode: p.source_code_url ?? undefined,
+        liveUrl: p.live_url ?? undefined,
     };
 }
 

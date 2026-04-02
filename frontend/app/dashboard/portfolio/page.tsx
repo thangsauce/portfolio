@@ -7,7 +7,7 @@ import { apiPrivate } from '@/lib/api'
 type ProjectImages = { thumbnail?: string; long?: string; gallery?: string[] }
 type ProjectCategory = 'web_development' | 'cybersecurity' | 'network'
 type LegacyProjectCategory = ProjectCategory | 'it_systems'
-type Project    = { id: string; title: string; slug: string; description: string | null; category: LegacyProjectCategory | null; tech_stack: string[] | string | null; images: ProjectImages | null; featured: boolean; order_index: number }
+type Project    = { id: string; title: string; slug: string; description: string | null; category: LegacyProjectCategory | null; tech_stack: string[] | string | null; source_code_url?: string | null; live_url?: string | null; images: ProjectImages | null; featured: boolean; order_index: number }
 type Stack      = { id: string; name: string; category: string | null; icon_url: string | null; order_index: number }
 type Skill      = { id: string; name: string; order_index: number }
 type Cert       = { id: string; name: string; issuer: string | null; issue_date: string | null; credential_id: string | null; url: string | null }
@@ -118,6 +118,8 @@ export default function PortfolioPage() {
     description: '',
     category: 'web_development' as ProjectCategory,
     tech_stack: '',
+    source_code_url: '',
+    live_url: '',
     image_thumbnail: '',
     image_long: '',
     image_gallery: '',
@@ -167,6 +169,8 @@ export default function PortfolioPage() {
       description: '',
       category: 'web_development',
       tech_stack: '',
+      source_code_url: '',
+      live_url: '',
       image_thumbnail: '',
       image_long: '',
       image_gallery: '',
@@ -196,6 +200,8 @@ export default function PortfolioPage() {
         description: p.description ?? '',
         category: normalizeProjectCategory(p.category),
         tech_stack: toTechStackArray(p.tech_stack).join(', '),
+        source_code_url: p.source_code_url ?? '',
+        live_url: p.live_url ?? '',
         image_thumbnail: images.thumbnail ?? '',
         image_long: images.long ?? '',
         image_gallery: (images.gallery ?? []).join(', '),
@@ -236,6 +242,8 @@ export default function PortfolioPage() {
           description: pf.description || null,
           category: pf.category,
           tech_stack: pf.tech_stack.split(',').map(s => s.trim()).filter(Boolean),
+          source_code_url: pf.source_code_url.trim() || null,
+          live_url: pf.live_url.trim() || null,
           images: {
             thumbnail: pf.image_thumbnail.trim(),
             long: pf.image_long.trim(),
@@ -420,6 +428,14 @@ export default function PortfolioPage() {
         <Fld label="tech_stack (comma-separated)">
           <input style={iSt} value={pf.tech_stack} placeholder="React, TypeScript, Tailwind CSS"
             onChange={e => setPf(p => ({ ...p, tech_stack: e.target.value }))} />
+        </Fld>
+        <Fld label="github_url (optional)">
+          <input style={iSt} value={pf.source_code_url} placeholder="https://github.com/username/repo"
+            onChange={e => setPf(p => ({ ...p, source_code_url: e.target.value }))} />
+        </Fld>
+        <Fld label="website_url (optional)">
+          <input style={iSt} value={pf.live_url} placeholder="https://example.com"
+            onChange={e => setPf(p => ({ ...p, live_url: e.target.value }))} />
         </Fld>
         <Fld label="image_thumbnail (url/path/gif)">
           <input style={iSt} value={pf.image_thumbnail} placeholder="/projects/thumbnail/portfolio-thumbnail.jpg or .gif"
@@ -648,7 +664,7 @@ export default function PortfolioPage() {
       q.length === 0 || values.some((v) => (v ?? '').toLowerCase().includes(q))
 
     if (tab === 'projects') return {
-      headers: ['// title', '// slug', '// category', '// thumb', '// long', '// tech', '// featured', '// order'],
+      headers: ['// title', '// slug', '// category', '// links', '// thumb', '// long', '// tech', '// featured', '// order'],
       rows: projects
         .filter((p) => {
           const categoryPass = projectCategoryFilter === 'all' || normalizeProjectCategory(p.category) === projectCategoryFilter
@@ -659,6 +675,8 @@ export default function PortfolioPage() {
             p.description ?? '',
             PROJECT_CATEGORY_LABELS[normalizeProjectCategory(p.category)],
             toTechStackArray(p.tech_stack).join(' '),
+            p.source_code_url ?? '',
+            p.live_url ?? '',
           )
           return categoryPass && featuredPass && queryPass
         })
@@ -667,6 +685,18 @@ export default function PortfolioPage() {
         <span style={{ fontFamily: 'monospace', fontSize: 10, color: 'hsl(0 0% 38%)' }}>{p.slug}</span>,
         <span style={{ color: 'hsl(193 80% 45%)', fontSize: 10, letterSpacing: '0.12em' }}>
           {PROJECT_CATEGORY_LABELS[normalizeProjectCategory(p.category)]}
+        </span>,
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          {p.source_code_url ? (
+            <span title="GitHub link" style={{ color: 'hsl(0 0% 78%)', fontSize: 12 }}>🐙</span>
+          ) : (
+            <span style={{ color: 'hsl(0 0% 24%)', fontSize: 11 }}>—</span>
+          )}
+          {p.live_url ? (
+            <span title="Website link" style={{ color: 'hsl(193 88% 60%)', fontSize: 12 }}>🔗</span>
+          ) : (
+            <span style={{ color: 'hsl(0 0% 24%)', fontSize: 11 }}>—</span>
+          )}
         </span>,
         p.images?.thumbnail ? (
           <img

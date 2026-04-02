@@ -92,7 +92,7 @@ const NAV = [
   { href: '/dashboard/notes',     label: 'Notes',     Icon: IconNotes                  },
   { href: '/dashboard/todos',     label: 'Todos',     Icon: IconTodos                  },
   { href: '/dashboard/learning',  label: 'Learning',  Icon: IconLearning               },
-  { href: '/dashboard/projects',  label: 'Projects.md',  Icon: IconProjects               },
+  { href: '/dashboard/projects',  label: 'Projects.md', Icon: IconProjects               },
   { href: '/dashboard/blog',      label: 'Blog',      Icon: IconBlog                   },
 ]
 
@@ -192,7 +192,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               color: 'hsl(158 58% 54%)',
               boxShadow: '0 0 0 1px hsl(158 64% 36% / 0.28), 0 4px 14px hsl(158 64% 36% / 0.16)',
-              borderRadius: 6,
+              borderRadius: 10,
             }}>
               <svg
                 ref={logoEyeRef}
@@ -266,7 +266,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   fontWeight: isActive ? 500 : 400,
                   letterSpacing: '-0.01em',
                   textDecoration: 'none',
-                  borderRadius: 8,
+                  borderRadius: 10,
                   color: isActive
                     ? 'hsl(158 58% 42%)'
                     : isHov
@@ -288,7 +288,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   <div style={{
                     width: 6, height: 6, borderRadius: '50%',
                     background: 'hsl(158 64% 42%)',
-                    boxShadow: '0 0 6px hsl(158 64% 42% / 0.5)',
                     flexShrink: 0,
                   }} />
                 )}
@@ -305,7 +304,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div style={{
             display: 'flex', alignItems: 'center', gap: 10,
             padding: '10px 10px',
-            borderRadius: 8,
+            borderRadius: 10,
             background: isLight ? 'hsl(0 0% 97%)' : 'hsl(226 12% 10%)',
             marginBottom: 8,
           }}>
@@ -338,7 +337,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               width: '100%',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
               padding: '8px 12px',
-              borderRadius: 7,
+              borderRadius: 10,
               fontSize: 12, fontWeight: 500,
               color: 'hsl(0 62% 55%)',
               background: 'hsl(0 62% 52% / 0.08)',

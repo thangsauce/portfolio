@@ -23,6 +23,7 @@ const projectSchema = z.object({
   category: projectCategorySchema.default('web_development'),
   tech_stack: z.array(z.string()).default([]),
   source_code_url: z.string().url().optional().or(z.literal('')),
+  live_url: z.string().url().optional().or(z.literal('')),
   images: z.object({
     thumbnail: z.string().default(''),
     long: z.string().default(''),

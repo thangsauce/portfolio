@@ -28,6 +28,7 @@ export type Database = {
           category: string
           tech_stack: string[]
           source_code_url: string | null
+          live_url: string | null
           images: Json
           featured: boolean
           year: number | null
@@ -43,6 +44,7 @@ export type Database = {
           category?: string
           tech_stack?: string[]
           source_code_url?: string | null
+          live_url?: string | null
           images?: Json
           featured?: boolean
           year?: number | null
@@ -58,6 +60,7 @@ export type Database = {
           category?: string
           tech_stack?: string[]
           source_code_url?: string | null
+          live_url?: string | null
           images?: Json
           featured?: boolean
           year?: number | null

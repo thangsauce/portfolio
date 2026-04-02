@@ -18,6 +18,8 @@ type ApiProject = {
     description: string | null;
     category: 'web_development' | 'cybersecurity' | 'network' | 'it_systems' | null;
     tech_stack: string[];
+    source_code_url?: string | null;
+    live_url?: string | null;
     images: { thumbnail: string; long: string; gallery: string[] } | null;
     featured: boolean;
     order_index: number;
@@ -48,6 +50,8 @@ function mapProject(p: ApiProject): IProject {
         thumbnail: normalizeProjectAssetUrl(p.images?.thumbnail),
         longThumbnail: normalizeProjectAssetUrl(p.images?.long) || undefined,
         images: (p.images?.gallery ?? []).map((img) => normalizeProjectAssetUrl(img)),
+        sourceCode: p.source_code_url ?? undefined,
+        liveUrl: p.live_url ?? undefined,
     };
 }
 

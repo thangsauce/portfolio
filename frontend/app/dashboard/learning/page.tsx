@@ -72,13 +72,15 @@ function InlineAdd({ onSubmit, onCancel }: { onSubmit: (t: string) => Promise<vo
 
 // ─── Learning Card ────────────────────────────────────────────────────────────
 function LearningCard({
-  item, onUpdate, onDelete, canMoveLeft, canMoveRight,
+  item, onUpdate, onDelete, canMoveLeft, canMoveRight, onDragStart, onDragEnd,
 }: {
   item: LearningItem
   onUpdate: (id: string, patch: Partial<LearningItem>) => Promise<void>
   onDelete: (id: string) => Promise<void>
   canMoveLeft: boolean
   canMoveRight: boolean
+  onDragStart: (item: LearningItem) => void
+  onDragEnd: () => void
 }) {
   const [hovered,    setHovered]    = useState(false)
   const [confirmDel, setConfirmDel] = useState(false)
@@ -133,11 +135,15 @@ function LearningCard({
     <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => { setHovered(false); setConfirmDel(false) }}
+      draggable
+      onDragStart={() => onDragStart(item)}
+      onDragEnd={onDragEnd}
       style={{
         background: 'hsl(0 0% 12%)',
         border: `1px solid ${hovered ? 'hsl(0 0% 22%)' : 'hsl(0 0% 16%)'}`,
         padding: '10px 12px', marginBottom: 6,
         transition: 'border-color 0.12s',
+        cursor: 'grab',
       }}
     >
       {/* Title */}
@@ -316,6 +322,8 @@ export default function LearningPage() {
   const [items,    setItems]    = useState<LearningItem[]>([])
   const [loading,  setLoading]  = useState(true)
   const [addingTo, setAddingTo] = useState<LStatus | null>(null)
+  const [draggingItem, setDraggingItem] = useState<LearningItem | null>(null)
+  const [dragOverStatus, setDragOverStatus] = useState<LStatus | null>(null)
 
   useEffect(() => {
     apiPrivate<LearningItem[]>('/learning')
@@ -352,6 +360,11 @@ export default function LearningPage() {
     } catch {}
   }
 
+  async function moveItemToStatus(item: LearningItem, status: LStatus) {
+    if (item.status === status) return
+    await updateItem(item.id, { status })
+  }
+
   return (
     <div>
       <div style={{ marginBottom: 24 }}>
@@ -369,8 +382,32 @@ export default function LearningPage() {
           {STATUSES.map((status, colIdx) => {
             const conf = COL[status]
             const colItems = items.filter(i => i.status === status)
+            const isDropTarget = dragOverStatus === status && draggingItem !== null
             return (
-              <div key={status} style={{ background: conf.bg, padding: 12 }}>
+              <div
+                key={status}
+                onDragOver={(e) => {
+                  if (!draggingItem) return
+                  e.preventDefault()
+                  setDragOverStatus(status)
+                }}
+                onDragLeave={() => {
+                  if (dragOverStatus === status) setDragOverStatus(null)
+                }}
+                onDrop={async (e) => {
+                  e.preventDefault()
+                  if (draggingItem) await moveItemToStatus(draggingItem, status)
+                  setDragOverStatus(null)
+                  setDraggingItem(null)
+                }}
+                style={{
+                  background: conf.bg,
+                  padding: 12,
+                  outline: isDropTarget ? '1px dashed hsl(158 64% 42% / 0.7)' : 'none',
+                  boxShadow: isDropTarget ? 'inset 0 0 0 1px hsl(158 64% 42% / 0.2)' : 'none',
+                  transition: 'outline-color 0.12s, box-shadow 0.12s',
+                }}
+              >
 
                 {/* Column header */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
@@ -421,6 +458,11 @@ export default function LearningPage() {
                     onDelete={deleteItem}
                     canMoveLeft={colIdx > 0}
                     canMoveRight={colIdx < STATUSES.length - 1}
+                    onDragStart={(dragItem) => setDraggingItem(dragItem)}
+                    onDragEnd={() => {
+                      setDraggingItem(null)
+                      setDragOverStatus(null)
+                    }}
                   />
                 ))}
               </div>

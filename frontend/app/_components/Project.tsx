@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import { IProject } from '@/types';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
+import { ExternalLink, Github } from 'lucide-react';
 import { useRef } from 'react';
 
 interface Props {
@@ -101,8 +102,7 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
     });
 
     return (
-        <TransitionLink
-            href={`/projects?slug=${encodeURIComponent(project.slug)}`}
+        <div
             className="project-item group leading-none py-5 first:!pt-0 last:pb-0 md:group-hover/projects:opacity-30 md:hover:!opacity-100 transition-all"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
@@ -132,30 +132,61 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
                     _{(index + 1).toString().padStart(2, '0')}.
                 </div>
                 <div className="">
-                    <h4 className="text-4xl xs:text-6xl flex gap-4 font-anton transition-all duration-700 bg-gradient-to-r from-primary to-foreground from-[50%] to-[50%] bg-[length:200%] bg-right bg-clip-text text-transparent group-hover:bg-left">
-                        {project.title}
-                        <span className="text-foreground opacity-0 group-hover:opacity-100 transition-all">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="36"
-                                height="36"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                ref={externalLinkSVGRef}
-                            >
-                                <path
-                                    id="box"
-                                    d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
-                                ></path>
-                                <path id="arrow-line" d="M10 14 21 3"></path>
-                                <path id="arrow-curb" d="M15 3h6v6"></path>
-                            </svg>
-                        </span>
-                    </h4>
+                    <div className="flex items-start justify-between gap-4">
+                        <TransitionLink href={`/projects?slug=${encodeURIComponent(project.slug)}`} className="min-w-0">
+                            <h4 className="text-4xl xs:text-6xl flex gap-4 font-anton transition-all duration-700 bg-gradient-to-r from-primary to-foreground from-[50%] to-[50%] bg-[length:200%] bg-right bg-clip-text text-transparent group-hover:bg-left">
+                                {project.title}
+                                <span className="text-foreground opacity-0 group-hover:opacity-100 transition-all">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="36"
+                                        height="36"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        ref={externalLinkSVGRef}
+                                    >
+                                        <path
+                                            id="box"
+                                            d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+                                        ></path>
+                                        <path id="arrow-line" d="M10 14 21 3"></path>
+                                        <path id="arrow-curb" d="M15 3h6v6"></path>
+                                    </svg>
+                                </span>
+                            </h4>
+                        </TransitionLink>
+
+                        <div className="flex items-center gap-2.5 pt-2">
+                            {project.sourceCode && (
+                                <a
+                                    href={project.sourceCode}
+                                    target="_blank"
+                                    rel="noreferrer noopener"
+                                    className="text-muted-foreground hover:text-primary transition-colors"
+                                    aria-label={`${project.title} GitHub`}
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    <Github size={18} />
+                                </a>
+                            )}
+                            {project.liveUrl && (
+                                <a
+                                    href={project.liveUrl}
+                                    target="_blank"
+                                    rel="noreferrer noopener"
+                                    className="text-muted-foreground hover:text-primary transition-colors"
+                                    aria-label={`${project.title} website`}
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    <ExternalLink size={18} />
+                                </a>
+                            )}
+                        </div>
+                    </div>
                     <div className="mt-2 flex flex-wrap gap-3 text-muted-foreground text-xs">
                         {project.techStack
                             .slice(0, 3)
@@ -178,7 +209,7 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
                     )}
                 </div>
             </div>
-        </TransitionLink>
+        </div>
     );
 };
 
