@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 
@@ -10,7 +10,9 @@ export default function LoginPage() {
   const [error,     setError]     = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [mounted,   setMounted]   = useState(false)
-  const { login, loginWithOAuth, isAuthenticated, isLoading: authLoading } = useAuth()
+  const logoEyeRef = useRef<SVGSVGElement>(null)
+  const logoPupilRef = useRef<SVGGElement>(null)
+  const { login, isAuthenticated, isLoading: authLoading } = useAuth()
   const router = useRouter()
 
   useEffect(() => { setMounted(true) }, [])
@@ -18,6 +20,37 @@ export default function LoginPage() {
   useEffect(() => {
     if (!authLoading && isAuthenticated) router.replace('/dashboard')
   }, [isAuthenticated, authLoading, router])
+
+  useEffect(() => {
+    const eye = logoEyeRef.current
+    const pupil = logoPupilRef.current
+    if (!eye || !pupil) return
+
+    const onMove = (e: MouseEvent) => {
+      const rect = eye.getBoundingClientRect()
+      const cx = rect.left + rect.width / 2
+      const cy = rect.top + rect.height / 2
+      const dx = e.clientX - cx
+      const dy = e.clientY - cy
+      const max = 4.2
+      const dist = Math.hypot(dx, dy) || 1
+      const clamped = Math.min(max, dist)
+      const x = (dx / dist) * clamped
+      const y = (dy / dist) * clamped
+      pupil.setAttribute('transform', `translate(${x} ${y})`)
+    }
+
+    const onLeave = () => {
+      pupil.setAttribute('transform', 'translate(0 0)')
+    }
+
+    window.addEventListener('mousemove', onMove, { passive: true })
+    window.addEventListener('mouseleave', onLeave, { passive: true })
+    return () => {
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseleave', onLeave)
+    }
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -29,17 +62,6 @@ export default function LoginPage() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Invalid email or password')
     } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handleOAuth = async (provider: 'google' | 'github') => {
-    setError(null)
-    setIsLoading(true)
-    try {
-      await loginWithOAuth(provider)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'OAuth sign-in failed')
       setIsLoading(false)
     }
   }
@@ -66,14 +88,41 @@ export default function LoginPage() {
           <div style={{
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
             width: 44, height: 44,
-            background: 'hsl(158 64% 36%)',
+            background: 'hsl(226 12% 13%)',
+            border: '1px solid hsl(158 64% 36% / 0.32)',
+            boxShadow: '0 6px 18px hsl(158 64% 36% / 0.22)',
             borderRadius: 14,
-            fontFamily: 'var(--font-anton)',
-            fontSize: 16, letterSpacing: '0.04em',
-            color: '#fff',
+            color: 'hsl(158 64% 54%)',
             marginBottom: 18,
           }}>
-            TL
+            <svg
+              ref={logoEyeRef}
+              width="30"
+              height="18"
+              viewBox="0 0 44 28"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <defs>
+                <clipPath id="triumph-eye-clip">
+                  <path d="M3 14C7.8 6 14.8 2.5 22 2.5C29.2 2.5 36.2 6 41 14C36.2 22 29.2 25.5 22 25.5C14.8 25.5 7.8 22 3 14Z" />
+                </clipPath>
+              </defs>
+              <path
+                d="M3 14C7.8 6 14.8 2.5 22 2.5C29.2 2.5 36.2 6 41 14C36.2 22 29.2 25.5 22 25.5C14.8 25.5 7.8 22 3 14Z"
+                fill="hsl(226 12% 10%)"
+                stroke="currentColor"
+                strokeWidth="2.2"
+              />
+              <g clipPath="url(#triumph-eye-clip)">
+                <rect x="0" y="0" width="44" height="28" fill="hsl(220 12% 90%)" />
+                <g ref={logoPupilRef}>
+                  <circle cx="22" cy="14" r="5" fill="hsl(158 64% 36%)" />
+                  <circle cx="22" cy="14" r="1.5" fill="hsl(220 12% 90%)" />
+                </g>
+              </g>
+            </svg>
           </div>
           <h1 style={{
             fontSize: 22, fontWeight: 600, letterSpacing: '-0.02em',
@@ -97,60 +146,6 @@ export default function LoginPage() {
           padding: '28px 28px 24px',
         }}>
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-            {/* OAuth */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <button
-                type="button"
-                disabled={isLoading}
-                onClick={() => handleOAuth('google')}
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  background: 'hsl(226 12% 10%)',
-                  color: 'hsl(220 12% 88%)',
-                  border: '1px solid hsl(226 10% 20%)',
-                  borderRadius: 10,
-                  fontSize: 13,
-                  letterSpacing: '-0.01em',
-                  cursor: isLoading ? 'not-allowed' : 'pointer',
-                  opacity: isLoading ? 0.7 : 1,
-                  fontFamily: 'var(--font-roboto-flex)',
-                }}
-              >
-                Continue with Google
-              </button>
-              <button
-                type="button"
-                disabled={isLoading}
-                onClick={() => handleOAuth('github')}
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  background: 'hsl(226 12% 10%)',
-                  color: 'hsl(220 12% 88%)',
-                  border: '1px solid hsl(226 10% 20%)',
-                  borderRadius: 10,
-                  fontSize: 13,
-                  letterSpacing: '-0.01em',
-                  cursor: isLoading ? 'not-allowed' : 'pointer',
-                  opacity: isLoading ? 0.7 : 1,
-                  fontFamily: 'var(--font-roboto-flex)',
-                }}
-              >
-                Continue with GitHub
-              </button>
-            </div>
-
-            <div style={{
-              fontSize: 10,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              color: 'hsl(220 6% 30%)',
-              textAlign: 'center',
-            }}>
-              or use email and password
-            </div>
-
             {/* Email */}
             <div>
               <label htmlFor="email" style={{
