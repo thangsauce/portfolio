@@ -131,12 +131,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname()
   const [mounted, setMounted] = useState(false)
   const [hoveredNav, setHoveredNav] = useState<string | null>(null)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   useEffect(() => { setMounted(true) }, [])
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) router.push('/login')
-  }, [isAuthenticated, isLoading, router])
+    if (!isLoading && !isAuthenticated && !isLoggingOut) router.push('/triumph')
+  }, [isAuthenticated, isLoading, isLoggingOut, router])
 
   if (isLoading || !isAuthenticated) return null
 
@@ -241,7 +242,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {user?.email ?? '—'}
           </div>
           <button
-            onClick={async () => { await logout(); router.push('/login') }}
+            onClick={async () => {
+              setIsLoggingOut(true)
+              try {
+                await logout()
+                router.push('/')
+              } catch {
+                setIsLoggingOut(false)
+              }
+            }}
             style={{
               display: 'flex', alignItems: 'center', gap: 7,
               fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase',
