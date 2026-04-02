@@ -22,6 +22,7 @@ const Banner = () => {
     const [showCursor, setShowCursor] = React.useState(false);
     const [showEmoji,  setShowEmoji]  = React.useState(false);
     const bubblePrefix = "Hi! I'm ";
+    type ProjectCategoryKey = 'web_development' | 'cybersecurity' | 'it_systems';
 
     const goToContact = () => {
         if (typeof window === 'undefined') return;
@@ -51,6 +52,43 @@ const Banner = () => {
 
         if (lenis) {
             lenis.scrollTo('#contact', { duration: 1.05 });
+        } else {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    };
+
+    const goToProjectsCategory = (category: ProjectCategoryKey) => {
+        if (typeof window === 'undefined') return;
+        const target = document.querySelector('#selected-projects') as HTMLElement | null;
+        if (!target) return;
+
+        window.dispatchEvent(
+            new CustomEvent('portfolio:project-category', { detail: category }),
+        );
+
+        const isHorizontalMode =
+            window.innerWidth >= 768 && !!document.querySelector('.horizontal-mode');
+
+        if (isHorizontalMode) {
+            const root = document.querySelector('.horizontal-mode') as HTMLElement | null;
+            const track = root?.firstElementChild as HTMLElement | null;
+            const panel = target.closest('.horizontal-panel') as HTMLElement | null;
+            if (root && track && panel) {
+                const horizontalDistance = Math.max(0, track.scrollWidth - window.innerWidth);
+                const rootTop = root.getBoundingClientRect().top + window.scrollY;
+                const panelOffset = Math.max(0, Math.min(horizontalDistance, panel.offsetLeft));
+                const targetY = rootTop + panelOffset;
+                if (lenis) {
+                    lenis.scrollTo(targetY, { duration: 1.05 });
+                } else {
+                    window.scrollTo({ top: targetY, behavior: 'smooth' });
+                }
+                return;
+            }
+        }
+
+        if (lenis) {
+            lenis.scrollTo('#selected-projects', { duration: 1.05 });
         } else {
             target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
@@ -165,28 +203,40 @@ const Banner = () => {
                         </div>
                         <p className="banner-description slide-up-and-fade mt-5 max-w-[52ch] text-base sm:text-lg leading-relaxed text-muted-foreground">
                             For most of the days, I dedicate most of my time to{' '}
-                            <span className="inline-flex items-center gap-1.5 text-foreground text-[1.08em] transition-all duration-200 hover:text-primary hover:[text-shadow:0_0_10px_rgba(52,211,153,0.55)] hover:[&>svg]:[filter:drop-shadow(0_0_6px_rgba(52,211,153,0.75))]">
+                            <button
+                                type="button"
+                                onClick={() => goToProjectsCategory('web_development')}
+                                className="inline-flex items-center gap-1.5 text-foreground text-[1.08em] transition-all duration-200 hover:text-primary hover:[text-shadow:0_0_10px_rgba(52,211,153,0.55)] hover:[&>svg]:[filter:drop-shadow(0_0_6px_rgba(52,211,153,0.75))]"
+                            >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-primary transition-all duration-200">
                                     <polyline points="16 18 22 12 16 6" />
                                     <polyline points="8 6 2 12 8 18" />
                                 </svg>
                                 web development
-                            </span>,{' '}
-                            <span className="inline-flex items-center gap-1.5 text-foreground text-[1.08em] transition-all duration-200 hover:text-primary hover:[text-shadow:0_0_10px_rgba(52,211,153,0.55)] hover:[&>svg]:[filter:drop-shadow(0_0_6px_rgba(52,211,153,0.75))]">
+                            </button>,{' '}
+                            <button
+                                type="button"
+                                onClick={() => goToProjectsCategory('cybersecurity')}
+                                className="inline-flex items-center gap-1.5 text-foreground text-[1.08em] transition-all duration-200 hover:text-primary hover:[text-shadow:0_0_10px_rgba(52,211,153,0.55)] hover:[&>svg]:[filter:drop-shadow(0_0_6px_rgba(52,211,153,0.75))]"
+                            >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-primary transition-all duration-200">
                                     <path d="M12 2 4 5v6c0 5 3.4 9.6 8 11 4.6-1.4 8-6 8-11V5l-8-3z" />
                                 </svg>
                                 cybersecurity
-                            </span>,{' '}
+                            </button>,{' '}
                             <span className="text-muted-foreground">and</span>{' '}
-                            <span className="inline-flex items-center gap-1.5 text-foreground text-[1.08em] transition-all duration-200 hover:text-primary hover:[text-shadow:0_0_10px_rgba(52,211,153,0.55)] hover:[&>svg]:[filter:drop-shadow(0_0_6px_rgba(52,211,153,0.75))]">
+                            <button
+                                type="button"
+                                onClick={() => goToProjectsCategory('it_systems')}
+                                className="inline-flex items-center gap-1.5 text-foreground text-[1.08em] transition-all duration-200 hover:text-primary hover:[text-shadow:0_0_10px_rgba(52,211,153,0.55)] hover:[&>svg]:[filter:drop-shadow(0_0_6px_rgba(52,211,153,0.75))]"
+                            >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-primary transition-all duration-200">
                                     <rect x="3" y="4" width="18" height="12" rx="2" />
                                     <path d="M8 20h8" />
                                     <path d="M12 16v4" />
                                 </svg>
                                 IT systems
-                            </span>. I love taking new ideas and build it into a functioning product.
+                            </button>. I love taking new ideas and build it into a functioning product.
                         </p>
                         <div className="flex gap-4 flex-wrap mt-9 banner-button slide-up-and-fade">
                             <Button
@@ -234,14 +284,13 @@ const Banner = () => {
                             }
                         `}</style>
 
-                        <div style={{
-                            position: 'absolute',
-                            top: -30,
-                            right: -38,
-                            zIndex: 10,
-                            transformOrigin: 'bottom right',
-                            animation: 'bubble-in 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) 3.8s both',
-                        }}>
+                        <div
+                            className="absolute top-3 right-2 md:-top-8 md:-right-10 z-10"
+                            style={{
+                                transformOrigin: 'bottom right',
+                                animation: 'bubble-in 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) 3.8s both',
+                            }}
+                        >
                             {/* Bubble body */}
                             <div style={{
                                 background: '#ffffff',

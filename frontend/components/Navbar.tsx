@@ -11,7 +11,7 @@ import { SOCIAL_LINKS } from '@/lib/data';
 const MENU_LINKS = [
     {
         name: 'Home',
-        url: '/',
+        url: '/#banner',
     },
     {
         name: 'About Me',
@@ -68,6 +68,7 @@ const Navbar = () => {
         originX: 0,
         originY: 0,
     });
+    const PENDING_HASH_KEY = 'pending-home-hash';
 
     const scrollToY = (y: number) => {
         if (lenis) {
@@ -77,29 +78,7 @@ const Navbar = () => {
         window.scrollTo({ top: y, behavior: 'smooth' });
     };
 
-    const navigateTo = (url: string) => {
-        setIsMenuOpen(false);
-
-        if (url === '/') {
-            if (pathname === '/') {
-                setTimeout(() => scrollToY(0), 120);
-            } else {
-                router.push('/');
-            }
-            return;
-        }
-
-        if (!url.startsWith('/#')) {
-            router.push(url);
-            return;
-        }
-
-        if (pathname !== '/') {
-            router.push(url);
-            return;
-        }
-
-        const hash = url.slice(1); // "#section-id"
+    const scrollToHash = (hash: string) => {
         const target = document.querySelector(hash) as HTMLElement | null;
         if (!target) return;
 
@@ -127,6 +106,48 @@ const Navbar = () => {
         // Mobile/normal layout.
         setTimeout(() => lenis?.scrollTo(hash), 120);
     };
+
+    const navigateTo = (url: string) => {
+        setIsMenuOpen(false);
+
+        if (url === '/') {
+            if (pathname === '/') {
+                setTimeout(() => scrollToY(0), 120);
+            } else {
+                router.push('/');
+            }
+            return;
+        }
+
+        if (!url.startsWith('/#')) {
+            router.push(url);
+            return;
+        }
+
+        const hash = url.slice(1); // "#section-id"
+
+        if (pathname !== '/') {
+            window.sessionStorage.setItem(PENDING_HASH_KEY, hash);
+            router.push('/');
+            return;
+        }
+
+        scrollToHash(hash);
+    };
+
+    useEffect(() => {
+        if (pathname !== '/') return;
+        const pendingHash = window.sessionStorage.getItem(PENDING_HASH_KEY);
+        if (!pendingHash) return;
+
+        const run = () => {
+            scrollToHash(pendingHash);
+            window.sessionStorage.removeItem(PENDING_HASH_KEY);
+        };
+
+        const timer = window.setTimeout(run, 220);
+        return () => window.clearTimeout(timer);
+    }, [pathname, lenis]);
 
     useEffect(() => {
         function handleScroll() {
@@ -406,9 +427,9 @@ const Navbar = () => {
                                         {'internal' in link && link.internal ? (
                                             <button
                                                 onClick={() => navigateTo(link.url)}
-                                            className="group flex items-center gap-2.5 text-base md:text-lg capitalize text-foreground hover:text-primary transition-colors duration-200"
+                                            className="group flex items-center gap-2.5 text-base md:text-lg capitalize text-foreground transition-colors duration-200 hover:text-white"
                                             >
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-foreground/75 transition-all duration-200 group-hover:text-primary group-hover:[filter:drop-shadow(0_0_6px_#4ade80)]">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-foreground/75 transition-all duration-200 group-hover:text-white group-hover:[filter:drop-shadow(0_0_8px_rgba(255,255,255,0.95))]">
                                                     <path d="M4 19.5V4.5a.5.5 0 0 1 .8-.4L10 8h10a.5.5 0 0 1 .5.5v10.5a.5.5 0 0 1-.5.5H4.5a.5.5 0 0 1-.5-.5Z" />
                                                     <path d="M8 12h8" />
                                                     <path d="M8 15h6" />
@@ -482,8 +503,8 @@ const Navbar = () => {
                                     }}
                                     className="group flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors duration-200"
                                 >
+                                    <MoveUpRight size={16} className="group-hover:-translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-200" />
                                     <span className="text-sm md:text-base uppercase tracking-widest">Let's Connect</span>
-                                    <MoveUpRight size={16} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-200" />
                                 </button>
 
                                 <button

@@ -26,6 +26,7 @@ type ApiProject = {
 type ProjectGroupKey = 'web_development' | 'cybersecurity' | 'it_systems';
 type GroupedProjects = Record<ProjectGroupKey, IProject[]>;
 type CategoryOption = { key: ProjectGroupKey; title: string };
+type ProjectCategoryEvent = CustomEvent<ProjectGroupKey>;
 
 function mapProject(p: ApiProject): IProject {
     const slug = p.slug.toLowerCase();
@@ -71,6 +72,7 @@ const ProjectList = () => {
     const [selectedProject, setSelectedProject] = useState<string | null>(null);
     const [activeCategory, setActiveCategory] = useState<ProjectGroupKey>('web_development');
     const [flipDirection, setFlipDirection] = useState<1 | -1>(1);
+    const [isMobile, setIsMobile] = useState(false);
     const [activePage, setActivePage] = useState<Record<ProjectGroupKey, number>>({
         web_development: 0,
         cybersecurity: 0,
@@ -89,6 +91,35 @@ const ProjectList = () => {
                 }
             })
             .catch(() => {});
+    }, []);
+
+    useEffect(() => {
+        const handleCategoryJump = (event: Event) => {
+            const customEvent = event as ProjectCategoryEvent;
+            const category = customEvent.detail;
+            if (!category) return;
+            setFlipDirection(1);
+            setActiveCategory(category);
+            setActivePage((prev) => ({ ...prev, [category]: 0 }));
+        };
+
+        window.addEventListener(
+            'portfolio:project-category',
+            handleCategoryJump as EventListener,
+        );
+        return () => {
+            window.removeEventListener(
+                'portfolio:project-category',
+                handleCategoryJump as EventListener,
+            );
+        };
+    }, []);
+
+    useEffect(() => {
+        const updateViewport = () => setIsMobile(window.innerWidth < 768);
+        updateViewport();
+        window.addEventListener('resize', updateViewport, { passive: true });
+        return () => window.removeEventListener('resize', updateViewport);
     }, []);
 
     // update imageRef.current href based on the cursor hover position
@@ -174,10 +205,11 @@ const ProjectList = () => {
     ];
     const currentCategoryIndex = categories.findIndex((c) => c.key === activeCategory);
     const activeProjects = grouped[activeCategory];
-    const totalPages = Math.max(1, Math.ceil(activeProjects.length / 2));
+    const itemsPerPage = isMobile ? 1 : 2;
+    const totalPages = Math.max(1, Math.ceil(activeProjects.length / itemsPerPage));
     const currentPage = Math.min(activePage[activeCategory], totalPages - 1);
-    const startIndex = currentPage * 2;
-    const currentProjects = activeProjects.slice(startIndex, startIndex + 2);
+    const startIndex = currentPage * itemsPerPage;
+    const currentProjects = activeProjects.slice(startIndex, startIndex + itemsPerPage);
     const currentProject = currentProjects[0];
 
     useEffect(() => {

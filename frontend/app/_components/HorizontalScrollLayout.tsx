@@ -89,6 +89,43 @@ const HorizontalScrollLayout = ({ children }: Props) => {
                 };
             });
 
+            mm.add('(max-width: 767px)', () => {
+                const mobileParallaxTweens: gsap.core.Tween[] = [];
+                const panelEls = gsap.utils.toArray<HTMLElement>(
+                    track.querySelectorAll('.horizontal-panel'),
+                );
+
+                panelEls.forEach((panel) => {
+                    const content = panel.querySelector<HTMLElement>('.horizontal-panel-content');
+                    if (!content) return;
+                    const target = content.querySelector<HTMLElement>('.container') ?? content;
+
+                    const parallaxTween = gsap.fromTo(
+                        target,
+                        { yPercent: 8 },
+                        {
+                            yPercent: -8,
+                            ease: 'none',
+                            scrollTrigger: {
+                                trigger: panel,
+                                start: 'top bottom',
+                                end: 'bottom top',
+                                scrub: 1,
+                                invalidateOnRefresh: true,
+                            },
+                        },
+                    );
+                    mobileParallaxTweens.push(parallaxTween);
+                });
+
+                return () => {
+                    mobileParallaxTweens.forEach((pt) => {
+                        pt.scrollTrigger?.kill();
+                        pt.kill();
+                    });
+                };
+            });
+
             return () => mm.revert();
         },
         { scope: rootRef, dependencies: [panels.length] },
