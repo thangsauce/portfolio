@@ -148,11 +148,11 @@ export function ContactSection() {
                         <button
                             type="button"
                             onClick={() => router.push('/blog')}
-                            className="pointer-events-auto group inline-flex items-center gap-2 rounded-full border border-primary/35 bg-background/85 px-4 py-2 text-[11px] uppercase tracking-[0.18em] text-primary shadow-[0_8px_24px_rgba(0,0,0,0.22)] backdrop-blur-sm transition-all hover:border-primary hover:bg-background hover:text-foreground"
+                            className="pointer-events-auto group inline-flex items-center gap-2 bg-transparent px-0 py-0 text-[12px] uppercase tracking-[0.22em] text-primary/90 transition-colors hover:text-foreground"
                         >
-                            <span className="text-primary group-hover:text-foreground transition-colors">&lt;</span>
-                            Blog
-                            <span className="text-primary group-hover:text-foreground transition-colors">&gt;</span>
+                            <span className="text-primary/90 group-hover:text-foreground transition-colors">&lt;</span>
+                            <span>BLOG</span>
+                            <span className="text-primary/90 group-hover:text-foreground transition-colors">&gt;</span>
                         </button>
                     </div>,
                     document.body,

@@ -24,6 +24,13 @@ function formatDate(dateStr: string): string {
   })
 }
 
+function formatTime(dateStr: string): string {
+  return new Date(dateStr).toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+  })
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function BlogPostClient({ slug }: { slug: string }) {
   const [post,     setPost]     = useState<Post | null>(null)
@@ -74,11 +81,9 @@ export default function BlogPostClient({ slug }: { slug: string }) {
             {/* Header */}
             <header style={{ marginBottom: 52, borderBottom: '1px solid hsl(0 0% 11%)', paddingBottom: 32 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20, flexWrap: 'wrap' }}>
-                {post.published_at && (
-                  <span style={{ fontSize: 10, letterSpacing: '0.2em', color: 'hsl(0 0% 30%)', textTransform: 'uppercase' }}>
-                    {formatDate(post.published_at)}
-                  </span>
-                )}
+                <span style={{ fontSize: 10, letterSpacing: '0.2em', color: 'hsl(0 0% 30%)', textTransform: 'uppercase' }}>
+                  {formatDate(post.published_at ?? post.created_at)} · {formatTime(post.published_at ?? post.created_at)}
+                </span>
                 {post.tags.map(tag => (
                   <span key={tag} style={{
                     fontSize: 9, letterSpacing: '0.22em', textTransform: 'uppercase',
