@@ -5,7 +5,6 @@ import { IProject } from '@/types';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
-import Image from 'next/image';
 import React, { useRef, useState, useEffect, MouseEvent } from 'react';
 import Project from './Project';
 
@@ -16,14 +15,14 @@ type ApiProject = {
     title: string;
     slug: string;
     description: string | null;
-    category: 'web_development' | 'cybersecurity' | 'it_systems' | null;
+    category: 'web_development' | 'cybersecurity' | 'network' | 'it_systems' | null;
     tech_stack: string[];
     images: { thumbnail: string; long: string; gallery: string[] } | null;
     featured: boolean;
     order_index: number;
 }
 
-type ProjectGroupKey = 'web_development' | 'cybersecurity' | 'it_systems';
+type ProjectGroupKey = 'web_development' | 'cybersecurity' | 'network';
 type GroupedProjects = Record<ProjectGroupKey, IProject[]>;
 type CategoryOption = { key: ProjectGroupKey; title: string };
 type ProjectCategoryEvent = CustomEvent<ProjectGroupKey>;
@@ -41,7 +40,9 @@ function mapProject(p: ApiProject): IProject {
         year: new Date().getFullYear(),
         description: p.description ?? '',
         role: '',
-        category: isCampusLabSiem ? 'cybersecurity' : (p.category ?? 'web_development'),
+        category: isCampusLabSiem
+            ? 'cybersecurity'
+            : (p.category === 'it_systems' ? 'network' : (p.category ?? 'web_development')),
         techStack: p.tech_stack ?? [],
         thumbnail: p.images?.thumbnail ?? '',
         longThumbnail: p.images?.long || undefined,
@@ -56,7 +57,7 @@ function groupProjects(projects: IProject[]): GroupedProjects {
             acc[category].push(project);
             return acc;
         },
-        { web_development: [], cybersecurity: [], it_systems: [] },
+        { web_development: [], cybersecurity: [], network: [] },
     );
 }
 
@@ -76,7 +77,7 @@ const ProjectList = () => {
     const [activePage, setActivePage] = useState<Record<ProjectGroupKey, number>>({
         web_development: 0,
         cybersecurity: 0,
-        it_systems: 0,
+        network: 0,
     });
 
     useEffect(() => {
@@ -201,11 +202,11 @@ const ProjectList = () => {
     const categories: CategoryOption[] = [
         { key: 'web_development', title: 'Web Development' },
         { key: 'cybersecurity', title: 'Cybersecurity' },
-        { key: 'it_systems', title: 'IT Systems' },
+        { key: 'network', title: 'Network' },
     ];
     const currentCategoryIndex = categories.findIndex((c) => c.key === activeCategory);
     const activeProjects = grouped[activeCategory];
-    const itemsPerPage = isMobile ? 1 : 2;
+    const itemsPerPage = isMobile ? 1 : 3;
     const totalPages = Math.max(1, Math.ceil(activeProjects.length / itemsPerPage));
     const currentPage = Math.min(activePage[activeCategory], totalPages - 1);
     const startIndex = currentPage * itemsPerPage;
@@ -279,17 +280,15 @@ const ProjectList = () => {
                             ref={imageContainer}
                         >
                             {projects.filter(p => p.thumbnail).map((project) => (
-                                <Image
+                                <img
                                     src={project.longThumbnail ?? project.thumbnail}
                                     alt="Project"
-                                    width={400}
-                                    height={500}
                                     className={cn(
                                         'absolute inset-0 transition-all duration-500 w-full h-full object-cover',
                                         { 'opacity-0': project.slug !== selectedProject },
                                     )}
-                                    ref={imageRef}
                                     key={project.slug}
+                                    ref={project.slug === selectedProject ? imageRef : undefined}
                                 />
                             ))}
                         </div>

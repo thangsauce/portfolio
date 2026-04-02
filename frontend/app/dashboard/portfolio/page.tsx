@@ -5,8 +5,9 @@ import { apiPrivate } from '@/lib/api'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 type ProjectImages = { thumbnail?: string; long?: string; gallery?: string[] }
-type ProjectCategory = 'web_development' | 'cybersecurity' | 'it_systems'
-type Project    = { id: string; title: string; slug: string; description: string | null; category: ProjectCategory | null; tech_stack: string[] | string | null; images: ProjectImages | null; featured: boolean; order_index: number }
+type ProjectCategory = 'web_development' | 'cybersecurity' | 'network'
+type LegacyProjectCategory = ProjectCategory | 'it_systems'
+type Project    = { id: string; title: string; slug: string; description: string | null; category: LegacyProjectCategory | null; tech_stack: string[] | string | null; images: ProjectImages | null; featured: boolean; order_index: number }
 type Stack      = { id: string; name: string; category: string | null; icon_url: string | null; order_index: number }
 type Skill      = { id: string; name: string; order_index: number }
 type Cert       = { id: string; name: string; issuer: string | null; issue_date: string | null; credential_id: string | null; url: string | null }
@@ -55,7 +56,17 @@ function parseCsvUrls(csv: string) {
 }
 
 const SKILL_CATEGORIES = ['frontend', 'backend', 'database', 'tools', 'it_support'] as const
-const PROJECT_CATEGORIES: ProjectCategory[] = ['web_development', 'cybersecurity', 'it_systems']
+const PROJECT_CATEGORIES: ProjectCategory[] = ['web_development', 'cybersecurity', 'network']
+const PROJECT_CATEGORY_LABELS: Record<ProjectCategory, string> = {
+  web_development: 'Web Development',
+  cybersecurity: 'Cybersecurity',
+  network: 'Network',
+}
+
+function normalizeProjectCategory(value: LegacyProjectCategory | null | undefined): ProjectCategory {
+  if (!value || value === 'it_systems') return 'network'
+  return value
+}
 
 function normalizeSkillCategory(value: string) {
   const normalized = value.toLowerCase().trim().replace(/[\s-]+/g, '_')
@@ -183,7 +194,7 @@ export default function PortfolioPage() {
         title: p.title,
         slug: p.slug,
         description: p.description ?? '',
-        category: p.category ?? 'web_development',
+        category: normalizeProjectCategory(p.category),
         tech_stack: toTechStackArray(p.tech_stack).join(', '),
         image_thumbnail: images.thumbnail ?? '',
         image_long: images.long ?? '',
@@ -402,7 +413,7 @@ export default function PortfolioPage() {
           <select style={{ ...iSt, appearance: 'none' }} value={pf.category}
             onChange={e => setPf(p => ({ ...p, category: e.target.value as ProjectCategory }))}>
             {PROJECT_CATEGORIES.map(c => (
-              <option key={c} value={c}>{c}</option>
+              <option key={c} value={c}>{PROJECT_CATEGORY_LABELS[c]}</option>
             ))}
           </select>
         </Fld>
@@ -410,13 +421,13 @@ export default function PortfolioPage() {
           <input style={iSt} value={pf.tech_stack} placeholder="React, TypeScript, Tailwind CSS"
             onChange={e => setPf(p => ({ ...p, tech_stack: e.target.value }))} />
         </Fld>
-        <Fld label="image_thumbnail (url/path)">
-          <input style={iSt} value={pf.image_thumbnail} placeholder="/projects/thumbnail/portfolio-thumbnail.jpg"
+        <Fld label="image_thumbnail (url/path/gif)">
+          <input style={iSt} value={pf.image_thumbnail} placeholder="/projects/thumbnail/portfolio-thumbnail.jpg or .gif"
             onChange={e => setPf(p => ({ ...p, image_thumbnail: e.target.value }))} />
           <div style={{ marginTop: 8 }}>
             <input
               type="file"
-              accept="image/*"
+              accept="image/*,.gif,image/gif"
               disabled={uploadingProjectImage.thumbnail}
               onChange={async (e) => {
                 await handleSingleProjectImageUpload('thumbnail', e.target.files?.[0] ?? null)
@@ -425,7 +436,7 @@ export default function PortfolioPage() {
               style={{ ...iSt, padding: '6px 11px' }}
             />
             <div style={{ fontSize: 10, letterSpacing: '0.08em', color: 'hsl(0 0% 32%)', marginTop: 6 }}>
-              {uploadingProjectImage.thumbnail ? 'uploading_thumbnail...' : 'upload thumbnail from computer'}
+              {uploadingProjectImage.thumbnail ? 'uploading_thumbnail...' : 'upload thumbnail (jpg/png/webp/gif) from computer'}
             </div>
           </div>
         </Fld>
@@ -435,7 +446,7 @@ export default function PortfolioPage() {
           <div style={{ marginTop: 8 }}>
             <input
               type="file"
-              accept="image/*"
+              accept="image/*,.gif,image/gif"
               disabled={uploadingProjectImage.long}
               onChange={async (e) => {
                 await handleSingleProjectImageUpload('long', e.target.files?.[0] ?? null)
@@ -454,7 +465,7 @@ export default function PortfolioPage() {
           <div style={{ marginTop: 8 }}>
             <input
               type="file"
-              accept="image/*"
+              accept="image/*,.gif,image/gif"
               multiple
               disabled={uploadingProjectImage.gallery}
               onChange={async (e) => {
@@ -637,16 +648,16 @@ export default function PortfolioPage() {
       q.length === 0 || values.some((v) => (v ?? '').toLowerCase().includes(q))
 
     if (tab === 'projects') return {
-      headers: ['// title', '// slug', '// category', '// tech', '// featured', '// order'],
+      headers: ['// title', '// slug', '// category', '// thumb', '// long', '// tech', '// featured', '// order'],
       rows: projects
         .filter((p) => {
-          const categoryPass = projectCategoryFilter === 'all' || (p.category ?? 'web_development') === projectCategoryFilter
+          const categoryPass = projectCategoryFilter === 'all' || normalizeProjectCategory(p.category) === projectCategoryFilter
           const featuredPass = featuredFilter === 'all' || (featuredFilter === 'yes' ? p.featured : !p.featured)
           const queryPass = includesQ(
             p.title,
             p.slug,
             p.description ?? '',
-            p.category ?? 'web_development',
+            PROJECT_CATEGORY_LABELS[normalizeProjectCategory(p.category)],
             toTechStackArray(p.tech_stack).join(' '),
           )
           return categoryPass && featuredPass && queryPass
@@ -654,7 +665,27 @@ export default function PortfolioPage() {
         .map(p => ({ id: p.id, item: p, cells: [
         <span style={{ color: 'hsl(0 0% 76%)' }}>{p.title}</span>,
         <span style={{ fontFamily: 'monospace', fontSize: 10, color: 'hsl(0 0% 38%)' }}>{p.slug}</span>,
-        <span style={{ color: 'hsl(193 80% 45%)', fontSize: 10, letterSpacing: '0.12em' }}>{p.category ?? 'web_development'}</span>,
+        <span style={{ color: 'hsl(193 80% 45%)', fontSize: 10, letterSpacing: '0.12em' }}>
+          {PROJECT_CATEGORY_LABELS[normalizeProjectCategory(p.category)]}
+        </span>,
+        p.images?.thumbnail ? (
+          <img
+            src={p.images.thumbnail}
+            alt={`${p.title} thumbnail`}
+            style={{ width: 64, height: 42, objectFit: 'cover', borderRadius: 4, border: '1px solid hsl(0 0% 20%)' }}
+          />
+        ) : (
+          <span style={{ color: 'hsl(0 0% 26%)', fontSize: 10 }}>—</span>
+        ),
+        p.images?.long ? (
+          <img
+            src={p.images.long}
+            alt={`${p.title} long`}
+            style={{ width: 44, height: 56, objectFit: 'cover', borderRadius: 4, border: '1px solid hsl(0 0% 20%)' }}
+          />
+        ) : (
+          <span style={{ color: 'hsl(0 0% 26%)', fontSize: 10 }}>—</span>
+        ),
         <span style={{ fontSize: 10, color: 'hsl(0 0% 38%)' }}>{toTechStackArray(p.tech_stack).slice(0, 2).join(', ')}{toTechStackArray(p.tech_stack).length > 2 ? ' …' : ''}</span>,
         <span style={{ color: p.featured ? 'hsl(158 64% 45%)' : 'hsl(0 0% 26%)', fontSize: 10, letterSpacing: '0.15em' }}>{p.featured ? 'yes' : 'no'}</span>,
         <span style={{ color: 'hsl(0 0% 35%)' }}>{p.order_index}</span>,
@@ -792,7 +823,7 @@ export default function PortfolioPage() {
                 >
                   <option value="all">all categories</option>
                   {PROJECT_CATEGORIES.map((c) => (
-                    <option key={c} value={c}>{c}</option>
+                    <option key={c} value={c}>{PROJECT_CATEGORY_LABELS[c]}</option>
                   ))}
                 </select>
                 <select

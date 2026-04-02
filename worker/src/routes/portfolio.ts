@@ -13,7 +13,10 @@ portfolio.get('/projects', async (c) => {
     .select('id, title, slug, description, tech_stack, source_code_url, images, featured, category, year, order_index')
     .order('order_index')
   if (error) return c.json({ error: 'Failed to fetch projects' }, 500)
-  return c.json(data)
+  return c.json((data ?? []).map((project) => ({
+    ...project,
+    category: project.category === 'it_systems' ? 'network' : project.category,
+  })))
 })
 
 portfolio.get('/projects/:slug', async (c) => {
@@ -23,7 +26,10 @@ portfolio.get('/projects/:slug', async (c) => {
     .eq('slug', c.req.param('slug'))
     .single()
   if (error || !data) return c.json({ error: 'Project not found' }, 404)
-  return c.json(data)
+  return c.json({
+    ...data,
+    category: data.category === 'it_systems' ? 'network' : data.category,
+  })
 })
 
 portfolio.get('/skills', async (c) => {

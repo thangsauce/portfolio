@@ -20,7 +20,7 @@ export interface IProject {
     year: number;
     description: string;
     role: string;
-    category?: 'web_development' | 'cybersecurity' | 'it_systems';
+    category?: 'web_development' | 'cybersecurity' | 'network';
     techStack: string[];
     thumbnail: string;
     longThumbnail?: string;

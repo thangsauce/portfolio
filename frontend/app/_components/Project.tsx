@@ -3,7 +3,6 @@ import { cn } from '@/lib/utils';
 import { IProject } from '@/types';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
-import Image from 'next/image';
 import { useRef } from 'react';
 
 interface Props {
@@ -108,11 +107,9 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
             onMouseLeave={handleMouseLeave}
         >
             {selectedProject === null && project.thumbnail && (
-                <Image
+                <img
                     src={project.thumbnail}
                     alt="Project"
-                    width="300"
-                    height="200"
                     className={cn(
                         'w-full object-cover mb-6 aspect-[3/2] object-top',
                     )}

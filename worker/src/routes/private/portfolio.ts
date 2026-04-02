@@ -8,7 +8,10 @@ const r = new Hono<{ Bindings: Env; Variables: Variables }>()
 const RESUME_BUCKET = 'portfolio-assets'
 const RESUME_PATH = 'resume/resume.pdf'
 const PROJECTS_PATH = 'projects'
-const projectCategorySchema = z.enum(['web_development', 'cybersecurity', 'it_systems'])
+const projectCategorySchema = z.preprocess(
+  (value) => (value === 'it_systems' ? 'network' : value),
+  z.enum(['web_development', 'cybersecurity', 'network']),
+)
 
 // ── Projects ──────────────────────────────────────────────────────────────────
 

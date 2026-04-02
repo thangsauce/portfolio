@@ -25,6 +25,18 @@ function reltime(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
+function formatDateTime(dateStr: string): string {
+  const d = new Date(dateStr)
+  if (Number.isNaN(d.getTime())) return '—'
+  return d.toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  })
+}
+
 // ─── Icons ────────────────────────────────────────────────────────────────────
 const sv = { width: 13, height: 13, viewBox: '0 0 16 16', fill: 'none', stroke: 'currentColor', strokeWidth: '1.5', strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, style: { display: 'block' as const } }
 function IcPlus()   { return <svg {...sv}><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg> }
@@ -103,6 +115,15 @@ function NoteEditor({
             marginBottom: 18,
           }}
         />
+
+        <div style={{ display: 'flex', gap: 16, marginBottom: 12, flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 10, letterSpacing: '0.08em', color: 'hsl(0 0% 34%)', textTransform: 'uppercase' }}>
+            created: {formatDateTime(note.created_at)}
+          </span>
+          <span style={{ fontSize: 10, letterSpacing: '0.08em', color: 'hsl(0 0% 34%)', textTransform: 'uppercase' }}>
+            last edited: {formatDateTime(note.updated_at)}
+          </span>
+        </div>
       </div>
 
       {/* BlockNote */}
@@ -157,13 +178,14 @@ export default function NotesPage() {
   }
 
   const saveNote = useCallback(async (id: string, title: string, content: any[]) => {
-    await apiPrivate(`/notes/${id}`, {
+    const updated = await apiPrivate<Note>(`/notes/${id}`, {
       method: 'PUT',
       body: JSON.stringify({ title, content }),
     })
     setNotes(prev => prev.map(n =>
-      n.id === id ? { ...n, title, updated_at: new Date().toISOString() } : n
+      n.id === id ? { ...n, title: updated.title, updated_at: updated.updated_at, created_at: updated.created_at } : n
     ))
+    setActiveNote(prev => (prev && prev.id === id ? updated : prev))
   }, [])
 
   async function deleteNote(id: string) {
@@ -277,7 +299,10 @@ export default function NotesPage() {
                       {note.title || 'Untitled'}
                     </div>
                     <div style={{ fontSize: 9, letterSpacing: '0.15em', color: 'hsl(0 0% 26%)', textTransform: 'uppercase' }}>
-                      {reltime(note.updated_at)}
+                      edited {reltime(note.updated_at)}
+                    </div>
+                    <div style={{ fontSize: 9, letterSpacing: '0.12em', color: 'hsl(0 0% 30%)', textTransform: 'uppercase', marginTop: 2 }}>
+                      created {formatDateTime(note.created_at)}
                     </div>
                   </div>
 
