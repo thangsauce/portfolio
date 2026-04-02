@@ -56,6 +56,7 @@ const HorizontalScrollLayout = ({ children }: Props) => {
                 );
 
                 panelEls.forEach((panel) => {
+                    if (panel.querySelector('.align-lock')) return;
                     const content = panel.querySelector<HTMLElement>('.horizontal-panel-content');
                     if (!content) return;
                     const target = content.querySelector<HTMLElement>('.container') ?? content;
