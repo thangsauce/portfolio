@@ -10,6 +10,11 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 type Skill = { id: string; name: string; icon_url?: string | null }
 
+function shouldInvertIconInDarkMode(name: string): boolean {
+    const normalized = name.trim().toLowerCase();
+    return normalized === 'zed' || normalized === 'notion';
+}
+
 const CurrentlyUsing = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [skills, setSkills] = useState<Skill[]>([]);
@@ -111,7 +116,7 @@ const CurrentlyUsing = () => {
                                             alt={skill.name}
                                             width={40}
                                             height={40}
-                                            className="w-8 h-8 object-contain object-left"
+                                            className={`w-8 h-8 object-contain object-left ${shouldInvertIconInDarkMode(skill.name) ? 'dark:brightness-0 dark:invert' : ''}`}
                                         />
                                     ) : null}
                                 </div>

@@ -28,6 +28,11 @@ function formatCategoryLabel(category: string): string {
     return category.replace(/_/g, ' ');
 }
 
+function shouldInvertIconInDarkMode(name: string): boolean {
+    const normalized = name.trim().toLowerCase();
+    return normalized === 'zed' || normalized === 'notion';
+}
+
 const Skills = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [skills, setSkills] = useState<Skill[]>([]);
@@ -110,9 +115,9 @@ const Skills = () => {
                                     {formatCategoryLabel(category)}
                                 </p>
                             </div>
-                            <div className="sm:col-span-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-x-6 gap-y-8 items-start justify-items-start">
+                            <div className="sm:col-span-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-x-12 gap-y-8 items-start justify-items-start">
                                 {items.map((item) => (
-                                    <div key={item.id} className="slide-up flex items-center gap-2.5 min-w-0 w-full">
+                                    <div key={item.id} className="slide-up flex items-center gap-2.5 min-w-0 w-full pl-4 md:pl-6">
                                         <div className="w-8 h-8 shrink-0 flex items-center justify-start">
                                             {item.icon_url ? (
                                                 <Image
@@ -120,7 +125,7 @@ const Skills = () => {
                                                     alt={item.name}
                                                     width={32}
                                                     height={32}
-                                                    className="w-8 h-8 object-contain object-left"
+                                                    className={`w-8 h-8 object-contain object-left ${shouldInvertIconInDarkMode(item.name) ? 'dark:brightness-0 dark:invert' : ''}`}
                                                 />
                                             ) : null}
                                         </div>
