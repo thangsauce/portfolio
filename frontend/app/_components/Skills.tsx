@@ -102,7 +102,7 @@ const Skills = () => {
                     <span className="text-primary font-mono text-xl leading-none select-none">&gt;</span>
                 </div>
 
-                <div className="space-y-10 md:max-h-[62vh] md:overflow-y-auto md:pr-2">
+                <div className="space-y-10">
                     {entries.map(([category, items]) => (
                         <div className="grid gap-4 sm:grid-cols-12" key={category}>
                             <div className="sm:col-span-4">
@@ -110,7 +110,7 @@ const Skills = () => {
                                     {formatCategoryLabel(category)}
                                 </p>
                             </div>
-                            <div className="sm:col-span-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-x-8 gap-y-5 items-start justify-items-start">
+                            <div className="sm:col-span-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-x-6 gap-y-5 items-start justify-items-start">
                                 {items.map((item) => (
                                     <div className="slide-up flex items-center gap-2.5 leading-none min-w-0 w-full" key={item.id}>
                                         <div className="w-8 h-8 shrink-0 flex items-center justify-start">
