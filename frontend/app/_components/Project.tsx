@@ -165,7 +165,7 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
                             ))}
                     </div>
                     {project.description && (
-                        <p className="mt-3 max-w-3xl text-sm md:text-base text-muted-foreground leading-relaxed">
+                        <p className="max-w-3xl text-sm md:text-base text-muted-foreground leading-relaxed overflow-hidden transition-all duration-500 ease-out max-md:mt-3 max-md:max-h-40 max-md:opacity-100 md:mt-0 md:max-h-0 md:opacity-0 md:group-hover:mt-3 md:group-hover:max-h-40 md:group-hover:opacity-100">
                             {project.description}
                         </p>
                     )}
