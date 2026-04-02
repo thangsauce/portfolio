@@ -25,6 +25,7 @@ type ApiProject = {
 
 type ProjectGroupKey = 'web_development' | 'cybersecurity' | 'it_systems';
 type GroupedProjects = Record<ProjectGroupKey, IProject[]>;
+type CategoryOption = { key: ProjectGroupKey; title: string };
 
 function mapProject(p: ApiProject): IProject {
     return {
@@ -60,6 +61,12 @@ const ProjectList = () => {
 
     const [projects, setProjects] = useState<IProject[]>([]);
     const [selectedProject, setSelectedProject] = useState<string | null>(null);
+    const [activeCategory, setActiveCategory] = useState<ProjectGroupKey>('web_development');
+    const [activeIndex, setActiveIndex] = useState<Record<ProjectGroupKey, number>>({
+        web_development: 0,
+        cybersecurity: 0,
+        it_systems: 0,
+    });
 
     useEffect(() => {
         apiFetch<ApiProject[]>('/api/portfolio/projects')
@@ -151,11 +158,33 @@ const ProjectList = () => {
     };
 
     const grouped = groupProjects(projects);
-    const sections: Array<{ key: ProjectGroupKey; title: string; items: IProject[] }> = [
-        { key: 'web_development', title: 'Web Development Projects', items: grouped.web_development },
-        { key: 'cybersecurity', title: 'Cybersecurity Projects', items: grouped.cybersecurity },
-        { key: 'it_systems', title: 'IT Systems Projects', items: grouped.it_systems },
+    const categories: CategoryOption[] = [
+        { key: 'web_development', title: 'Web Development' },
+        { key: 'cybersecurity', title: 'Cybersecurity' },
+        { key: 'it_systems', title: 'IT Systems' },
     ];
+    const activeProjects = grouped[activeCategory];
+    const currentIndex = Math.min(activeIndex[activeCategory], Math.max(0, activeProjects.length - 1));
+    const currentProject = activeProjects[currentIndex];
+
+    useEffect(() => {
+        if (!currentProject) {
+            setSelectedProject(null);
+            return;
+        }
+        if (window.innerWidth >= 768) {
+            setSelectedProject(currentProject.slug);
+        }
+    }, [currentProject?.slug]);
+
+    const flipProject = (direction: 1 | -1) => {
+        if (activeProjects.length <= 1) return;
+        setActiveIndex((prev) => {
+            const count = activeProjects.length;
+            const next = (prev[activeCategory] + direction + count) % count;
+            return { ...prev, [activeCategory]: next };
+        });
+    };
 
     if (projects.length === 0) return null;
 
@@ -194,24 +223,59 @@ const ProjectList = () => {
                     )}
 
                     <div className="flex flex-col max-md:gap-10" ref={projectListRef}>
-                        {sections.map((section) => (
-                            section.items.length > 0 ? (
-                                <div key={section.key} className="mb-10 last:mb-0">
-                                    <h3 className="text-sm sm:text-base uppercase tracking-[0.22em] text-primary/90 mb-5">
-                                        {section.title}
-                                    </h3>
-                                    {section.items.map((project, index) => (
-                                        <Project
-                                            index={index}
-                                            project={project}
-                                            selectedProject={selectedProject}
-                                            onMouseEnter={handleMouseEnter}
-                                            key={`${section.key}-${project.slug}`}
-                                        />
-                                    ))}
-                                </div>
-                            ) : null
-                        ))}
+                        <div className="mb-6 flex flex-wrap items-center gap-2.5">
+                            {categories.map((category) => (
+                                <button
+                                    key={category.key}
+                                    type="button"
+                                    onClick={() => setActiveCategory(category.key)}
+                                    className={cn(
+                                        'rounded-full border px-4 py-1.5 text-xs sm:text-sm uppercase tracking-[0.16em] transition-all',
+                                        activeCategory === category.key
+                                            ? 'border-primary/55 bg-primary/15 text-primary'
+                                            : 'border-border text-muted-foreground hover:border-primary/35 hover:text-foreground',
+                                    )}
+                                >
+                                    {category.title}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="mb-6 flex items-center gap-3">
+                            <button
+                                type="button"
+                                onClick={() => flipProject(-1)}
+                                disabled={activeProjects.length <= 1}
+                                className="h-9 w-9 rounded-full border border-border text-foreground disabled:opacity-35 disabled:cursor-not-allowed hover:border-primary/45 hover:text-primary transition-colors"
+                                aria-label="Previous project"
+                            >
+                                ‹
+                            </button>
+                            <span className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
+                                {activeProjects.length > 0 ? `${currentIndex + 1} / ${activeProjects.length}` : '0 / 0'}
+                            </span>
+                            <button
+                                type="button"
+                                onClick={() => flipProject(1)}
+                                disabled={activeProjects.length <= 1}
+                                className="h-9 w-9 rounded-full border border-border text-foreground disabled:opacity-35 disabled:cursor-not-allowed hover:border-primary/45 hover:text-primary transition-colors"
+                                aria-label="Next project"
+                            >
+                                ›
+                            </button>
+                        </div>
+
+                        {currentProject ? (
+                            <Project
+                                index={currentIndex}
+                                project={currentProject}
+                                selectedProject={selectedProject}
+                                onMouseEnter={handleMouseEnter}
+                                key={`${activeCategory}-${currentProject.slug}`}
+                            />
+                        ) : (
+                            <p className="text-sm text-muted-foreground">No projects in this category yet.</p>
+                        )}
                     </div>
                 </div>
             </div>
