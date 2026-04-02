@@ -103,7 +103,7 @@ const CurrentlyUsing = () => {
                 </div>
 
                 {skills.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-6 items-start justify-items-start">
+                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-6 items-start justify-items-start">
                         {skills.map((skill) => (
                             <div
                                 key={skill.id}

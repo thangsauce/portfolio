@@ -110,12 +110,12 @@ const Skills = () => {
                 <div className="space-y-10">
                     {entries.map(([category, items]) => (
                         <div className="grid gap-4 sm:grid-cols-12" key={category}>
-                            <div className="sm:col-span-4">
+                            <div className="sm:col-span-4 lg:col-span-3">
                                 <p className="slide-up text-3xl md:text-4xl font-anton leading-none text-muted-foreground uppercase">
                                     {formatCategoryLabel(category)}
                                 </p>
                             </div>
-                            <div className="sm:col-span-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-x-12 gap-y-8 items-start justify-items-start">
+                            <div className="sm:col-span-8 lg:col-span-9 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-x-12 gap-y-8 items-start justify-items-start">
                                 {items.map((item) => (
                                     <div key={item.id} className="slide-up flex items-center gap-2.5 min-w-0 w-full pl-4 md:pl-6">
                                         <div className="w-8 h-8 shrink-0 flex items-center justify-start">

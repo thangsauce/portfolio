@@ -2,14 +2,9 @@
 
 import { FormEvent, useRef, useState } from 'react';
 import { GENERAL_INFO } from '@/lib/data';
-import { useLenis } from 'lenis/react';
-import { usePathname, useRouter } from 'next/navigation';
 
 export function ContactSection() {
     const containerRef = useRef<HTMLDivElement>(null);
-    const lenis = useLenis();
-    const router = useRouter();
-    const pathname = usePathname();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
@@ -79,67 +74,9 @@ export function ContactSection() {
         }
     }
 
-    const handleBackToHome = () => {
-        if (typeof window === 'undefined') return;
-
-        if (pathname !== '/') {
-            router.push('/');
-            return;
-        }
-
-        const scrollToY = (y: number) => {
-            if (lenis) {
-                lenis.scrollTo(y, { duration: 1.2 });
-                return;
-            }
-            window.scrollTo({ top: y, behavior: 'smooth' });
-        };
-
-        const isHorizontalMode =
-            window.innerWidth >= 768 && !!document.querySelector('.horizontal-mode');
-
-        if (isHorizontalMode) {
-            scrollToY(0);
-            return;
-        }
-
-        if (lenis) {
-            lenis.scrollTo(0, { duration: 1.2 });
-            return;
-        }
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
     return (
         <>
             <section className="relative pt-16 pb-24 md:pt-28 md:pb-24" id="contact" ref={containerRef}>
-            <button
-                type="button"
-                onClick={handleBackToHome}
-                aria-label="Back to home"
-                className="group absolute bottom-6 right-6 md:bottom-10 md:right-10 inline-flex items-center gap-3 text-primary hover:text-foreground transition-colors z-20"
-            >
-                <span className="inline-flex h-10 w-10 items-center justify-center">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="22"
-                        height="22"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.4"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="rotate-90 md:rotate-0 transition-transform duration-300 ease-out group-hover:-translate-y-1.5 md:group-hover:translate-y-0 md:group-hover:-translate-x-1.5"
-                    >
-                        <path d="M19 12H5" />
-                        <path d="m12 19-7-7 7-7" />
-                    </svg>
-                </span>
-                <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground group-hover:text-foreground transition-colors">
-                    Back To Home
-                </span>
-            </button>
             <div className="container">
                 <div className="max-w-2xl">
                     <h2 className="text-4xl md:text-5xl font-anton leading-none mb-10">

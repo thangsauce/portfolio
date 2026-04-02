@@ -218,7 +218,7 @@ const ProjectList = () => {
     ];
     const currentCategoryIndex = categories.findIndex((c) => c.key === activeCategory);
     const activeProjects = grouped[activeCategory];
-    const itemsPerPage = isMobile ? 1 : 2;
+    const itemsPerPage = isMobile ? Math.max(1, activeProjects.length) : 2;
     const totalPages = Math.max(1, Math.ceil(activeProjects.length / itemsPerPage));
     const currentPage = Math.min(activePage[activeCategory], totalPages - 1);
     const startIndex = currentPage * itemsPerPage;
@@ -343,29 +343,31 @@ const ProjectList = () => {
                             ))}
                         </div>
 
-                        <div className="mb-4 md:mb-6 flex items-center gap-3">
-                            <button
-                                type="button"
-                                onClick={() => flipProject(-1)}
-                                disabled={totalPages <= 1}
-                                className="h-9 w-9 rounded-full border border-border text-foreground disabled:opacity-35 disabled:cursor-not-allowed hover:border-primary/45 hover:text-primary transition-colors"
-                                aria-label="Previous project"
-                            >
-                                ‹
-                            </button>
-                            <span className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
-                                {activeProjects.length > 0 ? `${currentPage + 1} / ${totalPages}` : '0 / 0'}
-                            </span>
-                            <button
-                                type="button"
-                                onClick={() => flipProject(1)}
-                                disabled={totalPages <= 1}
-                                className="h-9 w-9 rounded-full border border-border text-foreground disabled:opacity-35 disabled:cursor-not-allowed hover:border-primary/45 hover:text-primary transition-colors"
-                                aria-label="Next project"
-                            >
-                                ›
-                            </button>
-                        </div>
+                        {!isMobile && (
+                            <div className="mb-4 md:mb-6 flex items-center gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => flipProject(-1)}
+                                    disabled={totalPages <= 1}
+                                    className="h-9 w-9 rounded-full border border-border text-foreground disabled:opacity-35 disabled:cursor-not-allowed hover:border-primary/45 hover:text-primary transition-colors"
+                                    aria-label="Previous project"
+                                >
+                                    ‹
+                                </button>
+                                <span className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
+                                    {activeProjects.length > 0 ? `${currentPage + 1} / ${totalPages}` : '0 / 0'}
+                                </span>
+                                <button
+                                    type="button"
+                                    onClick={() => flipProject(1)}
+                                    disabled={totalPages <= 1}
+                                    className="h-9 w-9 rounded-full border border-border text-foreground disabled:opacity-35 disabled:cursor-not-allowed hover:border-primary/45 hover:text-primary transition-colors"
+                                    aria-label="Next project"
+                                >
+                                    ›
+                                </button>
+                            </div>
+                        )}
 
                         {currentProjects.length > 0 ? (
                             <div
