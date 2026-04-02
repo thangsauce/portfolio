@@ -43,8 +43,8 @@ portfolio.get('/skills', async (c) => {
 
 portfolio.get('/currently_using', async (c) => {
   const { data, error } = await getSupabase(c.env)
-    .from('skills')
-    .select('id, name, order_index')
+    .from('currently_using')
+    .select('id, name, icon_url, order_index')
     .order('order_index')
   if (error) return c.json({ error: 'Failed to fetch currently using items' }, 500)
   return c.json(data)

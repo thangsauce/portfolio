@@ -15,9 +15,31 @@ const CurrentlyUsing = () => {
     const [skills, setSkills] = useState<Skill[]>([]);
 
     useEffect(() => {
-        apiFetch<Skill[]>('/api/portfolio/currently_using')
-            .then(setSkills)
-            .catch(() => {});
+        let alive = true;
+        const load = async () => {
+            const endpoints = [
+                '/api/portfolio/currently_using',
+                '/api/portfolio/currently-using',
+                '/api/portfolio/skills',
+            ];
+            for (const endpoint of endpoints) {
+                try {
+                    const data = await apiFetch<Skill[]>(endpoint);
+                    if (!alive) return;
+                    if (Array.isArray(data)) {
+                        setSkills(data);
+                        return;
+                    }
+                } catch {
+                    // Try next endpoint for compatibility across deployments.
+                }
+            }
+            if (alive) setSkills([]);
+        };
+        void load();
+        return () => {
+            alive = false;
+        };
     }, []);
 
     useGSAP(
@@ -66,10 +88,8 @@ const CurrentlyUsing = () => {
         { scope: containerRef },
     );
 
-    if (skills.length === 0) return null;
-
     return (
-        <section className="pt-0 pb-section" id="it-skills" ref={containerRef}>
+        <section className="pt-0 pb-section" id="currently-using" ref={containerRef}>
             <div className="container">
                 <div className="flex items-center gap-3 mb-10">
                     <span className="text-primary font-mono text-xl leading-none select-none">&lt;</span>
@@ -77,27 +97,31 @@ const CurrentlyUsing = () => {
                     <span className="text-primary font-mono text-xl leading-none select-none">&gt;</span>
                 </div>
 
-                <div className="flex gap-x-11 gap-y-9 flex-wrap">
-                    {skills.map((skill) => (
-                        <div
-                            key={skill.id}
-                            className="it-skill-item flex gap-3.5 items-center leading-none"
-                        >
-                            {skill.icon_url && (
-                                <div>
-                                    <Image
-                                        src={skill.icon_url}
-                                        alt={skill.name}
-                                        width={40}
-                                        height={40}
-                                        className="max-h-10"
-                                    />
-                                </div>
-                            )}
-                            <span className="text-2xl capitalize">{skill.name}</span>
-                        </div>
-                    ))}
-                </div>
+                {skills.length > 0 ? (
+                    <div className="flex gap-x-11 gap-y-9 flex-wrap">
+                        {skills.map((skill) => (
+                            <div
+                                key={skill.id}
+                                className="it-skill-item flex gap-3.5 items-center leading-none"
+                            >
+                                {skill.icon_url && (
+                                    <div>
+                                        <Image
+                                            src={skill.icon_url}
+                                            alt={skill.name}
+                                            width={40}
+                                            height={40}
+                                            className="max-h-10"
+                                        />
+                                    </div>
+                                )}
+                                <span className="text-2xl capitalize">{skill.name}</span>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-muted-foreground text-base">No currently using items yet.</p>
+                )}
             </div>
         </section>
     );
