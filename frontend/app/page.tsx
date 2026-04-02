@@ -4,7 +4,7 @@ import Certifications from './_components/Certifications';
 import { ContactSection } from './_components/ContactForm';
 import Experiences from './_components/Experiences';
 import HorizontalScrollLayout from './_components/HorizontalScrollLayout';
-import ITSkills from './_components/ITSkills';
+import CurrentlyUsing from './_components/CurrentlyUsing';
 import Skills from './_components/Skills';
 import ProjectList from './_components/ProjectList';
 
@@ -24,7 +24,7 @@ export default function Home() {
                 <ProjectList />
             </div>
             <div className="page- md:pl-40 lg:pl-64 xl:pl-80">
-                <ITSkills />
+                <CurrentlyUsing />
             </div>
             <div className="page- md:pl-44 lg:pl-72 xl:pl-96">
                 <Skills />

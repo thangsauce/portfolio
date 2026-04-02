@@ -10,7 +10,7 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 type Skill = { id: string; name: string; icon_url: string | null }
 
-const ITSkills = () => {
+const CurrentlyUsing = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [skills, setSkills] = useState<Skill[]>([]);
 
@@ -105,4 +105,4 @@ const ITSkills = () => {
     );
 };
 
-export default ITSkills;
+export default CurrentlyUsing;
