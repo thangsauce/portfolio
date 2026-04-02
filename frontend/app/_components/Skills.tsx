@@ -53,7 +53,7 @@ const Skills = () => {
             if (isHorizontalMode) {
                 gsap.from('.slide-up', {
                     opacity: 0,
-                    y: 40,
+                    y: 24,
                     ease: 'power2.out',
                     stagger: 0.08,
                     duration: 0.8,
@@ -62,7 +62,7 @@ const Skills = () => {
             }
             gsap.from('.slide-up', {
                 opacity: 0,
-                y: 40,
+                y: 24,
                 ease: 'power2.out',
                 stagger: 0.08,
                 scrollTrigger: {
@@ -110,20 +110,20 @@ const Skills = () => {
                                     {formatCategoryLabel(category)}
                                 </p>
                             </div>
-                            <div className="sm:col-span-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-10 gap-y-5">
+                            <div className="sm:col-span-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-10 gap-y-5 items-start justify-items-start">
                                 {items.map((item) => (
-                                    <div className="slide-up flex gap-2.5 items-center leading-none min-w-0" key={item.id}>
-                                        {item.icon_url && (
-                                            <div className="w-9 h-9 shrink-0 flex items-center justify-center">
+                                    <div className="slide-up flex items-center gap-2.5 leading-none min-w-0 w-full" key={item.id}>
+                                        <div className="w-8 h-8 shrink-0 flex items-center justify-start">
+                                            {item.icon_url ? (
                                                 <Image
                                                     src={item.icon_url}
                                                     alt={item.name}
                                                     width={32}
                                                     height={32}
-                                                    className="w-8 h-8 object-contain"
+                                                    className="w-8 h-8 object-contain object-left"
                                                 />
-                                            </div>
-                                        )}
+                                            ) : null}
+                                        </div>
                                         <span className="text-lg md:text-xl capitalize break-words">{item.name}</span>
                                     </div>
                                 ))}
