@@ -7,7 +7,7 @@ import { apiPrivate } from '@/lib/api'
 type ProjectImages = { thumbnail?: string; long?: string; gallery?: string[] }
 type ProjectCategory = 'web_development' | 'cybersecurity' | 'network'
 type LegacyProjectCategory = ProjectCategory | 'it_systems'
-type Project    = { id: string; title: string; slug: string; description: string | null; category: LegacyProjectCategory | null; tech_stack: string[] | string | null; source_code_url?: string | null; live_url?: string | null; images: ProjectImages | null; featured: boolean; order_index: number }
+type Project    = { id: string; title: string; slug: string; description: string | null; done_for?: string | null; category: LegacyProjectCategory | null; tech_stack: string[] | string | null; source_code_url?: string | null; live_url?: string | null; images: ProjectImages | null; featured: boolean; order_index: number }
 type Stack      = { id: string; name: string; category: string | null; icon_url: string | null; order_index: number }
 type Skill      = { id: string; name: string; order_index: number }
 type Cert       = { id: string; name: string; issuer: string | null; issue_date: string | null; credential_id: string | null; url: string | null }
@@ -116,6 +116,7 @@ export default function PortfolioPage() {
     title: '',
     slug: '',
     description: '',
+    done_for: '',
     category: 'web_development' as ProjectCategory,
     tech_stack: '',
     source_code_url: '',
@@ -167,6 +168,7 @@ export default function PortfolioPage() {
       title: '',
       slug: '',
       description: '',
+      done_for: '',
       category: 'web_development',
       tech_stack: '',
       source_code_url: '',
@@ -198,6 +200,7 @@ export default function PortfolioPage() {
         title: p.title,
         slug: p.slug,
         description: p.description ?? '',
+        done_for: p.done_for ?? '',
         category: normalizeProjectCategory(p.category),
         tech_stack: toTechStackArray(p.tech_stack).join(', '),
         source_code_url: p.source_code_url ?? '',
@@ -240,6 +243,7 @@ export default function PortfolioPage() {
           title: pf.title,
           slug: pf.slug,
           description: pf.description || null,
+          done_for: pf.done_for.trim() || null,
           category: pf.category,
           tech_stack: pf.tech_stack.split(',').map(s => s.trim()).filter(Boolean),
           source_code_url: pf.source_code_url.trim() || null,
@@ -416,6 +420,10 @@ export default function PortfolioPage() {
         <Fld label="description">
           <textarea style={{ ...iSt, resize: 'vertical' }} rows={4} value={pf.description} placeholder="Project description..."
             onChange={e => setPf(p => ({ ...p, description: e.target.value }))} />
+        </Fld>
+        <Fld label="done_for (who this project was for)">
+          <input style={iSt} value={pf.done_for} placeholder="Client / Organization / Team"
+            onChange={e => setPf(p => ({ ...p, done_for: e.target.value }))} />
         </Fld>
         <Fld label="category">
           <select style={{ ...iSt, appearance: 'none' }} value={pf.category}
@@ -664,7 +672,7 @@ export default function PortfolioPage() {
       q.length === 0 || values.some((v) => (v ?? '').toLowerCase().includes(q))
 
     if (tab === 'projects') return {
-      headers: ['// title', '// slug', '// category', '// links', '// thumb', '// long', '// tech', '// featured', '// order'],
+      headers: ['// title', '// slug', '// done for', '// category', '// links', '// thumb', '// long', '// tech', '// featured', '// order'],
       rows: projects
         .filter((p) => {
           const categoryPass = projectCategoryFilter === 'all' || normalizeProjectCategory(p.category) === projectCategoryFilter
@@ -683,6 +691,7 @@ export default function PortfolioPage() {
         .map(p => ({ id: p.id, item: p, cells: [
         <span style={{ color: 'hsl(0 0% 76%)' }}>{p.title}</span>,
         <span style={{ fontFamily: 'monospace', fontSize: 10, color: 'hsl(0 0% 38%)' }}>{p.slug}</span>,
+        <span style={{ color: 'hsl(0 0% 62%)', fontSize: 10 }}>{p.done_for ?? '—'}</span>,
         <span style={{ color: 'hsl(193 80% 45%)', fontSize: 10, letterSpacing: '0.12em' }}>
           {PROJECT_CATEGORY_LABELS[normalizeProjectCategory(p.category)]}
         </span>,
