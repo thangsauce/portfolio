@@ -1,10 +1,9 @@
 'use client';
 
-import { FormEvent, useEffect, useRef, useState } from 'react';
+import { FormEvent, useRef, useState } from 'react';
 import { GENERAL_INFO } from '@/lib/data';
 import { useLenis } from 'lenis/react';
 import { usePathname, useRouter } from 'next/navigation';
-import { createPortal } from 'react-dom';
 
 export function ContactSection() {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -15,32 +14,9 @@ export function ContactSection() {
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
     const [sending, setSending] = useState(false);
-    const [showBlogDrop, setShowBlogDrop] = useState(false);
-    const [canPortal, setCanPortal] = useState(false);
     const [status, setStatus] = useState<{ ok: boolean; msg: string } | null>(
         null,
     );
-
-    useEffect(() => {
-        setCanPortal(true);
-    }, []);
-
-    useEffect(() => {
-        const node = containerRef.current;
-        if (!node) return;
-
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                setShowBlogDrop(entry.isIntersecting && entry.intersectionRatio > 0.28);
-            },
-            {
-                threshold: [0, 0.18, 0.28, 0.5, 0.8, 1],
-            },
-        );
-
-        observer.observe(node);
-        return () => observer.disconnect();
-    }, []);
 
     async function handleEmailJsSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -136,31 +112,6 @@ export function ContactSection() {
 
     return (
         <>
-            {canPortal &&
-                createPortal(
-                    <div
-                        className={`pointer-events-none fixed left-1/2 top-10 z-[7] -translate-x-1/2 transition-all duration-500 ease-out ${
-                            showBlogDrop
-                                ? 'translate-y-0 opacity-100'
-                                : '-translate-y-8 opacity-0'
-                        }`}
-                    >
-                        <button
-                            type="button"
-                            onClick={() => router.push('/blog')}
-                            className="pointer-events-auto group inline-flex items-center gap-2 bg-transparent px-0 py-0 text-[12px] uppercase tracking-[0.22em] text-primary/90 transition-colors hover:text-foreground"
-                        >
-                            <span className="text-primary/90 group-hover:text-foreground transition-colors">&lt;</span>
-                            <span className="relative inline-flex size-2.5 items-center justify-center">
-                                <span className="absolute inline-flex size-2.5 animate-ping rounded-full bg-primary/70 opacity-75" />
-                                <span className="relative inline-flex size-1.5 rounded-full bg-primary" />
-                            </span>
-                            <span>BLOG</span>
-                            <span className="text-primary/90 group-hover:text-foreground transition-colors">&gt;</span>
-                        </button>
-                    </div>,
-                    document.body,
-                )}
             <section className="relative pt-16 pb-24 md:pt-28 md:pb-24" id="contact" ref={containerRef}>
             <button
                 type="button"
@@ -311,6 +262,16 @@ export function ContactSection() {
                 </div>
             </div>
             </section>
+            <footer className="border-t border-border/60 bg-background/60">
+                <div className="container py-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs tracking-wide">
+                    <p className="text-muted-foreground">
+                        © {new Date().getFullYear()} Thang Le. All rights reserved.
+                    </p>
+                    <p className="text-muted-foreground">
+                        Built with care in Orlando, FL.
+                    </p>
+                </div>
+            </footer>
         </>
     );
 }
