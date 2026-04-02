@@ -110,7 +110,7 @@ const Skills = () => {
                                     {formatCategoryLabel(category)}
                                 </p>
                             </div>
-                            <div className="sm:col-span-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-10 gap-y-5 items-start justify-items-start">
+                            <div className="sm:col-span-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-x-8 gap-y-5 items-start justify-items-start">
                                 {items.map((item) => (
                                     <div className="slide-up flex items-center gap-2.5 leading-none min-w-0 w-full" key={item.id}>
                                         <div className="w-8 h-8 shrink-0 flex items-center justify-start">
