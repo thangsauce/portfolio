@@ -63,6 +63,7 @@ export default {
             fontFamily: {
                 anton: ['var(--font-anton)'],
                 'roboto-flex': ['var(--font-roboto-flex)'],
+                'google-sans': ['var(--font-google-sans)'],
             },
             padding: {
                 section: '250px',

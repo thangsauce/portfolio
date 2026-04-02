@@ -16,11 +16,15 @@ type ApiProject = {
     title: string;
     slug: string;
     description: string | null;
+    category: 'web_development' | 'cybersecurity' | 'it_systems' | null;
     tech_stack: string[];
     images: { thumbnail: string; long: string; gallery: string[] } | null;
     featured: boolean;
     order_index: number;
 }
+
+type ProjectGroupKey = 'web_development' | 'cybersecurity' | 'it_systems';
+type GroupedProjects = Record<ProjectGroupKey, IProject[]>;
 
 function mapProject(p: ApiProject): IProject {
     return {
@@ -29,11 +33,23 @@ function mapProject(p: ApiProject): IProject {
         year: new Date().getFullYear(),
         description: p.description ?? '',
         role: '',
+        category: p.category ?? 'web_development',
         techStack: p.tech_stack ?? [],
         thumbnail: p.images?.thumbnail ?? '',
         longThumbnail: p.images?.long || undefined,
         images: p.images?.gallery ?? [],
     };
+}
+
+function groupProjects(projects: IProject[]): GroupedProjects {
+    return projects.reduce<GroupedProjects>(
+        (acc, project) => {
+            const category = (project.category ?? 'web_development') as ProjectGroupKey;
+            acc[category].push(project);
+            return acc;
+        },
+        { web_development: [], cybersecurity: [], it_systems: [] },
+    );
 }
 
 const ProjectList = () => {
@@ -134,6 +150,13 @@ const ProjectList = () => {
         setSelectedProject(slug);
     };
 
+    const grouped = groupProjects(projects);
+    const sections: Array<{ key: ProjectGroupKey; title: string; items: IProject[] }> = [
+        { key: 'web_development', title: 'Web Development Projects', items: grouped.web_development },
+        { key: 'cybersecurity', title: 'Cybersecurity Projects', items: grouped.cybersecurity },
+        { key: 'it_systems', title: 'IT Systems Projects', items: grouped.it_systems },
+    ];
+
     if (projects.length === 0) return null;
 
     return (
@@ -142,7 +165,7 @@ const ProjectList = () => {
                 <div className="flex items-center gap-3 mb-10">
                     <span className="text-primary font-mono text-xl leading-none select-none">&lt;</span>
                     <h2 className="text-xl uppercase leading-none tracking-widest">
-                        FEATURED PROJECTS
+                        PROJECTS
                     </h2>
                     <span className="text-primary font-mono text-xl leading-none select-none">&gt;</span>
                 </div>
@@ -171,14 +194,23 @@ const ProjectList = () => {
                     )}
 
                     <div className="flex flex-col max-md:gap-10" ref={projectListRef}>
-                        {projects.map((project, index) => (
-                            <Project
-                                index={index}
-                                project={project}
-                                selectedProject={selectedProject}
-                                onMouseEnter={handleMouseEnter}
-                                key={project.slug}
-                            />
+                        {sections.map((section) => (
+                            section.items.length > 0 ? (
+                                <div key={section.key} className="mb-10 last:mb-0">
+                                    <h3 className="text-sm sm:text-base uppercase tracking-[0.22em] text-primary/90 mb-5">
+                                        {section.title}
+                                    </h3>
+                                    {section.items.map((project, index) => (
+                                        <Project
+                                            index={index}
+                                            project={project}
+                                            selectedProject={selectedProject}
+                                            onMouseEnter={handleMouseEnter}
+                                            key={`${section.key}-${project.slug}`}
+                                        />
+                                    ))}
+                                </div>
+                            ) : null
                         ))}
                     </div>
                 </div>

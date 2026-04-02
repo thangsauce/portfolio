@@ -7,6 +7,7 @@ import type { Env, Variables } from '../../index'
 const r = new Hono<{ Bindings: Env; Variables: Variables }>()
 const RESUME_BUCKET = 'portfolio-assets'
 const RESUME_PATH = 'resume/resume.pdf'
+const projectCategorySchema = z.enum(['web_development', 'cybersecurity', 'it_systems'])
 
 // ── Projects ──────────────────────────────────────────────────────────────────
 
@@ -15,6 +16,7 @@ const projectSchema = z.object({
   slug: z.string().regex(/^[a-z0-9-]+$/, 'Slug must be lowercase letters, numbers, and hyphens only'),
   description: z.string().optional(),
   long_description: z.string().optional(),
+  category: projectCategorySchema.default('web_development'),
   tech_stack: z.array(z.string()).default([]),
   source_code_url: z.string().url().optional().or(z.literal('')),
   images: z.object({

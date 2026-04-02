@@ -25,6 +25,7 @@ export type Database = {
           slug: string
           description: string | null
           long_description: string | null
+          category: string
           tech_stack: string[]
           source_code_url: string | null
           images: Json
@@ -39,6 +40,7 @@ export type Database = {
           slug: string
           description?: string | null
           long_description?: string | null
+          category?: string
           tech_stack?: string[]
           source_code_url?: string | null
           images?: Json
@@ -53,6 +55,7 @@ export type Database = {
           slug?: string
           description?: string | null
           long_description?: string | null
+          category?: string
           tech_stack?: string[]
           source_code_url?: string | null
           images?: Json

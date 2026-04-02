@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Anton, Roboto_Flex } from 'next/font/google';
+import { Anton, DM_Sans, Roboto_Flex } from 'next/font/google';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ReactLenis } from 'lenis/react';
 
@@ -24,6 +24,13 @@ const robotoFlex = Roboto_Flex({
     style: 'normal',
     subsets: ['latin'],
     variable: '--font-roboto-flex',
+});
+
+const dmSans = DM_Sans({
+    weight: ['400', '500', '700'],
+    style: 'normal',
+    subsets: ['latin'],
+    variable: '--font-google-sans',
 });
 
 export const metadata: Metadata = {
@@ -54,7 +61,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body
-                className={`${antonFont.variable} ${robotoFlex.variable} antialiased`}
+                className={`${antonFont.variable} ${robotoFlex.variable} ${dmSans.variable} antialiased`}
             >
                 <AuthProvider>
                 <ReactLenis

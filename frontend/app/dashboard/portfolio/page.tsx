@@ -5,7 +5,8 @@ import { apiPrivate } from '@/lib/api'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 type ProjectImages = { thumbnail?: string; long?: string; gallery?: string[] }
-type Project    = { id: string; title: string; slug: string; description: string | null; tech_stack: string[] | string | null; images: ProjectImages | null; featured: boolean; order_index: number }
+type ProjectCategory = 'web_development' | 'cybersecurity' | 'it_systems'
+type Project    = { id: string; title: string; slug: string; description: string | null; category: ProjectCategory | null; tech_stack: string[] | string | null; images: ProjectImages | null; featured: boolean; order_index: number }
 type Stack      = { id: string; name: string; category: string | null; icon_url: string | null; order_index: number }
 type Skill      = { id: string; name: string; order_index: number }
 type Cert       = { id: string; name: string; issuer: string | null; issue_date: string | null; credential_id: string | null; url: string | null }
@@ -53,6 +54,7 @@ function parseCsvUrls(csv: string) {
 }
 
 const SKILL_CATEGORIES = ['frontend', 'backend', 'database', 'tools', 'it_support'] as const
+const PROJECT_CATEGORIES: ProjectCategory[] = ['web_development', 'cybersecurity', 'it_systems']
 
 function normalizeSkillCategory(value: string) {
   const normalized = value.toLowerCase().trim().replace(/[\s-]+/g, '_')
@@ -94,6 +96,7 @@ export default function PortfolioPage() {
     title: '',
     slug: '',
     description: '',
+    category: 'web_development' as ProjectCategory,
     tech_stack: '',
     image_thumbnail: '',
     image_long: '',
@@ -142,6 +145,7 @@ export default function PortfolioPage() {
       title: '',
       slug: '',
       description: '',
+      category: 'web_development',
       tech_stack: '',
       image_thumbnail: '',
       image_long: '',
@@ -170,6 +174,7 @@ export default function PortfolioPage() {
         title: p.title,
         slug: p.slug,
         description: p.description ?? '',
+        category: p.category ?? 'web_development',
         tech_stack: toTechStackArray(p.tech_stack).join(', '),
         image_thumbnail: images.thumbnail ?? '',
         image_long: images.long ?? '',
@@ -209,6 +214,7 @@ export default function PortfolioPage() {
           title: pf.title,
           slug: pf.slug,
           description: pf.description || null,
+          category: pf.category,
           tech_stack: pf.tech_stack.split(',').map(s => s.trim()).filter(Boolean),
           images: {
             thumbnail: pf.image_thumbnail.trim(),
@@ -328,6 +334,14 @@ export default function PortfolioPage() {
         <Fld label="description">
           <textarea style={{ ...iSt, resize: 'vertical' }} rows={4} value={pf.description} placeholder="Project description..."
             onChange={e => setPf(p => ({ ...p, description: e.target.value }))} />
+        </Fld>
+        <Fld label="category">
+          <select style={{ ...iSt, appearance: 'none' }} value={pf.category}
+            onChange={e => setPf(p => ({ ...p, category: e.target.value as ProjectCategory }))}>
+            {PROJECT_CATEGORIES.map(c => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
         </Fld>
         <Fld label="tech_stack (comma-separated)">
           <input style={iSt} value={pf.tech_stack} placeholder="React, TypeScript, Tailwind CSS"
@@ -511,10 +525,11 @@ export default function PortfolioPage() {
     if (tab === 'resume') return { headers: [], rows: [] }
 
     if (tab === 'projects') return {
-      headers: ['// title', '// slug', '// tech', '// featured', '// order'],
+      headers: ['// title', '// slug', '// category', '// tech', '// featured', '// order'],
       rows: projects.map(p => ({ id: p.id, item: p, cells: [
         <span style={{ color: 'hsl(0 0% 76%)' }}>{p.title}</span>,
         <span style={{ fontFamily: 'monospace', fontSize: 10, color: 'hsl(0 0% 38%)' }}>{p.slug}</span>,
+        <span style={{ color: 'hsl(193 80% 45%)', fontSize: 10, letterSpacing: '0.12em' }}>{p.category ?? 'web_development'}</span>,
         <span style={{ fontSize: 10, color: 'hsl(0 0% 38%)' }}>{toTechStackArray(p.tech_stack).slice(0, 2).join(', ')}{toTechStackArray(p.tech_stack).length > 2 ? ' …' : ''}</span>,
         <span style={{ color: p.featured ? 'hsl(158 64% 45%)' : 'hsl(0 0% 26%)', fontSize: 10, letterSpacing: '0.15em' }}>{p.featured ? 'yes' : 'no'}</span>,
         <span style={{ color: 'hsl(0 0% 35%)' }}>{p.order_index}</span>,

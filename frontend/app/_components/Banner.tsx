@@ -147,7 +147,7 @@ const Banner = () => {
                                 ref={titleRef}
                                 className="banner-title slide-up-and-fade leading-[0.92] font-sans font-bold tracking-tight"
                             >
-                                {renderAnimatedWord('IT', 'text-primary block text-[32px] sm:text-[42px] md:text-[48px]')}
+                                {renderAnimatedWord('IT', 'text-primary block text-[32px] sm:text-[42px] md:text-[48px] font-google-sans uppercase tracking-[0.14em] font-semibold')}
                                 <span className="block text-[52px] sm:text-[80px] md:text-[96px] lg:text-[102px]">
                                     {'SPECIALIST'.split('').map((char, idx) => (
                                         <span
@@ -186,7 +186,7 @@ const Banner = () => {
                                     <path d="M12 16v4" />
                                 </svg>
                                 IT systems
-                            </span>. I love taking ideas and build it into something that solve a genuine problem.
+                            </span>. I love taking new ideas and build it into a functioning product.
                         </p>
                         <div className="flex gap-4 flex-wrap mt-9 banner-button slide-up-and-fade">
                             <Button

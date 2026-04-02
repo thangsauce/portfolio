@@ -10,7 +10,7 @@ const RESUME_PATH = 'resume/resume.pdf'
 portfolio.get('/projects', async (c) => {
   const { data, error } = await getSupabase(c.env)
     .from('portfolio_projects')
-    .select('id, title, slug, description, tech_stack, source_code_url, images, featured, year, order_index')
+    .select('id, title, slug, description, tech_stack, source_code_url, images, featured, category, year, order_index')
     .order('order_index')
   if (error) return c.json({ error: 'Failed to fetch projects' }, 500)
   return c.json(data)
@@ -19,7 +19,7 @@ portfolio.get('/projects', async (c) => {
 portfolio.get('/projects/:slug', async (c) => {
   const { data, error } = await getSupabase(c.env)
     .from('portfolio_projects')
-    .select('id, title, slug, description, long_description, tech_stack, source_code_url, images, featured, year')
+    .select('id, title, slug, description, long_description, tech_stack, source_code_url, images, featured, category, year')
     .eq('slug', c.req.param('slug'))
     .single()
   if (error || !data) return c.json({ error: 'Project not found' }, 404)
