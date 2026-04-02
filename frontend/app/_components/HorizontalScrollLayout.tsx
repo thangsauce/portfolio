@@ -15,11 +15,39 @@ const HorizontalScrollLayout = ({ children }: Props) => {
     const rootRef = useRef<HTMLDivElement>(null);
     const trackRef = useRef<HTMLDivElement>(null);
     const panels = useMemo(() => React.Children.toArray(children), [children]);
+    const scrollStateKey = 'portfolio:home:scrollY';
 
     useEffect(() => {
-        if (window.innerWidth >= 768) {
-            window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+        if ('scrollRestoration' in window.history) {
+            window.history.scrollRestoration = 'manual';
         }
+
+        const restore = () => {
+            const raw = window.sessionStorage.getItem(scrollStateKey);
+            const saved = raw ? Number(raw) : 0;
+            if (Number.isFinite(saved) && saved > 0) {
+                window.scrollTo({ top: saved, left: 0, behavior: 'auto' });
+                requestAnimationFrame(() => {
+                    window.scrollTo({ top: saved, left: 0, behavior: 'auto' });
+                    ScrollTrigger.refresh();
+                });
+            }
+        };
+
+        const save = () => {
+            window.sessionStorage.setItem(scrollStateKey, String(window.scrollY));
+        };
+
+        const timer = window.setTimeout(restore, 40);
+        window.addEventListener('beforeunload', save);
+        window.addEventListener('pagehide', save);
+
+        return () => {
+            window.clearTimeout(timer);
+            save();
+            window.removeEventListener('beforeunload', save);
+            window.removeEventListener('pagehide', save);
+        };
     }, []);
 
     useGSAP(

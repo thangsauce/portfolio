@@ -93,7 +93,7 @@ const NAV = [
   { href: '/dashboard/notes',     label: 'Notes',       Icon: IconNotes                  },
   { href: '/dashboard/todos',     label: 'Todos',       Icon: IconTodos                  },
   { href: '/dashboard/learning',  label: 'Lesson',      Icon: IconLearning               },
-  { href: '/dashboard/projects',  label: 'Projects.md', Icon: IconProjects               },
+  { href: '/dashboard/projects',  label: 'Documents',   Icon: IconProjects               },
   { href: '/dashboard/blog',      label: 'Blog',        Icon: IconBlog                   },
 ]
 
@@ -105,6 +105,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [mounted,      setMounted]      = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const logoEyeRef   = useRef<SVGSVGElement>(null)
   const logoPupilRef = useRef<SVGGElement>(null)
 
@@ -119,6 +120,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const saved = window.localStorage.getItem('dashboard-theme') as 'dark' | 'light' | null
     const next = saved ?? (mediaQuery.matches ? 'dark' : 'light')
     setTheme(next)
+
+    const savedSidebar = window.localStorage.getItem('dashboard-sidebar-collapsed')
+    setIsSidebarCollapsed(savedSidebar === '1')
   }, [])
 
   useEffect(() => {
@@ -160,6 +164,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     setTheme(next)
     window.localStorage.setItem('dashboard-theme', next)
   }
+  const toggleSidebar = () => {
+    setIsSidebarCollapsed((prev) => {
+      const next = !prev
+      window.localStorage.setItem('dashboard-sidebar-collapsed', next ? '1' : '0')
+      return next
+    })
+  }
 
   return (
     <DashboardThemeContext.Provider value={{ isLight, toggleTheme }}>
@@ -168,14 +179,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         className={`transition-opacity duration-500 ${mounted ? 'opacity-100' : 'opacity-0'} fixed inset-0 z-50 flex overflow-hidden font-roboto-flex bg-[hsl(var(--dash-bg))]`}
       >
         {/* ── Sidebar ─────────────────────────────────────────────────────── */}
-        <aside className="w-60 min-w-[240px] flex-shrink-0 flex flex-col bg-[hsl(var(--dash-sidebar))] border-r border-border">
+        <aside className={`${isSidebarCollapsed ? 'w-[76px] min-w-[76px]' : 'w-60 min-w-[240px]'} flex-shrink-0 flex flex-col bg-[hsl(var(--dash-sidebar))] border-r border-border transition-all duration-200`}>
 
           {/* Logo */}
           <Link
             href="/#banner"
-            className="px-4 py-[18px] border-b border-border block no-underline"
+            className={`${isSidebarCollapsed ? 'px-2 py-[14px]' : 'px-4 py-[18px]'} border-b border-border block no-underline`}
           >
-            <div className="flex items-center gap-3">
+            <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center gap-0' : 'gap-3'}`}>
               <div
                 className="w-[42px] h-[34px] flex-shrink-0 flex items-center justify-center text-primary rounded-[14px]"
                 style={{ boxShadow: '0 0 0 1px hsl(158 64% 36% / 0.28), 0 4px 14px hsl(158 64% 36% / 0.16)' }}
@@ -209,6 +220,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   </g>
                 </svg>
               </div>
+              {!isSidebarCollapsed && (
               <div>
                 <div className="text-sm font-semibold tracking-tight text-foreground leading-tight">
                   thangle.me
@@ -217,14 +229,28 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   Dashboard
                 </div>
               </div>
+              )}
             </div>
           </Link>
 
+          <div className={`${isSidebarCollapsed ? 'px-2 py-2' : 'px-3 py-2'} border-b border-border`}>
+            <button
+              onClick={toggleSidebar}
+              title={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              className="w-full flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-xs tracking-tight text-muted-foreground border border-border bg-muted hover:text-foreground transition-colors"
+            >
+              <svg {...ip}><line x1="3" y1="5" x2="13" y2="5" /><line x1="3" y1="8" x2="13" y2="8" /><line x1="3" y1="11" x2="13" y2="11" /></svg>
+              {!isSidebarCollapsed && <span>{'Minimize'}</span>}
+            </button>
+          </div>
+
           {/* Nav */}
-          <nav data-lenis-prevent className="flex-1 px-2.5 py-2 overflow-y-auto">
+          <nav data-lenis-prevent className={`flex-1 ${isSidebarCollapsed ? 'px-2' : 'px-2.5'} py-2 overflow-y-auto`}>
+            {!isSidebarCollapsed && (
             <div className="text-[11px] font-medium tracking-tight text-muted-foreground px-2 pb-1.5 pt-1">
               Menu
             </div>
+            )}
 
             {NAV.map(({ href, label, Icon, exact }) => {
               const isActive = exact ? pathname === href : pathname.startsWith(href)
@@ -232,15 +258,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <Link
                   key={href}
                   href={href}
+                  title={label}
                   className={[
-                    'flex items-center gap-2.5 px-2.5 py-[9px] mb-px text-[13px] tracking-tight rounded-xl no-underline transition-colors duration-150',
+                    `flex items-center ${isSidebarCollapsed ? 'justify-center gap-0 px-2.5' : 'gap-2.5 px-2.5'} py-[9px] mb-px text-[13px] tracking-tight rounded-xl no-underline transition-colors duration-150`,
                     isActive
                       ? 'font-medium text-primary bg-primary/[0.12]'
                       : 'font-normal text-muted-foreground hover:text-foreground hover:bg-muted',
                   ].join(' ')}
                 >
                   <Icon />
-                  <span className="flex-1">{label}</span>
+                  {!isSidebarCollapsed && <span className="flex-1">{label}</span>}
                   {isActive && (
                     <div className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
                   )}
@@ -250,7 +277,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </nav>
 
           {/* User */}
-          <div className="px-3.5 py-3 border-t border-border">
+          <div className={`${isSidebarCollapsed ? 'px-2 py-2' : 'px-3.5 py-3'} border-t border-border`}>
+            {!isSidebarCollapsed && (
             <div className="flex items-center gap-2.5 px-2.5 py-2.5 rounded-xl bg-[hsl(var(--dash-bg))] mb-2">
               <div
                 className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-[11px] font-semibold text-primary"
@@ -265,6 +293,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 {user?.email ?? '—'}
               </div>
             </div>
+            )}
 
             <button
               onClick={async () => {
@@ -272,10 +301,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 try { await logout(); router.push('/') }
                 catch { setIsLoggingOut(false) }
               }}
+              title="Sign Out"
               className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-destructive bg-destructive/[0.08] border border-destructive/[0.15] cursor-pointer transition-colors duration-150 hover:bg-destructive/[0.14] hover:border-destructive/[0.28]"
             >
               <IconLogout />
-              Sign Out
+              {!isSidebarCollapsed && 'Sign Out'}
             </button>
           </div>
         </aside>
