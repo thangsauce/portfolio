@@ -694,13 +694,13 @@ export default function PortfolioPage() {
           return categoryPass && featuredPass && queryPass
         })
         .map(p => ({ id: p.id, item: p, cells: [
-        <span style={{ color: 'hsl(0 0% 76%)' }}>{p.title}</span>,
-        <span style={{ fontFamily: 'monospace', fontSize: 10, color: 'hsl(0 0% 38%)' }}>{p.slug}</span>,
-        <span style={{ color: 'hsl(0 0% 62%)', fontSize: 10 }}>{p.done_for ?? '—'}</span>,
-        <span style={{ color: 'hsl(193 80% 45%)', fontSize: 10, letterSpacing: '0.12em' }}>
+        <span key="title" style={{ color: 'hsl(0 0% 76%)' }}>{p.title}</span>,
+        <span key="slug" style={{ fontFamily: 'monospace', fontSize: 10, color: 'hsl(0 0% 38%)' }}>{p.slug}</span>,
+        <span key="done_for" style={{ color: 'hsl(0 0% 62%)', fontSize: 10 }}>{p.done_for ?? '—'}</span>,
+        <span key="category" style={{ color: 'hsl(193 80% 45%)', fontSize: 10, letterSpacing: '0.12em' }}>
           {PROJECT_CATEGORY_LABELS[normalizeProjectCategory(p.category)]}
         </span>,
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <span key="links" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
           {p.source_code_url ? (
             <span title="GitHub link" style={{ color: 'hsl(0 0% 78%)', fontSize: 12 }}>🐙</span>
           ) : (
@@ -714,25 +714,27 @@ export default function PortfolioPage() {
         </span>,
         p.images?.thumbnail ? (
           <img
+            key="thumb"
             src={p.images.thumbnail}
             alt={`${p.title} thumbnail`}
             style={{ width: 64, height: 42, objectFit: 'cover', borderRadius: 4, border: '1px solid hsl(0 0% 20%)' }}
           />
         ) : (
-          <span style={{ color: 'hsl(0 0% 26%)', fontSize: 10 }}>—</span>
+          <span key="thumb-empty" style={{ color: 'hsl(0 0% 26%)', fontSize: 10 }}>—</span>
         ),
         p.images?.long ? (
           <img
+            key="long"
             src={p.images.long}
             alt={`${p.title} long`}
             style={{ width: 44, height: 56, objectFit: 'cover', borderRadius: 4, border: '1px solid hsl(0 0% 20%)' }}
           />
         ) : (
-          <span style={{ color: 'hsl(0 0% 26%)', fontSize: 10 }}>—</span>
+          <span key="long-empty" style={{ color: 'hsl(0 0% 26%)', fontSize: 10 }}>—</span>
         ),
-        <span style={{ fontSize: 10, color: 'hsl(0 0% 38%)' }}>{toTechStackArray(p.tech_stack).slice(0, 2).join(', ')}{toTechStackArray(p.tech_stack).length > 2 ? ' …' : ''}</span>,
-        <span style={{ color: p.featured ? 'hsl(158 64% 45%)' : 'hsl(0 0% 26%)', fontSize: 10, letterSpacing: '0.15em' }}>{p.featured ? 'yes' : 'no'}</span>,
-        <span style={{ color: 'hsl(0 0% 35%)' }}>{p.order_index}</span>,
+        <span key="tech" style={{ fontSize: 10, color: 'hsl(0 0% 38%)' }}>{toTechStackArray(p.tech_stack).slice(0, 2).join(', ')}{toTechStackArray(p.tech_stack).length > 2 ? ' …' : ''}</span>,
+        <span key="featured" style={{ color: p.featured ? 'hsl(158 64% 45%)' : 'hsl(0 0% 26%)', fontSize: 10, letterSpacing: '0.15em' }}>{p.featured ? 'yes' : 'no'}</span>,
+        <span key="order" style={{ color: 'hsl(0 0% 35%)' }}>{p.order_index}</span>,
       ]})),
     }
 
@@ -741,10 +743,10 @@ export default function PortfolioPage() {
       rows: stacks
         .filter((s) => includesQ(s.name, s.category ?? '', s.icon_url ?? ''))
         .map(s => ({ id: s.id, item: s, cells: [
-        <span style={{ color: 'hsl(0 0% 76%)' }}>{s.name}</span>,
-        <span style={{ color: 'hsl(193 80% 45%)', fontSize: 10, letterSpacing: '0.12em' }}>{s.category ?? '—'}</span>,
-        <span style={{ fontSize: 10, color: s.icon_url ? 'hsl(158 64% 42%)' : 'hsl(0 0% 25%)' }}>{s.icon_url ? '✓ set' : '—'}</span>,
-        <span style={{ color: 'hsl(0 0% 35%)' }}>{s.order_index}</span>,
+        <span key="name" style={{ color: 'hsl(0 0% 76%)' }}>{s.name}</span>,
+        <span key="category" style={{ color: 'hsl(193 80% 45%)', fontSize: 10, letterSpacing: '0.12em' }}>{s.category ?? '—'}</span>,
+        <span key="icon" style={{ fontSize: 10, color: s.icon_url ? 'hsl(158 64% 42%)' : 'hsl(0 0% 25%)' }}>{s.icon_url ? '✓ set' : '—'}</span>,
+        <span key="order" style={{ color: 'hsl(0 0% 35%)' }}>{s.order_index}</span>,
       ]})),
     }
 
@@ -753,9 +755,9 @@ export default function PortfolioPage() {
       rows: skills
         .filter((s) => includesQ(s.name, s.icon_url ?? ''))
         .map(s => ({ id: s.id, item: s, cells: [
-        <span style={{ color: 'hsl(0 0% 76%)' }}>{s.name}</span>,
-        <span style={{ fontSize: 10, color: s.icon_url ? 'hsl(158 64% 42%)' : 'hsl(0 0% 25%)' }}>{s.icon_url ? '✓ set' : '—'}</span>,
-        <span style={{ color: 'hsl(0 0% 35%)' }}>{s.order_index}</span>,
+        <span key="name" style={{ color: 'hsl(0 0% 76%)' }}>{s.name}</span>,
+        <span key="icon" style={{ fontSize: 10, color: s.icon_url ? 'hsl(158 64% 42%)' : 'hsl(0 0% 25%)' }}>{s.icon_url ? '✓ set' : '—'}</span>,
+        <span key="order" style={{ color: 'hsl(0 0% 35%)' }}>{s.order_index}</span>,
       ]})),
     }
 
@@ -764,10 +766,10 @@ export default function PortfolioPage() {
       rows: certs
         .filter((c) => includesQ(c.name, c.issuer ?? '', c.credential_id ?? '', c.url ?? ''))
         .map(c => ({ id: c.id, item: c, cells: [
-        <span style={{ color: 'hsl(0 0% 76%)' }}>{c.name}</span>,
-        <span>{c.issuer ?? '—'}</span>,
-        <span style={{ fontSize: 10, color: 'hsl(0 0% 38%)', fontFamily: 'monospace' }}>{c.issue_date ?? '—'}</span>,
-        <span style={{ fontSize: 10, color: 'hsl(0 0% 32%)', fontFamily: 'monospace' }}>{c.credential_id ?? '—'}</span>,
+        <span key="name" style={{ color: 'hsl(0 0% 76%)' }}>{c.name}</span>,
+        <span key="issuer">{c.issuer ?? '—'}</span>,
+        <span key="date" style={{ fontSize: 10, color: 'hsl(0 0% 38%)', fontFamily: 'monospace' }}>{c.issue_date ?? '—'}</span>,
+        <span key="id" style={{ fontSize: 10, color: 'hsl(0 0% 32%)', fontFamily: 'monospace' }}>{c.credential_id ?? '—'}</span>,
       ]})),
     }
 
@@ -776,11 +778,11 @@ export default function PortfolioPage() {
       rows: experiences
         .filter((e) => includesQ(e.role, e.company, (e.description ?? []).join(' ')))
         .map(e => ({ id: e.id, item: e, cells: [
-        <span style={{ color: 'hsl(0 0% 76%)' }}>{e.role}</span>,
-        <span style={{ maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block' }}>{e.company}</span>,
-        <span style={{ color: e.featured ? 'hsl(158 64% 45%)' : 'hsl(0 0% 26%)', fontSize: 10, letterSpacing: '0.15em' }}>{e.featured ? 'yes' : 'no'}</span>,
-        <span style={{ fontSize: 10, color: 'hsl(0 0% 38%)', fontFamily: 'monospace' }}>{e.start_date ?? '—'}</span>,
-        <span style={{ fontSize: 10, color: e.end_date ? 'hsl(0 0% 38%)' : 'hsl(158 64% 38%)', fontFamily: 'monospace' }}>{e.end_date ?? 'Present'}</span>,
+        <span key="role" style={{ color: 'hsl(0 0% 76%)' }}>{e.role}</span>,
+        <span key="company" style={{ maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block' }}>{e.company}</span>,
+        <span key="featured" style={{ color: e.featured ? 'hsl(158 64% 45%)' : 'hsl(0 0% 26%)', fontSize: 10, letterSpacing: '0.15em' }}>{e.featured ? 'yes' : 'no'}</span>,
+        <span key="start" style={{ fontSize: 10, color: 'hsl(0 0% 38%)', fontFamily: 'monospace' }}>{e.start_date ?? '—'}</span>,
+        <span key="end" style={{ fontSize: 10, color: e.end_date ? 'hsl(0 0% 38%)' : 'hsl(158 64% 38%)', fontFamily: 'monospace' }}>{e.end_date ?? 'Present'}</span>,
       ]})),
     }
   }
@@ -849,7 +851,8 @@ export default function PortfolioPage() {
               onMouseEnter={e => { if (!active) (e.currentTarget).style.color = 'hsl(0 0% 52%)' }}
               onMouseLeave={e => { if (!active) (e.currentTarget).style.color = 'hsl(0 0% 30%)' }}
             >
-              // {TAB_LABELS[t]}
+              {'// '}
+              {TAB_LABELS[t]}
             </button>
           )
         })}
@@ -916,14 +919,14 @@ export default function PortfolioPage() {
             <thead>
               <tr>
                 {headers.map(h => <th key={h} style={thSt}>{h}</th>)}
-                <th style={{ ...thSt, width: 90, textAlign: 'right' }}>// act</th>
+                <th style={{ ...thSt, width: 90, textAlign: 'right' }}>{'// act'}</th>
               </tr>
             </thead>
             <tbody>
               {rows.length === 0 && !loading && (
                 <tr>
                   <td colSpan={headers.length + 1} style={{ ...tdSt, textAlign: 'center', color: 'hsl(0 0% 24%)', padding: '28px 0', letterSpacing: '0.2em', fontSize: 10, textTransform: 'uppercase' }}>
-                    // no records
+                    {'// no records'}
                   </td>
                 </tr>
               )}
@@ -1038,7 +1041,8 @@ export default function PortfolioPage() {
         <div style={{ padding: '15px 20px', borderBottom: '1px solid hsl(0 0% 14%)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
           <div>
             <div style={{ fontSize: 9, letterSpacing: '0.3em', color: 'hsl(158 64% 36%)', textTransform: 'uppercase', marginBottom: 3 }}>
-              // {editingId ? 'edit' : 'new'} record
+              {'// '}
+              {editingId ? 'edit' : 'new'} record
             </div>
             <div style={{ fontFamily: 'var(--font-anton)', fontSize: 14, letterSpacing: '0.18em', color: 'hsl(0 0% 80%)', textTransform: 'uppercase' }}>
               {tab}
