@@ -10,11 +10,13 @@ type ApiProject = {
     title: string;
     slug: string;
     description: string | null;
+    done_for?: string | null;
     category: 'web_development' | 'cybersecurity' | 'network' | 'it_systems' | null;
     tech_stack: string[];
     images: { thumbnail: string; long: string; gallery: string[] } | null;
     year: number | null;
     source_code_url?: string | null;
+    live_url?: string | null;
 };
 
 function mapProject(p: ApiProject): IProject {
@@ -23,6 +25,7 @@ function mapProject(p: ApiProject): IProject {
         slug: p.slug,
         year: p.year ?? new Date().getFullYear(),
         description: p.description ?? '',
+        doneFor: p.done_for ?? '',
         role: '',
         category: p.category === 'it_systems' ? 'network' : (p.category ?? 'web_development'),
         techStack: p.tech_stack ?? [],
@@ -30,6 +33,7 @@ function mapProject(p: ApiProject): IProject {
         longThumbnail: normalizeProjectAssetUrl(p.images?.long) || undefined,
         images: (p.images?.gallery ?? []).map((img) => normalizeProjectAssetUrl(img)),
         sourceCode: p.source_code_url ?? undefined,
+        liveUrl: p.live_url ?? undefined,
     };
 }
 

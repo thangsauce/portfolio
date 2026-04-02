@@ -20,6 +20,7 @@ const projectSchema = z.object({
   slug: z.string().regex(/^[a-z0-9-]+$/, 'Slug must be lowercase letters, numbers, and hyphens only'),
   description: z.string().optional(),
   long_description: z.string().optional(),
+  done_for: z.string().optional(),
   category: projectCategorySchema.default('web_development'),
   tech_stack: z.array(z.string()).default([]),
   source_code_url: z.string().url().optional().or(z.literal('')),

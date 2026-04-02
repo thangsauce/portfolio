@@ -150,6 +150,15 @@ const ProjectDetails = ({ project }: Props) => {
                                     {project.techStack.join(', ')}
                                 </div>
                             </div>
+                            {project.doneFor && (
+                                <div className="fade-in-later">
+                                    <p className="text-muted-foreground font-anton mb-3">
+                                        Done For
+                                    </p>
+
+                                    <div className="text-lg">{project.doneFor}</div>
+                                </div>
+                            )}
                             <div className="fade-in-later">
                                 <p className="text-muted-foreground font-anton mb-3">
                                     Description

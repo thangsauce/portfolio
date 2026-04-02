@@ -8,6 +8,7 @@ type ApiProject = {
     title: string;
     slug: string;
     description: string | null;
+    done_for?: string | null;
     category: 'web_development' | 'cybersecurity' | 'network' | null;
     tech_stack: string[];
     images: { thumbnail: string; long: string; gallery: string[] } | null;
@@ -47,6 +48,7 @@ function mapProject(p: ApiProject): IProject {
         slug: p.slug,
         year: p.year ?? new Date().getFullYear(),
         description: p.description ?? '',
+        doneFor: p.done_for ?? '',
         role: '',
         category: p.category ?? 'web_development',
         techStack: p.tech_stack ?? [],

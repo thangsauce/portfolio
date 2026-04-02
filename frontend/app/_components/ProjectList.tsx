@@ -16,6 +16,7 @@ type ApiProject = {
     title: string;
     slug: string;
     description: string | null;
+    done_for?: string | null;
     category: 'web_development' | 'cybersecurity' | 'network' | 'it_systems' | null;
     tech_stack: string[];
     source_code_url?: string | null;
@@ -42,6 +43,7 @@ function mapProject(p: ApiProject): IProject {
         slug: p.slug,
         year: new Date().getFullYear(),
         description: p.description ?? '',
+        doneFor: p.done_for ?? '',
         role: '',
         category: isCampusLabSiem
             ? 'cybersecurity'

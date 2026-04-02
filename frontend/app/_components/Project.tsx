@@ -210,6 +210,11 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
                             {project.description}
                         </p>
                     )}
+                    {project.doneFor && (
+                        <p className="mt-2 text-[11px] uppercase tracking-[0.16em] text-muted-foreground/75">
+                            Done for: <span className="text-foreground/80 normal-case tracking-normal">{project.doneFor}</span>
+                        </p>
+                    )}
                 </div>
             </div>
             </div>
