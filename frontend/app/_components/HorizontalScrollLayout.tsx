@@ -98,13 +98,17 @@ const HorizontalScrollLayout = ({ children }: Props) => {
                 panelEls.forEach((panel) => {
                     const content = panel.querySelector<HTMLElement>('.horizontal-panel-content');
                     if (!content) return;
-                    const target = content.querySelector<HTMLElement>('.container') ?? content;
+                    const target =
+                        content.querySelector<HTMLElement>('.page-') ??
+                        content.querySelector<HTMLElement>('.container') ??
+                        content;
 
                     const parallaxTween = gsap.fromTo(
                         target,
-                        { yPercent: 8 },
+                        { yPercent: 14, scale: 0.985 },
                         {
-                            yPercent: -8,
+                            yPercent: -14,
+                            scale: 1.015,
                             ease: 'none',
                             scrollTrigger: {
                                 trigger: panel,

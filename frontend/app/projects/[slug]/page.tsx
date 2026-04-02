@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import ProjectDetails from './_components/ProjectDetails';
 import { Metadata } from 'next';
 import { IProject } from '@/types';
+import { normalizeProjectAssetUrl } from '@/lib/projectAssets';
 
 type ApiProject = {
     title: string;
@@ -48,9 +49,9 @@ function mapProject(p: ApiProject): IProject {
         role: '',
         category: p.category ?? 'web_development',
         techStack: p.tech_stack ?? [],
-        thumbnail: p.images?.thumbnail ?? '',
-        longThumbnail: p.images?.long || undefined,
-        images: p.images?.gallery ?? [],
+        thumbnail: normalizeProjectAssetUrl(p.images?.thumbnail),
+        longThumbnail: normalizeProjectAssetUrl(p.images?.long) || undefined,
+        images: (p.images?.gallery ?? []).map((img) => normalizeProjectAssetUrl(img)),
         sourceCode: p.source_code_url ?? undefined,
     };
 }

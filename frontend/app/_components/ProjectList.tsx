@@ -1,6 +1,7 @@
 'use client';
 import { cn } from '@/lib/utils';
 import { apiFetch } from '@/lib/api';
+import { normalizeProjectAssetUrl } from '@/lib/projectAssets';
 import { IProject } from '@/types';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
@@ -44,9 +45,9 @@ function mapProject(p: ApiProject): IProject {
             ? 'cybersecurity'
             : (p.category === 'it_systems' ? 'network' : (p.category ?? 'web_development')),
         techStack: p.tech_stack ?? [],
-        thumbnail: p.images?.thumbnail ?? '',
-        longThumbnail: p.images?.long || undefined,
-        images: p.images?.gallery ?? [],
+        thumbnail: normalizeProjectAssetUrl(p.images?.thumbnail),
+        longThumbnail: normalizeProjectAssetUrl(p.images?.long) || undefined,
+        images: (p.images?.gallery ?? []).map((img) => normalizeProjectAssetUrl(img)),
     };
 }
 
@@ -68,6 +69,7 @@ const ProjectList = () => {
     const imageRef        = useRef<HTMLImageElement>(null);
     const pagePanelRef    = useRef<HTMLDivElement>(null);
     const hasAnimatedPage = useRef(false);
+    const fallbackPreview = '/projects/thumbnail/portfolio-thumbnail.jpg';
 
     const [projects, setProjects] = useState<IProject[]>([]);
     const [selectedProject, setSelectedProject] = useState<string | null>(null);
@@ -289,6 +291,15 @@ const ProjectList = () => {
                                     )}
                                     key={project.slug}
                                     ref={project.slug === selectedProject ? imageRef : undefined}
+                                    onError={(e) => {
+                                        const img = e.currentTarget;
+                                        if (img.dataset.fallbackApplied === '1') {
+                                            img.style.opacity = '0';
+                                            return;
+                                        }
+                                        img.dataset.fallbackApplied = '1';
+                                        img.src = fallbackPreview;
+                                    }}
                                 />
                             ))}
                         </div>

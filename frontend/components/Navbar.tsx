@@ -55,7 +55,7 @@ const Navbar = () => {
     const router = useRouter();
     const pathname = usePathname();
     const lenis = useLenis();
-    const isProjectPage = pathname?.startsWith('/projects/');
+    const isProjectPage = pathname === '/projects' || pathname?.startsWith('/projects/');
     const eyeRef = useRef<SVGSVGElement>(null);
     const pupilRef = useRef<SVGGElement>(null);
     const menuButtonRef = useRef<HTMLButtonElement>(null);

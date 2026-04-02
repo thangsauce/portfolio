@@ -31,6 +31,7 @@ gsap.registerPlugin(useGSAP);
 
 const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
     const externalLinkSVGRef = useRef<SVGSVGElement>(null);
+    const fallbackThumbnail = '/projects/thumbnail/portfolio-thumbnail.jpg';
 
     const { context, contextSafe } = useGSAP(() => {}, {
         scope: externalLinkSVGRef,
@@ -101,7 +102,7 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
 
     return (
         <TransitionLink
-            href={`/projects/${project.slug}`}
+            href={`/projects?slug=${encodeURIComponent(project.slug)}`}
             className="project-item group leading-none py-5 first:!pt-0 last:pb-0 md:group-hover/projects:opacity-30 md:hover:!opacity-100 transition-all"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
@@ -115,6 +116,15 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
                     )}
                     key={project.slug}
                     loading="lazy"
+                    onError={(e) => {
+                        const img = e.currentTarget;
+                        if (img.dataset.fallbackApplied === '1') {
+                            img.style.opacity = '0';
+                            return;
+                        }
+                        img.dataset.fallbackApplied = '1';
+                        img.src = fallbackThumbnail;
+                    }}
                 />
             )}
             <div className="flex gap-2 md:gap-5">

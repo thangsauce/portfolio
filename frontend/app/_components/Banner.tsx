@@ -190,9 +190,7 @@ const Banner = () => {
                                     {'SPECIALIST'.split('').map((char, idx) => (
                                         <span
                                             key={`specialist-${idx}`}
-                                            className={`hero-letter inline-block will-change-transform ${
-                                                idx === 7 || idx === 9 ? 'text-primary' : ''
-                                            }`}
+                                            className="hero-letter inline-block will-change-transform"
                                         >
                                             {char}
                                         </span>
@@ -246,14 +244,14 @@ const Banner = () => {
                                 as="button"
                                 variant="primary"
                                 onClick={goToContact}
-                                className="rounded-full border border-primary/55 shadow-[0_0_0_1px_rgba(52,211,153,0.22)_inset,0_0_18px_rgba(52,211,153,0.18)] before:content-[''] before:absolute before:inset-[5px] before:border before:border-primary/25 before:pointer-events-none before:rounded-full"
+                                className="rounded-full"
                             >
-                                Let's Connect
+                                Let&apos;s Connect
                             </Button>
                             <a
                                 href={resumeUrl}
                                 download="Thang_Le_Resume.pdf"
-                                className="group h-12 px-8 inline-flex justify-center items-center text-lg uppercase font-anton tracking-widest rounded-full border border-primary/45 bg-background/40 hover:border-primary hover:text-primary transition-colors overflow-hidden relative shadow-[0_0_0_1px_rgba(52,211,153,0.16)_inset,0_0_14px_rgba(52,211,153,0.12)] before:content-[''] before:absolute before:inset-[5px] before:border before:border-primary/20 before:pointer-events-none before:rounded-full"
+                                className="group h-12 px-8 inline-flex justify-center items-center text-lg uppercase font-anton tracking-widest border border-border hover:border-primary hover:text-primary transition-colors overflow-hidden relative rounded-full"
                             >
                                 <span className="transition-all duration-300 group-hover:-translate-y-full group-hover:opacity-0 absolute">Résumé</span>
                                 <span className="transition-all duration-300 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 absolute">Download</span>
