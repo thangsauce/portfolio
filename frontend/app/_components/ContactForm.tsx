@@ -3,10 +3,13 @@
 import { FormEvent, useRef, useState } from 'react';
 import { GENERAL_INFO } from '@/lib/data';
 import { useLenis } from 'lenis/react';
+import { usePathname, useRouter } from 'next/navigation';
 
 export function ContactSection() {
     const containerRef = useRef<HTMLDivElement>(null);
     const lenis = useLenis();
+    const router = useRouter();
+    const pathname = usePathname();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
@@ -79,6 +82,11 @@ export function ContactSection() {
     const handleBackToHome = () => {
         if (typeof window === 'undefined') return;
 
+        if (pathname !== '/') {
+            router.push('/');
+            return;
+        }
+
         const scrollToY = (y: number) => {
             if (lenis) {
                 lenis.scrollTo(y, { duration: 1.2 });
@@ -91,16 +99,12 @@ export function ContactSection() {
             window.innerWidth >= 768 && !!document.querySelector('.horizontal-mode');
 
         if (isHorizontalMode) {
-            const root = document.querySelector('.horizontal-mode') as HTMLElement | null;
-            if (root) {
-                const rootTop = root.getBoundingClientRect().top + window.scrollY;
-                scrollToY(rootTop);
-                return;
-            }
+            scrollToY(0);
+            return;
         }
 
         if (lenis) {
-            lenis.scrollTo('#banner', { duration: 1.2 });
+            lenis.scrollTo(0, { duration: 1.2 });
             return;
         }
         window.scrollTo({ top: 0, behavior: 'smooth' });
