@@ -9,16 +9,22 @@ import { apiFetch } from '@/lib/api';
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 type Skill = { id: string; name: string; category: string; icon_url: string | null }
-type Category = 'frontend' | 'backend' | 'database' | 'tools'
-const CATEGORY_ORDER: Category[] = ['frontend', 'backend', 'database', 'tools']
+const PREFERRED_CATEGORY_ORDER = ['frontend', 'backend', 'database', 'tools']
 
 function normalizeSkillCategory(value: string): string {
     const normalized = value.toLowerCase().trim().replace(/[\s-]+/g, '_');
     if (!normalized) return '';
     if (normalized === 'front_end' || normalized === 'frontend_dev' || normalized === 'web') return 'frontend';
     if (normalized === 'back_end' || normalized === 'backend_dev') return 'backend';
+    if (normalized === 'tool' || normalized === 'tooling') return 'tools';
+    if (normalized === 'db' || normalized === 'data') return 'database';
     if (normalized === 'itsupport' || normalized === 'it_skills' || normalized === 'it') return 'it_support';
     return normalized;
+}
+
+function formatCategoryLabel(category: string): string {
+    if (category === 'it_support') return 'it support';
+    return category.replace(/_/g, ' ');
 }
 
 const Skills = () => {
@@ -68,14 +74,19 @@ const Skills = () => {
         { scope: containerRef, dependencies: [skills.length] },
     );
 
-    const grouped = CATEGORY_ORDER.reduce((acc, cat) => {
-        acc[cat] = skills.filter((s) => s.category === cat);
+    const grouped = skills.reduce((acc, skill) => {
+        const cat = skill.category || 'other';
+        if (!acc[cat]) acc[cat] = [];
+        acc[cat].push(skill);
         return acc;
-    }, {} as Record<Category, Skill[]>);
+    }, {} as Record<string, Skill[]>);
 
-    const entries = CATEGORY_ORDER
-        .filter((cat) => grouped[cat].length > 0)
-        .map((cat) => [cat, grouped[cat]] as [Category, Skill[]]);
+    const allCategories = Object.keys(grouped);
+    const orderedCategories = [
+        ...PREFERRED_CATEGORY_ORDER.filter((cat) => allCategories.includes(cat)),
+        ...allCategories.filter((cat) => !PREFERRED_CATEGORY_ORDER.includes(cat)),
+    ];
+    const entries = orderedCategories.map((cat) => [cat, grouped[cat]] as [string, Skill[]]);
 
     if (skills.length === 0) return null;
 
@@ -95,7 +106,7 @@ const Skills = () => {
                         <div className="grid sm:grid-cols-12" key={category}>
                             <div className="sm:col-span-5">
                                 <p className="slide-up text-5xl font-anton leading-none text-muted-foreground uppercase">
-                                    {category}
+                                    {formatCategoryLabel(category)}
                                 </p>
                             </div>
                             <div className="sm:col-span-7 flex gap-x-11 gap-y-9 flex-wrap">

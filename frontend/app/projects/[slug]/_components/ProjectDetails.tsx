@@ -127,7 +127,7 @@ const ProjectDetails = ({ project }: Props) => {
                                         className="inline-flex items-center gap-2 text-xs sm:text-sm uppercase tracking-[0.14em] text-foreground/80 hover:text-primary transition-colors"
                                     >
                                         <span className="live-demo-dot inline-block size-2.5 rounded-full bg-red-500" />
-                                        <span>LIVE Demo</span>
+                                        <span>LIVE</span>
                                     </a>
                                 )}
                             </div>

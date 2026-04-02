@@ -184,7 +184,7 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
                                         onClick={(e) => e.stopPropagation()}
                                     >
                                         <span className="live-demo-dot inline-block size-2 rounded-full bg-red-500" />
-                                        <span>LIVE Demo</span>
+                                        <span>LIVE</span>
                                     </a>
                                 )}
                             </div>
