@@ -70,7 +70,7 @@ const Banner = () => {
             if (!title) return;
 
             // Delay start so it plays after initial page/preloader reveal.
-            const tl = gsap.timeline({ defaults: { ease: 'power3.out' }, delay: 1.1 });
+            const tl = gsap.timeline({ defaults: { ease: 'power3.out' }, delay: 1.8 });
 
             tl.set('.hero-letter', { transformOrigin: '50% 100%' })
                 .fromTo(

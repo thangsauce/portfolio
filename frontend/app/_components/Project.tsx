@@ -164,6 +164,11 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
                                 </div>
                             ))}
                     </div>
+                    {project.description && (
+                        <p className="mt-3 max-w-3xl text-sm md:text-base text-muted-foreground leading-relaxed">
+                            {project.description}
+                        </p>
+                    )}
                 </div>
             </div>
         </TransitionLink>

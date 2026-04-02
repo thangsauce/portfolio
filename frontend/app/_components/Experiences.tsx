@@ -11,6 +11,7 @@ type Experience = {
     id: string;
     company: string;
     role: string;
+    description: string[] | null;
     start_date: string | null;
     end_date: string | null;
     order_index: number;
@@ -97,6 +98,15 @@ const Experiences = () => {
                             <p className="text-xl text-muted-foreground">{item.company}</p>
                             <p className="text-5xl font-anton leading-none mt-3.5 mb-2.5">{item.role}</p>
                             <p className="text-lg text-muted-foreground">{formatDuration(item.start_date, item.end_date)}</p>
+                            {!!item.description?.length && (
+                                <ul className="mt-4 space-y-2 text-sm md:text-base text-muted-foreground max-w-3xl">
+                                    {item.description.map((line, idx) => (
+                                        <li key={`${item.id}-${idx}`} className="leading-relaxed">
+                                            {line}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
                         </div>
                     ))}
                 </div>
