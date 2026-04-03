@@ -321,7 +321,7 @@ const ProjectList = () => {
                     )}
 
                     <div className="flex flex-col max-md:gap-0 md:pr-[230px] xl:pr-[390px]" ref={projectListRef}>
-                        <div className="mb-0 max-md:pb-1 md:mb-6 flex flex-wrap items-center gap-2">
+                        <div className="mb-0 max-md:pb-0 md:mb-6 flex flex-wrap items-center gap-2 max-md:gap-y-1.5">
                             {categories.map((category) => (
                                 <button
                                     key={category.key}
@@ -371,7 +371,7 @@ const ProjectList = () => {
 
                         {currentProjects.length > 0 ? (
                             <div
-                                className="flex flex-col max-md:-mt-1"
+                                className="flex flex-col max-md:-mt-1 max-md:space-y-2.5"
                                 ref={pagePanelRef}
                                 key={`${activeCategory}-${currentPage}`}
                             >

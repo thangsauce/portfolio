@@ -105,7 +105,7 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
     return (
         <>
             <div
-                className="project-item group leading-none max-md:py-0.5 py-1.5 md:py-5 first:!pt-0 last:pb-0 md:group-hover/projects:opacity-30 md:hover:!opacity-100 transition-all"
+                className="project-item group leading-none max-md:py-1.5 py-1.5 md:py-5 first:!pt-0 last:pb-0 md:group-hover/projects:opacity-30 md:hover:!opacity-100 transition-all"
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
             >

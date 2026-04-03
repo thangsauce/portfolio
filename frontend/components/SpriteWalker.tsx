@@ -31,6 +31,8 @@ const BLOWN_FRAME_STEP_MS = 85;
 const FLY_FRAME_STEP_MS = 80;
 const FALL_FRAME_STEP_MS = 95;
 const BLOWN_ACTIVE_MS = 260;
+const DROP_THROUGH_MIN_MS = 520;
+const DROP_THROUGH_CLEARANCE_PX = 28;
 const FLY_SPEED_X = 4.7;
 const FLY_SPEED_Y = 4.7;
 const ALPHA_THRESHOLD = 10;
@@ -268,6 +270,8 @@ const SpriteWalker = () => {
     const scrollBurstUntilRef = useRef(0);
     const scrollDirRef = useRef<1 | -1>(1);
     const dropThroughUntilRef = useRef(0);
+    const dropThroughClearBelowBottomRef = useRef(0);
+    const dropTargetBottomRef = useRef<number | null>(null);
     const duckDropLatchRef = useRef(false);
     const lastScrollYRef = useRef(0);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -594,7 +598,28 @@ const SpriteWalker = () => {
                   : 0;
             const downPressed = keysRef.current.down;
             const upPressed = keysRef.current.up;
-            const dropThroughActive = t < dropThroughUntilRef.current;
+            const currentBottomPxEarly = FLOOR_OFFSET + yRef.current;
+            if (
+                dropThroughClearBelowBottomRef.current > 0 &&
+                currentBottomPxEarly <= dropThroughClearBelowBottomRef.current
+            ) {
+                dropThroughClearBelowBottomRef.current = 0;
+            }
+            const dropTargetBottom = dropTargetBottomRef.current;
+            if (
+                dropTargetBottom !== null &&
+                currentBottomPxEarly <= dropTargetBottom + 0.5
+            ) {
+                yRef.current = Math.max(0, dropTargetBottom - FLOOR_OFFSET);
+                vyRef.current = 0;
+                dropTargetBottomRef.current = null;
+                dropThroughUntilRef.current = 0;
+                dropThroughClearBelowBottomRef.current = 0;
+            }
+            let dropThroughActive =
+                t < dropThroughUntilRef.current ||
+                (dropThroughClearBelowBottomRef.current > 0 &&
+                    currentBottomPxEarly > dropThroughClearBelowBottomRef.current);
             if (!downPressed) duckDropLatchRef.current = false;
 
             if (requestedDir !== 0 && moveDirRef.current !== requestedDir) {
@@ -757,12 +782,29 @@ const SpriteWalker = () => {
                 !duckDropLatchRef.current &&
                 !flyCombo &&
                 !dropThroughActive;
+            let didDropThroughThisFrame = false;
             // Duck on a platform drops the sprite down to the next border/platform.
             if (canTriggerDrop && standingOnPlatform) {
-                dropThroughUntilRef.current = t + 220;
-                yRef.current = Math.max(0, yRef.current - 4);
-                vyRef.current = Math.min(vyRef.current, -1.8);
+                const belowPlatforms = platformBottomsNow.filter(
+                    (pb) => pb < supportBottomNow - 4,
+                );
+                const nextBelowBottom =
+                    belowPlatforms.length > 0
+                        ? belowPlatforms.reduce((best, pb) =>
+                              pb > best ? pb : best,
+                          FLOOR_OFFSET)
+                        : FLOOR_OFFSET;
+                dropTargetBottomRef.current = nextBelowBottom;
+                dropThroughUntilRef.current = t + Math.max(DROP_THROUGH_MIN_MS, 900);
+                dropThroughClearBelowBottomRef.current = Math.max(
+                    0,
+                    supportBottomNow - DROP_THROUGH_CLEARANCE_PX,
+                );
+                yRef.current = Math.max(0, yRef.current - 8);
+                vyRef.current = Math.min(vyRef.current, -3.8);
                 duckDropLatchRef.current = true;
+                didDropThroughThisFrame = true;
+                dropThroughActive = true;
             } else if (canTriggerDrop) {
                 // Also allow drop-through when squished/embedded between borders.
                 const spriteTopNow = window.innerHeight - currentBottomPx - playerH;
@@ -776,13 +818,29 @@ const SpriteWalker = () => {
                     intersectsLoose(spriteRectNow, obs, 2),
                 );
                 if (squishedNow) {
-                    dropThroughUntilRef.current = t + 240;
-                    yRef.current = Math.max(0, yRef.current - 6);
-                    vyRef.current = Math.min(vyRef.current, -2.2);
+                    const belowPlatforms = platformBottomsNow.filter(
+                        (pb) => pb < currentBottomPx - 4,
+                    );
+                    const nextBelowBottom =
+                        belowPlatforms.length > 0
+                            ? belowPlatforms.reduce((best, pb) =>
+                                  pb > best ? pb : best,
+                              FLOOR_OFFSET)
+                            : FLOOR_OFFSET;
+                    dropTargetBottomRef.current = nextBelowBottom;
+                    dropThroughUntilRef.current = t + Math.max(DROP_THROUGH_MIN_MS, 900);
+                    dropThroughClearBelowBottomRef.current = Math.max(
+                        0,
+                        currentBottomPx - DROP_THROUGH_CLEARANCE_PX,
+                    );
+                    yRef.current = Math.max(0, yRef.current - 8);
+                    vyRef.current = Math.min(vyRef.current, -3.8);
                     duckDropLatchRef.current = true;
+                    didDropThroughThisFrame = true;
+                    dropThroughActive = true;
                 }
             }
-            if (!flyCombo && standingOnPlatform) {
+            if (!flyCombo && standingOnPlatform && !didDropThroughThisFrame) {
                 yRef.current = Math.max(0, supportBottomNow - FLOOR_OFFSET);
                 vyRef.current = 0;
             }
@@ -802,6 +860,7 @@ const SpriteWalker = () => {
 
             const onGround =
                 !flyCombo &&
+                !didDropThroughThisFrame &&
                 (yRef.current <= 0 || standingOnPlatform || squishedForJump);
             if (!flyCombo && jumpQueuedRef.current && onGround) {
                 vyRef.current = JUMP_VELOCITY;
@@ -828,7 +887,14 @@ const SpriteWalker = () => {
                         playerW,
                         window.innerHeight,
                     );
+                    const dropTarget = dropTargetBottomRef.current;
                     for (const platformBottom of dropThroughActive ? [] : platformBottoms) {
+                        if (
+                            dropTarget !== null &&
+                            platformBottom > dropTarget + 0.5
+                        ) {
+                            continue;
+                        }
                         if (
                             prevBottomPx >= platformBottom - 0.5 &&
                             nextBottomPx <= platformBottom + 0.5
@@ -839,6 +905,14 @@ const SpriteWalker = () => {
                     if (landedBottomPx > 0) {
                         nextY = Math.max(0, landedBottomPx - FLOOR_OFFSET);
                         nextVy = 0;
+                        if (
+                            dropTarget !== null &&
+                            landedBottomPx <= dropTarget + 0.5
+                        ) {
+                            dropTargetBottomRef.current = null;
+                            dropThroughUntilRef.current = 0;
+                            dropThroughClearBelowBottomRef.current = 0;
+                        }
                     }
                 }
                 yRef.current = nextY;
