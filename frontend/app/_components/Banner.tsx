@@ -203,7 +203,7 @@ const Banner = () => {
                             <button
                                 type="button"
                                 onClick={() => goToProjectsCategory('web_development')}
-                                className="inline-flex items-center gap-1.5 mx-1.5 text-foreground text-[1.08em] transition-all duration-200 hover:text-primary hover:[text-shadow:0_0_10px_rgba(52,211,153,0.55)] hover:[&>svg]:[filter:drop-shadow(0_0_6px_rgba(52,211,153,0.75))]"
+                                className="inline-flex items-center gap-1.5 mx-1.5 text-foreground text-[1.08em] transition-all duration-200 hover:text-primary hover:[text-shadow:0_0_10px_rgba(255,255,255,0.55)] hover:[&>svg]:[filter:drop-shadow(0_0_6px_rgba(255,255,255,0.75))]"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-primary transition-all duration-200">
                                     <polyline points="16 18 22 12 16 6" />
@@ -214,7 +214,7 @@ const Banner = () => {
                             <button
                                 type="button"
                                 onClick={() => goToProjectsCategory('cybersecurity')}
-                                className="inline-flex items-center gap-1.5 mx-1.5 text-foreground text-[1.08em] transition-all duration-200 hover:text-primary hover:[text-shadow:0_0_10px_rgba(52,211,153,0.55)] hover:[&>svg]:[filter:drop-shadow(0_0_6px_rgba(52,211,153,0.75))]"
+                                className="inline-flex items-center gap-1.5 mx-1.5 text-foreground text-[1.08em] transition-all duration-200 hover:text-primary hover:[text-shadow:0_0_10px_rgba(255,255,255,0.55)] hover:[&>svg]:[filter:drop-shadow(0_0_6px_rgba(255,255,255,0.75))]"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-primary transition-all duration-200">
                                     <path d="M12 2 4 5v6c0 5 3.4 9.6 8 11 4.6-1.4 8-6 8-11V5l-8-3z" />
@@ -224,7 +224,7 @@ const Banner = () => {
                             <button
                                 type="button"
                                 onClick={() => goToProjectsCategory('network')}
-                                className="inline-flex items-center gap-1.5 mx-1.5 text-foreground text-[1.08em] transition-all duration-200 hover:text-primary hover:[text-shadow:0_0_10px_rgba(52,211,153,0.55)] hover:[&>svg]:[filter:drop-shadow(0_0_6px_rgba(52,211,153,0.75))]"
+                                className="inline-flex items-center gap-1.5 mx-1.5 text-foreground text-[1.08em] transition-all duration-200 hover:text-primary hover:[text-shadow:0_0_10px_rgba(255,255,255,0.55)] hover:[&>svg]:[filter:drop-shadow(0_0_6px_rgba(255,255,255,0.75))]"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-primary transition-all duration-200">
                                     <circle cx="5" cy="12" r="2" />
@@ -278,8 +278,8 @@ const Banner = () => {
                                 100% { opacity: 1; transform: scale(1) rotate(0deg); }
                             }
                             @keyframes online-pulse {
-                                0%, 100% { box-shadow: 0 0 0 0 hsl(158 64% 44% / 0.6); }
-                                60%       { box-shadow: 0 0 0 5px hsl(158 64% 44% / 0); }
+                                0%, 100% { box-shadow: 0 0 0 0 hsl(0 0% 100% / 0.6); }
+                                60%       { box-shadow: 0 0 0 5px hsl(0 0% 100% / 0); }
                             }
                         `}</style>
 
@@ -309,7 +309,7 @@ const Banner = () => {
                                     alignItems: 'center',
                                     marginBottom: 4,
                                     paddingBottom: 4,
-                                    borderBottom: '1px solid hsl(158 64% 42% / 0.12)',
+                                    borderBottom: '1px solid hsl(0 0% 100% / 0.12)',
                                 }}>
                                     <span style={{
                                         fontSize: 7,
@@ -331,7 +331,7 @@ const Banner = () => {
                                         <span style={{ color: '#111111' }}>
                                             {bubbleText.slice(0, Math.min(bubbleText.length, bubblePrefix.length))}
                                         </span>
-                                        <span style={{ color: 'hsl(158 64% 42%)' }}>
+                                        <span style={{ color: 'hsl(0 0% 100%)' }}>
                                             {bubbleText.length > bubblePrefix.length ? bubbleText.slice(bubblePrefix.length) : ''}
                                         </span>
                                     </span>
@@ -339,7 +339,7 @@ const Banner = () => {
                                         <span style={{
                                             display: 'inline-block',
                                             width: 2, height: 13,
-                                            background: 'hsl(158 64% 44%)',
+                                            background: 'hsl(0 0% 100%)',
                                             borderRadius: 1,
                                             marginLeft: 2, flexShrink: 0,
                                             animation: 'cursor-blink 0.65s ease-in-out infinite',
@@ -348,7 +348,12 @@ const Banner = () => {
                                     {showEmoji && (
                                         <span style={{
                                             display: 'inline-block',
-                                            marginLeft: 4, fontSize: 14, lineHeight: 1,
+                                            marginLeft: 4,
+                                            fontSize: 15,
+                                            lineHeight: 1,
+                                            color: '#101010',
+                                            fontWeight: 700,
+                                            textShadow: '0 0 10px rgba(255,255,255,0.32)',
                                             animation: 'emoji-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both',
                                         }}>
                                             ヾ(＾∇＾)

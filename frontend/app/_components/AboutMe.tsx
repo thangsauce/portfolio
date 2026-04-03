@@ -150,10 +150,9 @@ const AboutMe = () => {
                 <div className="grid md:grid-cols-12 gap-y-10 md:gap-x-8 lg:gap-x-12 mt-6 md:mt-10 items-start">
                     <div className="md:col-span-5 space-y-6">
                         <p className="text-lg md:text-2xl font-light leading-relaxed slide-up-and-fade">
-                            With projects like web platforms and security
-                            monitoring tools, I&apos;m constantly picking up new
-                            technologies and sharpening my problem-solving
-                            skills.
+                            My goal is to keep growing as a professional
+                            and contribute to meaningful technology projects
+                            through my commitment and continuous learning.
                         </p>
                         <div className="slide-up-and-fade flex gap-6 items-center">
                             <a
@@ -190,7 +189,7 @@ const AboutMe = () => {
                             <div className="absolute inset-0 rounded-full bg-primary/15 blur-2xl" />
                             <svg
                                 viewBox="0 0 120 120"
-                                className="relative h-full w-full text-primary drop-shadow-[0_0_18px_rgba(106,191,86,0.45)]"
+                                className="relative h-full w-full text-primary drop-shadow-[0_0_18px_rgba(255,255,255,0.45)]"
                                 fill="none"
                                 xmlns="http://www.w3.org/2000/svg"
                             >
@@ -207,9 +206,10 @@ const AboutMe = () => {
                     <div className="md:col-span-5">
                         <div className="text-lg text-muted-foreground max-w-[520px] space-y-6">
                             <p className="slide-up-and-fade text-lg md:text-2xl font-light leading-relaxed text-foreground/95">
-                                My goal is to keep growing as a professional
-                                and contribute to meaningful technology projects
-                                through my commitment and continuous learning.
+                                With projects like web platforms and security
+                                monitoring tools, I&apos;m constantly picking up new
+                                technologies and sharpening my problem-solving
+                                skills.
                             </p>
                             <div>
                             <p className="slide-up-and-fade text-sm uppercase tracking-widest text-muted-foreground/60">
@@ -243,7 +243,7 @@ const AboutMe = () => {
                         </div>
                         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/75 via-background/20 to-transparent" />
 
-                        <div className="absolute left-4 top-4 rounded-full border border-primary/45 bg-background/70 px-4 py-1.5 text-sm sm:text-base tracking-wide text-foreground shadow-[0_0_14px_rgba(52,211,153,0.25)]">
+                        <div className="absolute left-4 top-4 rounded-full border border-primary/45 bg-background/70 px-4 py-1.5 text-sm sm:text-base tracking-wide text-foreground shadow-[0_0_14px_rgba(255,255,255,0.25)]">
                             Based in <span className="text-primary">Orlando, FL</span>
                         </div>
 
@@ -253,7 +253,7 @@ const AboutMe = () => {
                             aria-hidden="true"
                         >
                             <div className="absolute left-3 right-3 top-6 border-t border-dashed border-primary/55" />
-                            <div ref={planeRef} className="absolute top-1 left-0 text-primary drop-shadow-[0_0_8px_rgba(106,191,86,0.45)]">
+                            <div ref={planeRef} className="absolute top-1 left-0 text-primary drop-shadow-[0_0_8px_rgba(255,255,255,0.45)]">
                                 <svg
                                     width="30"
                                     height="30"

@@ -51,13 +51,11 @@ const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [theme, setTheme] = useState<'light' | 'dark'>('dark');
-    const [showDesktopThemeToggle, setShowDesktopThemeToggle] = useState(true);
+    const [showThemeToggle, setShowThemeToggle] = useState(true);
     const router = useRouter();
     const pathname = usePathname();
     const lenis = useLenis();
     const isProjectPage = pathname === '/projects' || pathname?.startsWith('/projects/');
-    const eyeRef = useRef<SVGSVGElement>(null);
-    const pupilRef = useRef<SVGGElement>(null);
     const menuButtonRef = useRef<HTMLButtonElement>(null);
     const [menuBtnOffset, setMenuBtnOffset] = useState({ x: 0, y: 0 });
     const dragRef = useRef({
@@ -178,28 +176,29 @@ const Navbar = () => {
     }, []);
 
     useEffect(() => {
-        let timer: ReturnType<typeof setTimeout> | null = null;
+        if (pathname !== '/') {
+            setShowThemeToggle(false);
+            return;
+        }
 
-        const startDesktopThemeTimer = () => {
-            if (timer) clearTimeout(timer);
-            if (window.innerWidth < 768) {
-                setShowDesktopThemeToggle(false);
-                return;
-            }
+        const hero = document.querySelector('#banner') as HTMLElement | null;
+        if (!hero) {
+            setShowThemeToggle(false);
+            return;
+        }
 
-            setShowDesktopThemeToggle(true);
-            timer = setTimeout(() => {
-                setShowDesktopThemeToggle(false);
-            }, 10000);
-        };
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                setShowThemeToggle(entry.isIntersecting && entry.intersectionRatio > 0.45);
+            },
+            {
+                threshold: [0, 0.2, 0.45, 0.6, 0.8, 1],
+            },
+        );
 
-        startDesktopThemeTimer();
-        window.addEventListener('resize', startDesktopThemeTimer, { passive: true });
-        return () => {
-            if (timer) clearTimeout(timer);
-            window.removeEventListener('resize', startDesktopThemeTimer);
-        };
-    }, []);
+        observer.observe(hero);
+        return () => observer.disconnect();
+    }, [pathname]);
 
     useEffect(() => {
         const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -227,74 +226,6 @@ const Navbar = () => {
         document.documentElement.setAttribute('data-theme', nextTheme);
         window.localStorage.setItem('theme-preference', nextTheme);
     };
-
-    useEffect(() => {
-        const eye = eyeRef.current;
-        const pupil = pupilRef.current;
-        if (!eye || !pupil) return;
-
-        const eyeMoveX = gsap.quickTo(eye, 'x', { duration: 0.18, ease: 'power3.out' });
-        const eyeMoveY = gsap.quickTo(eye, 'y', { duration: 0.18, ease: 'power3.out' });
-        const moveX = gsap.quickTo(pupil, 'x', { duration: 0.18, ease: 'power2.out' });
-        const moveY = gsap.quickTo(pupil, 'y', { duration: 0.18, ease: 'power2.out' });
-        let cursorOffsetY = 0;
-        let scrollOffsetX = 0;
-        let scrollOffsetY = 0;
-        let scrollResetTimer: ReturnType<typeof setTimeout> | null = null;
-
-        const applyEyeOffset = () => {
-            eyeMoveX(gsap.utils.clamp(-14, 14, scrollOffsetX));
-            eyeMoveY(gsap.utils.clamp(-14, 14, cursorOffsetY + scrollOffsetY));
-        };
-
-        const onMove = (e: MouseEvent) => {
-            const rect = eye.getBoundingClientRect();
-            const cx = rect.left + rect.width / 2;
-            const cy = rect.top + rect.height / 2;
-            const dx = e.clientX - cx;
-            const dy = e.clientY - cy;
-            const max = 10;
-            const dist = Math.hypot(dx, dy) || 1;
-            const clamped = Math.min(max, dist);
-            const x = (dx / dist) * clamped;
-            const y = (dy / dist) * clamped;
-            moveX(x);
-            moveY(y);
-            cursorOffsetY = gsap.utils.clamp(-10, 10, dy * 0.12);
-            applyEyeOffset();
-        };
-
-        const onWheel = (e: WheelEvent) => {
-            scrollOffsetX = gsap.utils.clamp(-14, 14, e.deltaX * 0.16);
-            scrollOffsetY = gsap.utils.clamp(-14, 14, e.deltaY * 0.16);
-            applyEyeOffset();
-            if (scrollResetTimer) clearTimeout(scrollResetTimer);
-            scrollResetTimer = setTimeout(() => {
-                scrollOffsetX = 0;
-                scrollOffsetY = 0;
-                applyEyeOffset();
-            }, 190);
-        };
-
-        const onLeave = () => {
-            moveX(0);
-            moveY(0);
-            cursorOffsetY = 0;
-            scrollOffsetX = 0;
-            scrollOffsetY = 0;
-            applyEyeOffset();
-        };
-
-        window.addEventListener('mousemove', onMove, { passive: true });
-        window.addEventListener('wheel', onWheel, { passive: true });
-        window.addEventListener('mouseleave', onLeave, { passive: true });
-        return () => {
-            window.removeEventListener('mousemove', onMove);
-            window.removeEventListener('wheel', onWheel);
-            window.removeEventListener('mouseleave', onLeave);
-            if (scrollResetTimer) clearTimeout(scrollResetTimer);
-        };
-    }, []);
 
     const handleMenuPointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
         const st = dragRef.current;
@@ -352,38 +283,42 @@ const Navbar = () => {
                     <Link
                         href="/#banner"
                         aria-label="Go to homepage"
-                        className="absolute top-5 left-5 md:left-6 z-[2] h-16 w-24 flex items-center justify-center text-primary/80"
+                        className="absolute top-2 left-5 md:top-1 md:left-6 z-[2] h-20 w-28 md:h-24 md:w-36 flex items-center justify-center text-primary/85"
                     >
                         <svg
-                            ref={eyeRef}
-                            viewBox="0 0 120 70"
-                            className="h-12 w-20"
+                            viewBox="0 0 120 72"
+                            className="h-16 w-24 md:h-20 md:w-32 shooting-star"
                             fill="none"
                             xmlns="http://www.w3.org/2000/svg"
                             aria-hidden="true"
                         >
-                            <defs>
-                                <clipPath id="nav-eye-clip">
-                                    <path d="M6 35C18 15 38 6 60 6C82 6 102 15 114 35C102 55 82 64 60 64C38 64 18 55 6 35Z" />
-                                </clipPath>
-                            </defs>
                             <path
-                                d="M6 35C18 15 38 6 60 6C82 6 102 15 114 35C102 55 82 64 60 64C38 64 18 55 6 35Z"
-                                fill="hsl(var(--background))"
+                                d="M10 52H76"
                                 stroke="currentColor"
-                                strokeWidth="4"
+                                strokeWidth="3"
+                                strokeLinecap="round"
+                                opacity="0.24"
+                                className="shooting-star-tail"
                             />
-                            <g clipPath="url(#nav-eye-clip)">
-                                <rect x="0" y="0" width="120" height="70" fill="hsl(var(--background))" />
-                                <g ref={pupilRef}>
-                                    <circle cx="60" cy="35" r="11" fill="currentColor" />
-                                    <circle cx="60" cy="35" r="3" fill="hsl(var(--background))" />
-                                </g>
-                                <path
-                                    className="eye-lid-svg"
-                                    d="M6 35C18 15 38 6 60 6C82 6 102 15 114 35C102 55 82 64 60 64C38 64 18 55 6 35Z"
-                                    fill="hsl(var(--background))"
-                                />
+                            <path
+                                d="M16 46H84"
+                                stroke="currentColor"
+                                strokeWidth="2.2"
+                                strokeLinecap="round"
+                                opacity="0.38"
+                                className="shooting-star-tail"
+                            />
+                            <path
+                                d="M24 40H90"
+                                stroke="currentColor"
+                                strokeWidth="1.6"
+                                strokeLinecap="round"
+                                opacity="0.5"
+                                className="shooting-star-tail"
+                            />
+                            <g className="shooting-star-head">
+                                <path d="M88 31L92.8 41L104 45L92.8 49L88 59L83.2 49L72 45L83.2 41L88 31Z" fill="currentColor" />
+                                <circle cx="88" cy="45" r="2.6" fill="hsl(var(--background))" opacity="0.7" />
                             </g>
                         </svg>
                     </Link>
@@ -442,7 +377,7 @@ const Navbar = () => {
                     title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
                     className={cn(
                         'absolute top-5 right-5 md:right-10 z-[2] hidden md:inline-flex h-8 w-8 items-center justify-center rounded-full border border-border/70 bg-background/30 text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all duration-500',
-                        showDesktopThemeToggle
+                        showThemeToggle
                             ? 'md:opacity-100 md:pointer-events-auto'
                             : 'md:opacity-0 md:pointer-events-none',
                     )}
@@ -466,6 +401,36 @@ const Navbar = () => {
                     )}
                 </button>
             </div>
+
+            <button
+                onClick={toggleTheme}
+                aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+                className={cn(
+                    'fixed bottom-5 right-5 z-[4] inline-flex md:hidden h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-background/40 backdrop-blur-sm text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all duration-500',
+                    showThemeToggle
+                        ? 'opacity-100 pointer-events-auto'
+                        : 'opacity-0 pointer-events-none',
+                )}
+            >
+                {theme === 'dark' ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="5" />
+                        <path d="M12 1v2" />
+                        <path d="M12 21v2" />
+                        <path d="m4.22 4.22 1.42 1.42" />
+                        <path d="m18.36 18.36 1.42 1.42" />
+                        <path d="M1 12h2" />
+                        <path d="M21 12h2" />
+                        <path d="m4.22 19.78 1.42-1.42" />
+                        <path d="m18.36 5.64 1.42-1.42" />
+                    </svg>
+                ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+                    </svg>
+                )}
+            </button>
 
             <div
                 className={cn(
@@ -492,7 +457,7 @@ const Navbar = () => {
                 <div className="grow flex w-auto px-4 md:px-4 lg:px-5">
                     <div className="flex gap-6 flex-col md:flex-row md:items-center md:gap-4 w-auto">
                         <div className="order-2">
-                            <p className="text-primary mb-3 md:mb-0 md:mr-2 text-xs md:text-[11px] tracking-[0.14em]">
+                            <p className="text-primary mb-3 md:mb-0 md:mr-2 text-xs md:text-[11px] tracking-[0.14em] md:hidden">
                                 SOCIAL
                             </p>
                             <ul className="space-y-1 md:space-y-0 md:flex md:items-center md:gap-4">
@@ -501,13 +466,16 @@ const Navbar = () => {
                                         {'internal' in link && link.internal ? (
                                             <button
                                                 onClick={() => navigateTo(link.url)}
-                                            className="group flex items-center gap-2 md:gap-2.5 text-base md:text-[15px] capitalize text-foreground transition-colors duration-200 hover:text-white"
+                                            className="nav-shake group flex items-center gap-2 md:gap-2.5 text-base md:text-[15px] capitalize text-foreground transition-colors duration-200 hover:text-white"
                                             >
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-foreground/75 transition-all duration-200 group-hover:text-white group-hover:[filter:drop-shadow(0_0_8px_rgba(255,255,255,0.95))]">
-                                                    <path d="M4 19.5V4.5a.5.5 0 0 1 .8-.4L10 8h10a.5.5 0 0 1 .5.5v10.5a.5.5 0 0 1-.5.5H4.5a.5.5 0 0 1-.5-.5Z" />
-                                                    <path d="M8 12h8" />
-                                                    <path d="M8 15h6" />
-                                                </svg>
+                                                <img
+                                                    src="https://cdn-icons-png.flaticon.com/512/2125/2125457.png"
+                                                    alt=""
+                                                    width="18"
+                                                    height="18"
+                                                    aria-hidden="true"
+                                                    className="opacity-80 transition-opacity duration-200 group-hover:opacity-100 dark:brightness-0 dark:invert"
+                                                />
                                                 {link.name}
                                             </button>
                                         ) : (
@@ -515,15 +483,15 @@ const Navbar = () => {
                                                 href={link.url}
                                                 target="_blank"
                                                 rel="noreferrer"
-                                                className="group flex items-center gap-2 md:gap-2.5 text-base md:text-[15px] capitalize text-foreground hover:text-primary transition-colors duration-200"
+                                                className="nav-shake group flex items-center gap-2 md:gap-2.5 text-base md:text-[15px] capitalize text-foreground transition-colors duration-200 hover:text-white"
                                             >
                                                 {link.name === 'github' && (
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="text-foreground/75 transition-all duration-200 group-hover:text-green-400 group-hover:[filter:drop-shadow(0_0_6px_#4ade80)]">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="text-foreground/75 transition-all duration-200 group-hover:text-white">
                                                         <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
                                                     </svg>
                                                 )}
                                                 {link.name === 'linkedin' && (
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="text-foreground/75 transition-all duration-200 group-hover:text-blue-400 group-hover:[filter:drop-shadow(0_0_6px_#60a5fa)]">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="text-foreground/75 transition-all duration-200 group-hover:text-white">
                                                         <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
                                                     </svg>
                                                 )}
@@ -545,10 +513,10 @@ const Navbar = () => {
                                             onClick={() => {
                                                 navigateTo(link.url);
                                             }}
-                                            className="group text-base flex items-center gap-3 text-left"
+                                            className="nav-shake group text-base flex items-center gap-3 text-left hover:text-white transition-colors duration-200"
                                         >
                                             <span
-                                                className="size-4 flex items-center justify-center text-foreground/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all"
+                                                className="size-4 flex items-center justify-center text-foreground/40 group-hover:text-white group-hover:translate-x-0.5 transition-all"
                                             >
                                                 <svg
                                                     width="14"
@@ -568,58 +536,48 @@ const Navbar = () => {
                                 ))}
                             </ul>
                         </div>
-                        <div className="order-3 md:hidden">
-                            <p className="text-primary mb-3 md:mb-0 md:mr-2 text-xs md:text-[11px] tracking-[0.14em]">PORTFOLIO MODE</p>
-                            <div className="flex flex-col gap-2.5 md:flex-row md:items-center md:gap-4">
-                                <button
-                                    onClick={toggleTheme}
-                                    aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-                                    title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
-                                    className="group inline-flex h-8 w-8 items-center justify-center rounded-full border border-border/70 bg-background/30 text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors duration-200"
-                                >
-                                    {theme === 'dark' ? (
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                                            <circle cx="12" cy="12" r="5" />
-                                            <path d="M12 1v2" />
-                                            <path d="M12 21v2" />
-                                            <path d="m4.22 4.22 1.42 1.42" />
-                                            <path d="m18.36 18.36 1.42 1.42" />
-                                            <path d="M1 12h2" />
-                                            <path d="M21 12h2" />
-                                            <path d="m4.22 19.78 1.42-1.42" />
-                                            <path d="m18.36 5.64 1.42-1.42" />
-                                        </svg>
-                                    ) : (
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                                            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
-                                        </svg>
-                                    )}
-                                </button>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
             <style jsx>{`
-                .eye-lid-svg {
-                    transform-box: fill-box;
-                    transform-origin: center;
-                    animation: eyeBlink 5.8s ease-in-out infinite;
+                .shooting-star {
+                    animation: starDrift 2.8s ease-in-out infinite;
+                }
+                .shooting-star-tail {
+                    transform-origin: 92px 38px;
+                    animation: tailPulse 2.8s ease-in-out infinite;
+                }
+                .shooting-star-head {
+                    transform-origin: 94px 38px;
+                    animation: starTwinkle 2.8s ease-in-out infinite;
                 }
                 .menu-dot-blink {
                     animation: menuDotBlink 2.4s ease-in-out infinite;
                 }
-                @keyframes eyeBlink {
-                    0%,
-                    43%,
-                    48%,
-                    100% {
-                        transform: scaleY(0);
-                    }
-                    45%,
-                    46% {
-                        transform: scaleY(1);
-                    }
+                @keyframes starDrift {
+                    0% { transform: translate(0px, 0px) rotate(-4deg); opacity: 0.84; }
+                    35% { transform: translate(3px, -2px) rotate(-2deg); opacity: 1; }
+                    70% { transform: translate(-2px, 1px) rotate(-5deg); opacity: 0.92; }
+                    100% { transform: translate(0px, 0px) rotate(-4deg); opacity: 0.84; }
+                }
+                @keyframes tailPulse {
+                    0%, 100% { opacity: 0.24; }
+                    50% { opacity: 0.58; }
+                }
+                @keyframes starTwinkle {
+                    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0px currentColor); }
+                    50% { transform: scale(1.08); filter: drop-shadow(0 0 6px currentColor); }
+                }
+                .nav-shake:hover {
+                    animation: navShake 0.34s ease-in-out;
+                }
+                @keyframes navShake {
+                    0% { transform: translateX(0); }
+                    20% { transform: translateX(-1.5px) rotate(-0.6deg); }
+                    40% { transform: translateX(1.5px) rotate(0.6deg); }
+                    60% { transform: translateX(-1px) rotate(-0.3deg); }
+                    80% { transform: translateX(1px) rotate(0.3deg); }
+                    100% { transform: translateX(0); }
                 }
                 @keyframes menuDotBlink {
                     0%,
