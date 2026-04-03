@@ -105,4 +105,58 @@
     .markdown-text ul {
         @apply pl-5 mt-2 list-disc;
     }
+
+    @keyframes clickableTextGlowPulseDark {
+        0%,
+        100% {
+            text-shadow: 0 0 0 rgba(255, 255, 255, 0);
+            filter: drop-shadow(0 0 0 rgba(255, 255, 255, 0));
+        }
+        50% {
+            text-shadow:
+                0 0 6px rgba(255, 255, 255, 0.45),
+                0 0 12px rgba(255, 255, 255, 0.28);
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.24));
+        }
+    }
+
+    a:not(.no-click-glow),
+    button:not(.no-click-glow),
+    [role='button']:not(.no-click-glow),
+    input[type='submit']:not(.no-click-glow),
+    input[type='button']:not(.no-click-glow) {
+        animation: clickableTextGlowPulseDark 3.8s ease-in-out infinite !important;
+        will-change: text-shadow, filter;
+    }
+
+    a:disabled,
+    button:disabled,
+    input[type='submit']:disabled,
+    input[type='button']:disabled {
+        animation: none !important;
+        text-shadow: none !important;
+        filter: none !important;
+    }
+
+    @keyframes clickableTextGlowPulseLight {
+        0%,
+        100% {
+            text-shadow: 0 0 0 rgba(17, 24, 39, 0);
+            filter: drop-shadow(0 0 0 rgba(17, 24, 39, 0));
+        }
+        50% {
+            text-shadow:
+                0 0 5px rgba(17, 24, 39, 0.22),
+                0 0 10px rgba(17, 24, 39, 0.12);
+            filter: drop-shadow(0 0 7px rgba(17, 24, 39, 0.15));
+        }
+    }
+
+    [data-theme='light'] a:not(.no-click-glow),
+    [data-theme='light'] button:not(.no-click-glow),
+    [data-theme='light'] [role='button']:not(.no-click-glow),
+    [data-theme='light'] input[type='submit']:not(.no-click-glow),
+    [data-theme='light'] input[type='button']:not(.no-click-glow) {
+        animation: clickableTextGlowPulseLight 3.8s ease-in-out infinite !important;
+    }
 }

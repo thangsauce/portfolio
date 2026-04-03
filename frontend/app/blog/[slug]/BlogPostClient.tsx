@@ -87,7 +87,7 @@ export default function BlogPostClient({
             {/* Header */}
             <header style={{ marginBottom: 52, borderBottom: '1px solid hsl(0 0% 11%)', paddingBottom: 32 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20, flexWrap: 'wrap' }}>
-                <span style={{ fontSize: 10, letterSpacing: '0.2em', color: 'hsl(0 0% 30%)', textTransform: 'uppercase' }}>
+                <span style={{ fontSize: 10, letterSpacing: '0.2em', color: 'hsl(var(--foreground) / 0.72)', textTransform: 'uppercase' }}>
                   {formatDate(post.published_at ?? post.created_at)} · {formatTime(post.published_at ?? post.created_at)}
                 </span>
                 {post.tags.map(tag => (
@@ -247,9 +247,10 @@ function BackLink({ onBack }: { onBack?: () => void }) {
       style={{
         display: 'inline-flex', alignItems: 'center', gap: 8,
         fontSize: 10, letterSpacing: '0.28em', textTransform: 'uppercase',
-        color: hovered ? 'hsl(158 64% 42%)' : 'hsl(0 0% 30%)',
+        color: hovered ? '#ffffff' : 'hsl(var(--foreground) / 0.7)',
+        textShadow: hovered ? '0 0 10px rgba(255,255,255,0.55)' : 'none',
         textDecoration: 'none', marginBottom: 52,
-        transition: 'color 0.12s',
+        transition: 'color 0.12s, text-shadow 0.12s',
       }}
     >
       ← blog
