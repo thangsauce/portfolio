@@ -159,4 +159,15 @@
     [data-theme='light'] input[type='button']:not(.no-click-glow) {
         animation: clickableTextGlowPulseLight 3.8s ease-in-out infinite !important;
     }
+
+    /* Keep dashboard controls/text sharp by disabling global clickable glow there. */
+    .no-dashboard-click-glow a:not(.no-click-glow),
+    .no-dashboard-click-glow button:not(.no-click-glow),
+    .no-dashboard-click-glow [role='button']:not(.no-click-glow),
+    .no-dashboard-click-glow input[type='submit']:not(.no-click-glow),
+    .no-dashboard-click-glow input[type='button']:not(.no-click-glow) {
+        animation: none !important;
+        text-shadow: none !important;
+        filter: none !important;
+    }
 }

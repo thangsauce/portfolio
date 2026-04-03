@@ -46,6 +46,7 @@ const sv = { width: 13, height: 13, viewBox: '0 0 16 16', fill: 'none', stroke: 
 function IcPlus()   { return <svg {...sv}><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg> }
 function IcTrash()  { return <svg {...sv}><polyline points="2,5 14,5"/><path d="M5 5V3h6v2"/><path d="M4 5l1 9h6l1-9"/></svg> }
 function IcSearch() { return <svg {...sv}><circle cx="7" cy="7" r="4.5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/></svg> }
+function IcPanel()  { return <svg {...sv}><rect x="2.5" y="2.5" width="11" height="11" rx="1.5"/><line x1="6" y1="2.5" x2="6" y2="13.5"/></svg> }
 
 // ─── Post Editor ──────────────────────────────────────────────────────────────
 function PostEditor({
@@ -291,6 +292,53 @@ export default function BlogDashboardPage() {
   const [creating,    setCreating]    = useState(false)
   const [search,      setSearch]      = useState('')
   const [hoveredId,   setHoveredId]   = useState<string | null>(null)
+  const [leftWidth, setLeftWidth] = useState(280)
+  const [leftCollapsed, setLeftCollapsed] = useState(false)
+  const [resizing, setResizing] = useState(false)
+
+  const BLOG_LEFT_MIN = 240
+  const BLOG_LEFT_MAX = 560
+  const BLOG_LEFT_WIDTH_KEY = 'dashboard.blog.leftWidth'
+  const BLOG_LEFT_COLLAPSED_KEY = 'dashboard.blog.leftCollapsed'
+
+  useEffect(() => {
+    const savedWidth = window.localStorage.getItem(BLOG_LEFT_WIDTH_KEY)
+    const savedCollapsed = window.localStorage.getItem(BLOG_LEFT_COLLAPSED_KEY)
+    const parsedWidth = Number(savedWidth)
+    if (!Number.isNaN(parsedWidth) && parsedWidth >= BLOG_LEFT_MIN && parsedWidth <= BLOG_LEFT_MAX) {
+      setLeftWidth(parsedWidth)
+    }
+    setLeftCollapsed(savedCollapsed === '1')
+  }, [])
+
+  useEffect(() => {
+    window.localStorage.setItem(BLOG_LEFT_WIDTH_KEY, String(leftWidth))
+  }, [leftWidth])
+
+  useEffect(() => {
+    window.localStorage.setItem(BLOG_LEFT_COLLAPSED_KEY, leftCollapsed ? '1' : '0')
+  }, [leftCollapsed])
+
+  useEffect(() => {
+    if (!resizing) return
+    const onMove = (e: MouseEvent) => {
+      const next = Math.max(BLOG_LEFT_MIN, Math.min(BLOG_LEFT_MAX, e.clientX))
+      setLeftWidth(next)
+    }
+    const onUp = () => {
+      setResizing(false)
+      document.body.style.userSelect = ''
+      document.body.style.cursor = ''
+    }
+    document.body.style.userSelect = 'none'
+    document.body.style.cursor = 'col-resize'
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+    return () => {
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
+  }, [resizing])
 
   useEffect(() => {
     apiPrivate<PostItem[]>('/blog')
@@ -353,19 +401,48 @@ export default function BlogDashboardPage() {
   return (
     <div style={{
       display: 'flex',
+      position: 'relative',
       height: 'calc(100vh - 44px)',
       margin: '-32px -28px',
       fontFamily: 'var(--font-roboto-flex)',
       overflow: 'hidden',
     }}>
 
+      {leftCollapsed && (
+        <button
+          onClick={() => setLeftCollapsed(false)}
+          title="Show posts panel"
+          style={{
+            position: 'absolute',
+            top: 10,
+            left: 10,
+            zIndex: 3,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            fontSize: 11,
+            color: 'hsl(var(--dash-fg-muted))',
+            background: 'hsl(var(--dash-panel))',
+            border: '1px solid hsl(var(--dash-border))',
+            borderRadius: 8,
+            padding: '6px 10px',
+            cursor: 'pointer',
+          }}
+        >
+          <IcPanel /> posts
+        </button>
+      )}
+
       {/* ── Left panel ──────────────────────────────────── */}
       <div style={{
-        width: 280, minWidth: 280, flexShrink: 0,
+        width: leftCollapsed ? 0 : leftWidth,
+        minWidth: leftCollapsed ? 0 : leftWidth,
+        flexShrink: 0,
         background: 'hsl(var(--dash-panel))',
-        borderRight: '1px solid hsl(var(--dash-border))',
+        borderRight: leftCollapsed ? 'none' : '1px solid hsl(var(--dash-border))',
         display: 'flex', flexDirection: 'column',
         overflow: 'hidden',
+        transition: resizing ? 'none' : 'width 0.18s ease',
       }}>
 
         {/* Header */}
@@ -378,22 +455,46 @@ export default function BlogDashboardPage() {
             <span style={{ fontSize: 11, color: 'hsl(var(--dash-fg-dim))' }}>
               Posts
             </span>
-            <button onClick={createPost} disabled={creating}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 5,
-                fontSize: 11,
-                color: creating ? 'hsl(var(--dash-fg-dim))' : 'hsl(158 64% 42%)',
-                background: 'none', border: 'none',
-                borderRadius: 6,
-                cursor: creating ? 'not-allowed' : 'pointer',
-                padding: 0, transition: 'color 0.12s',
-                fontFamily: 'var(--font-roboto-flex)',
-              }}
-              onMouseEnter={e => { if (!creating) e.currentTarget.style.color = 'hsl(158 64% 60%)' }}
-              onMouseLeave={e => { if (!creating) e.currentTarget.style.color = 'hsl(158 64% 42%)' }}
-            >
-              <IcPlus /> new
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <button
+                onClick={() => setLeftCollapsed(true)}
+                title="Minimize posts panel"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 5,
+                  fontSize: 11,
+                  color: 'hsl(var(--dash-fg-dim))',
+                  background: 'none',
+                  border: 'none',
+                  borderRadius: 6,
+                  cursor: 'pointer',
+                  padding: 0,
+                  transition: 'color 0.12s',
+                  fontFamily: 'var(--font-roboto-flex)',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.color = 'hsl(var(--dash-fg-muted))' }}
+                onMouseLeave={e => { e.currentTarget.style.color = 'hsl(var(--dash-fg-dim))' }}
+              >
+                <IcPanel />
+              </button>
+              <button onClick={createPost} disabled={creating}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 5,
+                  fontSize: 11,
+                  color: creating ? 'hsl(var(--dash-fg-dim))' : 'hsl(158 64% 42%)',
+                  background: 'none', border: 'none',
+                  borderRadius: 6,
+                  cursor: creating ? 'not-allowed' : 'pointer',
+                  padding: 0, transition: 'color 0.12s',
+                  fontFamily: 'var(--font-roboto-flex)',
+                }}
+                onMouseEnter={e => { if (!creating) e.currentTarget.style.color = 'hsl(158 64% 60%)' }}
+                onMouseLeave={e => { if (!creating) e.currentTarget.style.color = 'hsl(158 64% 42%)' }}
+              >
+                <IcPlus /> new
+              </button>
+            </div>
           </div>
 
           {/* Search */}
@@ -474,6 +575,24 @@ export default function BlogDashboardPage() {
           })}
         </div>
       </div>
+
+      {!leftCollapsed && (
+        <div
+          onMouseDown={() => setResizing(true)}
+          role="separator"
+          aria-orientation="vertical"
+          aria-label="Resize blog list panel"
+          style={{
+            width: 6,
+            cursor: 'col-resize',
+            background: 'transparent',
+            position: 'relative',
+            zIndex: 2,
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = 'hsl(var(--dash-border-subtle))' }}
+          onMouseLeave={e => { if (!resizing) e.currentTarget.style.background = 'transparent' }}
+        />
+      )}
 
       {/* ── Right panel ─────────────────────────────────── */}
       <div style={{

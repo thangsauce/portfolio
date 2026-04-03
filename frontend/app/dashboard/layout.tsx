@@ -130,25 +130,43 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const pupil = logoPupilRef.current
     if (!eye || !pupil) return
 
+    const target = { x: 0, y: 0 }
+    const current = { x: 0, y: 0 }
+    let rafId = 0
+
+    const render = () => {
+      current.x += (target.x - current.x) * 0.18
+      current.y += (target.y - current.y) * 0.18
+      pupil.setAttribute(
+        'transform',
+        `translate(${current.x.toFixed(2)} ${current.y.toFixed(2)})`,
+      )
+      rafId = window.requestAnimationFrame(render)
+    }
+
     const onMove = (e: MouseEvent) => {
       const rect = eye.getBoundingClientRect()
       const cx   = rect.left + rect.width / 2
       const cy   = rect.top + rect.height / 2
       const dx   = e.clientX - cx
       const dy   = e.clientY - cy
-      const max  = 4.2
+      const max  = 6.8
       const dist = Math.hypot(dx, dy) || 1
       const clamped = Math.min(max, dist)
-      const x = (dx / dist) * clamped
-      const y = (dy / dist) * clamped
-      pupil.setAttribute('transform', `translate(${x} ${y})`)
+      target.x = (dx / dist) * clamped
+      target.y = (dy / dist) * clamped
     }
 
-    const onLeave = () => { pupil.setAttribute('transform', 'translate(0 0)') }
+    const onLeave = () => {
+      target.x = 0
+      target.y = 0
+    }
 
+    rafId = window.requestAnimationFrame(render)
     window.addEventListener('mousemove', onMove, { passive: true })
     window.addEventListener('mouseleave', onLeave, { passive: true })
     return () => {
+      window.cancelAnimationFrame(rafId)
       window.removeEventListener('mousemove', onMove)
       window.removeEventListener('mouseleave', onLeave)
     }
@@ -176,7 +194,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <DashboardThemeContext.Provider value={{ isLight, toggleTheme }}>
       <div
         data-theme={theme}
-        className={`transition-opacity duration-500 ${mounted ? 'opacity-100' : 'opacity-0'} fixed inset-0 z-50 flex overflow-hidden font-roboto-flex bg-[hsl(var(--dash-bg))]`}
+        className={`no-dashboard-click-glow transition-opacity duration-500 ${mounted ? 'opacity-100' : 'opacity-0'} fixed inset-0 z-50 flex overflow-hidden font-roboto-flex bg-[hsl(var(--dash-bg))]`}
       >
         {/* ── Sidebar ─────────────────────────────────────────────────────── */}
         <aside className={`${isSidebarCollapsed ? 'w-[76px] min-w-[76px]' : 'w-60 min-w-[240px]'} flex-shrink-0 flex flex-col bg-[hsl(var(--dash-sidebar))] border-r border-border transition-all duration-200`}>
@@ -188,7 +206,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           >
             <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center gap-0' : 'gap-3'}`}>
               <div
-                className="w-[42px] h-[34px] flex-shrink-0 flex items-center justify-center text-primary rounded-[14px]"
+                className={`w-[42px] h-[34px] flex-shrink-0 flex items-center justify-center rounded-[14px] ${isLight ? 'text-foreground' : 'text-primary'}`}
                 style={{ boxShadow: '0 0 0 1px hsl(158 64% 36% / 0.28), 0 4px 14px hsl(158 64% 36% / 0.16)' }}
               >
                 <svg
@@ -225,7 +243,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <div className="text-sm font-semibold tracking-tight text-foreground leading-tight">
                   thangle.me
                 </div>
-                <div className="text-[11px] text-primary mt-0.5 tracking-wide">
+                <div className={`text-[11px] mt-0.5 tracking-wide ${isLight ? 'text-foreground/85' : 'text-primary'}`}>
                   Dashboard
                 </div>
               </div>
@@ -262,14 +280,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   className={[
                     `flex items-center ${isSidebarCollapsed ? 'justify-center gap-0 px-2.5' : 'gap-2.5 px-2.5'} py-[9px] mb-px text-[13px] tracking-tight rounded-xl no-underline transition-colors duration-150`,
                     isActive
-                      ? 'font-medium text-primary bg-primary/[0.12]'
-                      : 'font-normal text-muted-foreground hover:text-foreground hover:bg-muted',
+                      ? (isLight
+                          ? 'font-medium text-foreground bg-foreground/[0.08]'
+                          : 'font-medium text-primary bg-primary/[0.12]')
+                      : (isLight
+                          ? 'font-normal text-foreground/70 hover:text-foreground hover:bg-muted'
+                          : 'font-normal text-muted-foreground hover:text-foreground hover:bg-muted'),
                   ].join(' ')}
                 >
                   <Icon />
                   {!isSidebarCollapsed && <span className="flex-1">{label}</span>}
                   {isActive && (
-                    <div className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                    <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${isLight ? 'bg-foreground' : 'bg-primary'}`} />
                   )}
                 </Link>
               )
@@ -316,12 +338,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {/* Topbar */}
           <header className="h-11 min-h-[44px] flex-shrink-0 bg-[hsl(var(--dash-sidebar))] border-b border-border flex items-center justify-between px-7">
             <div className="flex items-center gap-2">
-              <span className="text-[13px] tracking-tight text-muted-foreground">
+              <span className={`text-[13px] tracking-tight ${isLight ? 'text-foreground/80' : 'text-muted-foreground'}`}>
                 Dashboard
               </span>
               {segments.map((seg, i) => (
                 <span key={i} className="flex items-center gap-2">
-                  <span className="text-base leading-none font-light text-muted-foreground">›</span>
+                  <span className={`text-base leading-none font-light ${isLight ? 'text-foreground/70' : 'text-muted-foreground'}`}>›</span>
                   <span className={[
                     'text-[13px] tracking-tight capitalize',
                     i === segments.length - 1
@@ -337,15 +359,37 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="flex items-center gap-2">
               <button
                 onClick={toggleTheme}
-                className="mr-2.5 px-3 py-[5px] rounded-full border border-border bg-muted text-muted-foreground text-xs tracking-tight cursor-pointer"
+                className="mr-2.5 px-3 py-[5px] rounded-full border border-border bg-muted text-muted-foreground text-xs tracking-tight cursor-pointer inline-flex items-center gap-1.5"
               >
-                {isLight ? '🌙 Dark' : '☀ Light'}
+                {isLight ? (
+                  <>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M12 3a7 7 0 1 0 9 9 9 9 0 1 1-9-9z" />
+                    </svg>
+                    <span>Dark</span>
+                  </>
+                ) : (
+                  <>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <circle cx="12" cy="12" r="4" />
+                      <line x1="12" y1="2" x2="12" y2="5" />
+                      <line x1="12" y1="19" x2="12" y2="22" />
+                      <line x1="2" y1="12" x2="5" y2="12" />
+                      <line x1="19" y1="12" x2="22" y2="12" />
+                      <line x1="4.9" y1="4.9" x2="7" y2="7" />
+                      <line x1="17" y1="17" x2="19.1" y2="19.1" />
+                      <line x1="17" y1="7" x2="19.1" y2="4.9" />
+                      <line x1="4.9" y1="19.1" x2="7" y2="17" />
+                    </svg>
+                    <span>Light</span>
+                  </>
+                )}
               </button>
               <div
-                className="w-[7px] h-[7px] rounded-full bg-primary"
-                style={{ boxShadow: '0 0 0 2px hsl(158 64% 42% / 0.22)' }}
+                className="w-[7px] h-[7px] rounded-full bg-emerald-400 animate-pulse"
+                style={{ boxShadow: '0 0 0 2px rgba(16, 185, 129, 0.22), 0 0 10px rgba(16, 185, 129, 0.35)' }}
               />
-              <span className="text-xs tracking-tight text-muted-foreground">Online</span>
+              <span className="text-xs tracking-tight text-emerald-400">Online</span>
             </div>
           </header>
 

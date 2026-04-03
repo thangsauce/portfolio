@@ -259,11 +259,11 @@ export function ContactSection() {
                             href={GENERAL_INFO.linkedinProfile}
                             target="_blank"
                             rel="noreferrer"
-                            className="group relative flex-1 flex flex-col items-center justify-center gap-3 px-6 py-6 rounded-xl border border-border bg-background-light overflow-hidden hover:border-blue-500/60 transition-all duration-300 text-center"
+                            className="group relative flex-1 flex flex-col items-center justify-center gap-3 px-6 py-6 rounded-xl border border-border [[data-theme='light']_&]:border-foreground/30 bg-background-light overflow-hidden hover:border-primary/60 [[data-theme='light']_&]:hover:border-foreground/55 transition-all duration-300 text-center"
                         >
-                            <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                            <div className="size-12 rounded-full bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors duration-300">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-blue-400">
+                            <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                            <div className="size-12 rounded-full bg-primary/10 [[data-theme='light']_&]:bg-foreground/10 flex items-center justify-center group-hover:bg-primary/20 [[data-theme='light']_&]:group-hover:bg-foreground/20 transition-colors duration-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-primary [[data-theme='light']_&]:text-foreground">
                                     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
                                 </svg>
                             </div>
