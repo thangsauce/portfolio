@@ -1,12 +1,10 @@
 'use client';
 import ArrowAnimation from '@/components/ArrowAnimation';
-import Button from '@/components/Button';
 import { apiFetch } from '@/lib/api';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
 import { useLenis } from 'lenis/react';
-import Image from 'next/image';
 import React from 'react';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -17,11 +15,6 @@ const Banner = () => {
     const [resumeUrl, setResumeUrl] = React.useState('/resume.pdf');
     const titleRef = React.useRef<HTMLHeadingElement>(null);
 
-    // ── Speech bubble typewriter ─────────────────────────────────────────
-    const [bubbleText, setBubbleText] = React.useState('');
-    const [showCursor, setShowCursor] = React.useState(false);
-    const [showEmoji,  setShowEmoji]  = React.useState(false);
-    const bubblePrefix = "Hi! I'm ";
     type ProjectCategoryKey = 'web_development' | 'cybersecurity' | 'network';
 
     const goToContact = () => {
@@ -114,28 +107,6 @@ const Banner = () => {
         return () => { mounted = false; };
     }, []);
 
-    // Typewriter: starts after bubble pops in (3.9s)
-    React.useEffect(() => {
-        const full = `${bubblePrefix}Thang Le`;
-        let i = 0;
-        const start = setTimeout(() => {
-            setShowCursor(true);
-            const interval = setInterval(() => {
-                i++;
-                setBubbleText(full.slice(0, i));
-                if (i >= full.length) {
-                    clearInterval(interval);
-                    setTimeout(() => {
-                        setShowEmoji(true);
-                        setTimeout(() => setShowCursor(false), 900);
-                    }, 150);
-                }
-            }, 58);
-            return () => clearInterval(interval);
-        }, 3900);
-        return () => clearTimeout(start);
-    }, []);
-
     useGSAP(
         () => {
             const isHorizontalMode = window.innerWidth >= 768 && !!document.querySelector('.horizontal-mode');
@@ -185,7 +156,7 @@ const Banner = () => {
                                 ref={titleRef}
                                 className="banner-title slide-up-and-fade leading-[0.92] font-sans font-bold tracking-tight"
                             >
-                                {renderAnimatedWord('IT', 'text-primary block text-[32px] sm:text-[42px] md:text-[48px] font-anton uppercase tracking-[0.24em]')}
+                                {renderAnimatedWord('IT', 'text-primary block text-[32px] sm:text-[42px] md:text-[48px] font-anton uppercase tracking-[0.24em] [[data-theme="light"]_&]:text-foreground')}
                                 <span className="block text-[52px] sm:text-[80px] md:text-[96px] lg:text-[102px]">
                                     {'SPECIALIST'.split('').map((char, idx) => (
                                         <span
@@ -197,15 +168,15 @@ const Banner = () => {
                                     ))}
                                 </span>
                             </h1>
-                            <span className="hero-title-sweep absolute left-0 mt-2 block h-1.5 w-[200px] sm:w-[250px] rounded-full bg-primary/70" />
+                            <span className="hero-title-sweep absolute left-0 mt-2 block h-1.5 w-[200px] sm:w-[250px] rounded-full bg-primary/70 [[data-theme='light']_&]:bg-black/75" />
                         </div>
                         <div className="banner-description slide-up-and-fade mt-5 max-w-[52ch] text-base sm:text-lg leading-relaxed text-muted-foreground">
                             <button
                                 type="button"
                                 onClick={() => goToProjectsCategory('web_development')}
-                                className="inline-flex items-center gap-1.5 mx-1.5 text-foreground text-[1.08em] transition-all duration-200 hover:text-primary hover:[text-shadow:0_0_10px_rgba(255,255,255,0.55)] hover:[&>svg]:[filter:drop-shadow(0_0_6px_rgba(255,255,255,0.75))]"
+                                className="inline-flex items-center gap-1.5 mx-1.5 text-foreground text-[1.08em] transition-all duration-200 hover:text-primary [[data-theme='light']_&]:hover:text-black hover:[text-shadow:0_0_10px_rgba(255,255,255,0.55)] [[data-theme='light']_&]:hover:[text-shadow:0_0_0_rgba(0,0,0,0)] hover:[&>svg]:[filter:drop-shadow(0_0_6px_rgba(255,255,255,0.75))] [[data-theme='light']_&]:hover:[&>svg]:[filter:drop-shadow(0_0_0_rgba(0,0,0,0))]"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-primary transition-all duration-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-primary transition-all duration-200 [[data-theme='light']_&]:text-black">
                                     <polyline points="16 18 22 12 16 6" />
                                     <polyline points="8 6 2 12 8 18" />
                                 </svg>
@@ -214,9 +185,9 @@ const Banner = () => {
                             <button
                                 type="button"
                                 onClick={() => goToProjectsCategory('cybersecurity')}
-                                className="inline-flex items-center gap-1.5 mx-1.5 text-foreground text-[1.08em] transition-all duration-200 hover:text-primary hover:[text-shadow:0_0_10px_rgba(255,255,255,0.55)] hover:[&>svg]:[filter:drop-shadow(0_0_6px_rgba(255,255,255,0.75))]"
+                                className="inline-flex items-center gap-1.5 mx-1.5 text-foreground text-[1.08em] transition-all duration-200 hover:text-primary [[data-theme='light']_&]:hover:text-black hover:[text-shadow:0_0_10px_rgba(255,255,255,0.55)] [[data-theme='light']_&]:hover:[text-shadow:0_0_0_rgba(0,0,0,0)] hover:[&>svg]:[filter:drop-shadow(0_0_6px_rgba(255,255,255,0.75))] [[data-theme='light']_&]:hover:[&>svg]:[filter:drop-shadow(0_0_0_rgba(0,0,0,0))]"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-primary transition-all duration-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-primary transition-all duration-200 [[data-theme='light']_&]:text-black">
                                     <path d="M12 2 4 5v6c0 5 3.4 9.6 8 11 4.6-1.4 8-6 8-11V5l-8-3z" />
                                 </svg>
                                 cybersecurity
@@ -224,9 +195,9 @@ const Banner = () => {
                             <button
                                 type="button"
                                 onClick={() => goToProjectsCategory('network')}
-                                className="inline-flex items-center gap-1.5 mx-1.5 text-foreground text-[1.08em] transition-all duration-200 hover:text-primary hover:[text-shadow:0_0_10px_rgba(255,255,255,0.55)] hover:[&>svg]:[filter:drop-shadow(0_0_6px_rgba(255,255,255,0.75))]"
+                                className="inline-flex items-center gap-1.5 mx-1.5 text-foreground text-[1.08em] transition-all duration-200 hover:text-primary [[data-theme='light']_&]:hover:text-black hover:[text-shadow:0_0_10px_rgba(255,255,255,0.55)] [[data-theme='light']_&]:hover:[text-shadow:0_0_0_rgba(0,0,0,0)] hover:[&>svg]:[filter:drop-shadow(0_0_6px_rgba(255,255,255,0.75))] [[data-theme='light']_&]:hover:[&>svg]:[filter:drop-shadow(0_0_0_rgba(0,0,0,0))]"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-primary transition-all duration-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-primary transition-all duration-200 [[data-theme='light']_&]:text-black">
                                     <circle cx="5" cy="12" r="2" />
                                     <circle cx="19" cy="6" r="2" />
                                     <circle cx="19" cy="18" r="2" />
@@ -238,180 +209,54 @@ const Banner = () => {
                             </button>
                         </div>
                         <div className="flex gap-4 flex-wrap mt-9 banner-button slide-up-and-fade">
-                            <Button
-                                as="button"
-                                variant="primary"
+                            <button
+                                type="button"
                                 onClick={goToContact}
-                                className="rounded-full"
+                                className="group h-12 px-8 inline-flex justify-center items-center text-lg uppercase font-anton tracking-widest rounded-full border border-border transition-colors duration-300 ease-out bg-black text-white hover:bg-white hover:text-black [[data-theme='dark']_&]:bg-white [[data-theme='dark']_&]:text-black [[data-theme='dark']_&]:hover:bg-black [[data-theme='dark']_&]:hover:text-white [[data-theme='dark']_&]:hover:border-white"
                             >
-                                Let&apos;s Connect
-                            </Button>
+                                <span className="transition-all duration-300 group-hover:-translate-y-full group-hover:opacity-0 absolute">
+                                    Let&apos;s Connect
+                                </span>
+                                <span className="transition-all duration-300 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 absolute">
+                                    Let&apos;s Connect
+                                </span>
+                                <span className="invisible">Let&apos;s Connect</span>
+                            </button>
                             <a
                                 href={resumeUrl}
                                 download="Thang_Le_Resume.pdf"
-                                className="group h-12 px-8 inline-flex justify-center items-center text-lg uppercase font-anton tracking-widest border border-border hover:border-primary hover:text-primary transition-colors overflow-hidden relative rounded-full"
+                                className="group h-12 px-8 inline-flex justify-center items-center text-lg uppercase font-anton tracking-widest border border-border hover:border-primary hover:text-primary transition-colors overflow-hidden relative rounded-full [[data-theme='light']_&]:text-foreground [[data-theme='light']_&]:border-foreground/35 [[data-theme='dark']_&]:border-white/35"
                             >
-                                <span className="transition-all duration-300 group-hover:-translate-y-full group-hover:opacity-0 absolute">Résumé</span>
-                                <span className="transition-all duration-300 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 absolute">Download</span>
+                                <span className="transition-all duration-300 group-hover:-translate-y-full group-hover:opacity-0 absolute [[data-theme='light']_&]:text-foreground">Résumé</span>
+                                <span className="transition-all duration-300 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 absolute [[data-theme='light']_&]:text-foreground">Download</span>
                                 <span className="invisible">Résumé</span>
                             </a>
-                        </div>
-                    </div>
-
-                    <div className="slide-up-and-fade relative shrink-0 w-full max-w-[300px] sm:max-w-[360px] lg:max-w-[390px] mx-0 mr-auto lg:mx-0 mt-12 lg:mt-0">
-
-                        {/* ── Speech bubble ──────────────────────────── */}
-                        <style>{`
-                            @keyframes bubble-in {
-                                0%   { opacity: 0; transform: scale(0.3) rotate(-8deg); }
-                                55%  { opacity: 1; transform: scale(1.07) rotate(1.5deg); }
-                                75%  { transform: scale(0.96) rotate(-0.5deg); }
-                                100% { opacity: 1; transform: scale(1) rotate(0deg); }
-                            }
-                            @keyframes cursor-blink {
-                                0%, 100% { opacity: 1; }
-                                50%       { opacity: 0; }
-                            }
-                            @keyframes emoji-pop {
-                                0%   { opacity: 0; transform: scale(0) rotate(-20deg); }
-                                60%  { transform: scale(1.4) rotate(10deg); }
-                                100% { opacity: 1; transform: scale(1) rotate(0deg); }
-                            }
-                            @keyframes online-pulse {
-                                0%, 100% { box-shadow: 0 0 0 0 hsl(0 0% 100% / 0.6); }
-                                60%       { box-shadow: 0 0 0 5px hsl(0 0% 100% / 0); }
-                            }
-                        `}</style>
-
-                        <div
-                            className="absolute top-3 right-2 md:-top-8 md:-right-10 z-10"
-                            style={{
-                                transformOrigin: 'bottom right',
-                                animation: 'bubble-in 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) 3.8s both',
-                            }}
-                        >
-                            {/* Bubble body */}
-                            <div style={{
-                                background: '#ffffff',
-                                backdropFilter: 'blur(28px)',
-                                WebkitBackdropFilter: 'blur(28px)',
-                                borderRadius: 14,
-                                padding: '8px 10px 10px',
-                                boxShadow: '0 12px 34px rgba(0,0,0,0.28)',
-                                width: 'fit-content',
-                                maxWidth: 220,
-                                position: 'relative',
-                            }}>
-                                {/* Header row: timestamp */}
-                                <div style={{
-                                    display: 'flex',
-                                    justifyContent: 'flex-end',
-                                    alignItems: 'center',
-                                    marginBottom: 4,
-                                    paddingBottom: 4,
-                                    borderBottom: '1px solid hsl(0 0% 100% / 0.12)',
-                                }}>
-                                    <span style={{
-                                        fontSize: 7,
-                                        color: '#5f5f5f',
-                                        fontFamily: 'var(--font-roboto-flex)',
-                                        letterSpacing: '0.04em',
-                                    }}>
-                                        now
-                                    </span>
-                                </div>
-
-                                {/* Typed message */}
-                                <div style={{
-                                    display: 'flex', alignItems: 'center',
-                                    fontFamily: 'var(--font-roboto-flex)',
-                                    minHeight: 18,
-                                }}>
-                                    <span style={{ fontSize: 14, fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1 }}>
-                                        <span style={{ color: '#111111' }}>
-                                            {bubbleText.slice(0, Math.min(bubbleText.length, bubblePrefix.length))}
-                                        </span>
-                                        <span style={{ color: 'hsl(0 0% 100%)' }}>
-                                            {bubbleText.length > bubblePrefix.length ? bubbleText.slice(bubblePrefix.length) : ''}
-                                        </span>
-                                    </span>
-                                    {showCursor && (
-                                        <span style={{
-                                            display: 'inline-block',
-                                            width: 2, height: 13,
-                                            background: 'hsl(0 0% 100%)',
-                                            borderRadius: 1,
-                                            marginLeft: 2, flexShrink: 0,
-                                            animation: 'cursor-blink 0.65s ease-in-out infinite',
-                                        }} />
-                                    )}
-                                    {showEmoji && (
-                                        <span style={{
-                                            display: 'inline-block',
-                                            marginLeft: 4,
-                                            fontSize: 15,
-                                            lineHeight: 1,
-                                            color: '#101010',
-                                            fontWeight: 700,
-                                            textShadow: '0 0 10px rgba(255,255,255,0.32)',
-                                            animation: 'emoji-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both',
-                                        }}>
-                                            ヾ(＾∇＾)
-                                        </span>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Tail — points down-left from bubble border */}
-                            <div
-                                style={{
-                                    position: 'absolute',
-                                    left: 8,
-                                    bottom: -4,
-                                    width: 12,
-                                    height: 12,
-                                    background: '#ffffff',
-                                    transform: 'rotate(-35deg)',
-                                    borderRadius: 2,
-                                    boxShadow: '-3px 3px 8px rgba(0,0,0,0.12)',
-                                }}
-                            />
-                        </div>
-
-                        <div className="relative overflow-hidden">
-                            <Image
-                                src="/me.png"
-                                alt="Portrait of Thang Le"
-                                width={768}
-                                height={768}
-                                className="w-full h-auto object-cover"
-                            />
                         </div>
                     </div>
                 </div>
 
                 <div className="md:absolute bottom-8 left-0 right-0 flex gap-8 md:gap-0 md:justify-between pt-6 mt-8 md:mt-0">
                     <div className="slide-up-and-fade">
-                        <h5 className="text-2xl sm:text-3xl font-anton text-primary mb-1">
+                        <h5 className="text-2xl sm:text-3xl font-anton text-primary mb-1 [[data-theme='light']_&]:text-black">
                             University of Central Florida
                         </h5>
-                        <p className="text-sm text-muted-foreground uppercase tracking-wider">
+                        <p className="text-sm text-muted-foreground uppercase tracking-wider [[data-theme='light']_&]:text-black/80">
                             School
                         </p>
                     </div>
                     <div className="slide-up-and-fade">
-                        <h5 className="text-2xl sm:text-3xl font-anton text-primary mb-1">
+                        <h5 className="text-2xl sm:text-3xl font-anton text-primary mb-1 [[data-theme='light']_&]:text-black">
                             3+
                         </h5>
-                        <p className="text-sm text-muted-foreground uppercase tracking-wider">
+                        <p className="text-sm text-muted-foreground uppercase tracking-wider [[data-theme='light']_&]:text-black/80">
                             Projects
                         </p>
                     </div>
                     <div className="slide-up-and-fade">
-                        <h5 className="text-2xl sm:text-3xl font-anton text-primary mb-1">
+                        <h5 className="text-2xl sm:text-3xl font-anton text-primary mb-1 [[data-theme='light']_&]:text-black">
                             2027
                         </h5>
-                        <p className="text-sm text-muted-foreground uppercase tracking-wider">
+                        <p className="text-sm text-muted-foreground uppercase tracking-wider [[data-theme='light']_&]:text-black/80">
                             Graduating
                         </p>
                     </div>

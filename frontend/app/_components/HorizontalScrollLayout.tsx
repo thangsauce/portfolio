@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
+import { useLenis } from 'lenis/react';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -16,6 +17,9 @@ const HorizontalScrollLayout = ({ children }: Props) => {
     const trackRef = useRef<HTMLDivElement>(null);
     const panels = useMemo(() => React.Children.toArray(children), [children]);
     const scrollStateKey = 'portfolio:home:scrollY';
+    const lenis = useLenis();
+    const lenisRef = useRef(lenis);
+    useEffect(() => { lenisRef.current = lenis; }, [lenis]);
 
     useEffect(() => {
         if ('scrollRestoration' in window.history) {
@@ -47,6 +51,31 @@ const HorizontalScrollLayout = ({ children }: Props) => {
             save();
             window.removeEventListener('beforeunload', save);
             window.removeEventListener('pagehide', save);
+        };
+    }, []);
+
+    useEffect(() => {
+        const onWheel = (e: WheelEvent) => {
+            if (window.innerWidth < 768) return;
+            const root = rootRef.current;
+            const track = trackRef.current;
+            if (!root || !track) return;
+
+            const horizontalDistance = Math.max(0, track.scrollWidth - window.innerWidth);
+            if (horizontalDistance <= 0) return;
+
+            // Bridge horizontal intent (trackpad/mouse wheel X) into the vertical
+            // scroll timeline that drives GSAP horizontal panels.
+            const primaryX = Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 0.5;
+            if (!primaryX) return;
+
+            e.preventDefault();
+            lenisRef.current?.scrollTo(window.scrollY + e.deltaX, { immediate: true });
+        };
+
+        window.addEventListener('wheel', onWheel, { passive: false });
+        return () => {
+            window.removeEventListener('wheel', onWheel);
         };
     }, []);
 
