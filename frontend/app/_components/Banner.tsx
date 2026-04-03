@@ -199,48 +199,44 @@ const Banner = () => {
                             </h1>
                             <span className="hero-title-sweep absolute left-0 mt-2 block h-1.5 w-[200px] sm:w-[250px] rounded-full bg-primary/70" />
                         </div>
-                        <p className="banner-description slide-up-and-fade mt-5 max-w-[52ch] text-base sm:text-lg leading-relaxed text-muted-foreground">
-                            For most of the days, I dedicate most of my time to{' '}
-                            <span style={{ marginLeft: '-4px' }}>
-                                <button
-                                    type="button"
-                                    onClick={() => goToProjectsCategory('web_development')}
-                                    className="inline-flex items-center gap-1.5 mx-1.5 text-foreground text-[1.08em] transition-all duration-200 hover:text-primary hover:[text-shadow:0_0_10px_rgba(52,211,153,0.55)] hover:[&>svg]:[filter:drop-shadow(0_0_6px_rgba(52,211,153,0.75))]"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-primary transition-all duration-200">
-                                        <polyline points="16 18 22 12 16 6" />
-                                        <polyline points="8 6 2 12 8 18" />
-                                    </svg>
-                                    web development
-                                </button>{' '}
-                                <button
-                                    type="button"
-                                    onClick={() => goToProjectsCategory('cybersecurity')}
-                                    className="inline-flex items-center gap-1.5 mx-1.5 text-foreground text-[1.08em] transition-all duration-200 hover:text-primary hover:[text-shadow:0_0_10px_rgba(52,211,153,0.55)] hover:[&>svg]:[filter:drop-shadow(0_0_6px_rgba(52,211,153,0.75))]"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-primary transition-all duration-200">
-                                        <path d="M12 2 4 5v6c0 5 3.4 9.6 8 11 4.6-1.4 8-6 8-11V5l-8-3z" />
-                                    </svg>
-                                    cybersecurity
-                                </button>{' '}
-                                <button
-                                    type="button"
-                                    onClick={() => goToProjectsCategory('network')}
-                                    className="inline-flex items-center gap-1.5 mx-1.5 text-foreground text-[1.08em] transition-all duration-200 hover:text-primary hover:[text-shadow:0_0_10px_rgba(52,211,153,0.55)] hover:[&>svg]:[filter:drop-shadow(0_0_6px_rgba(52,211,153,0.75))]"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-primary transition-all duration-200">
-                                        <circle cx="5" cy="12" r="2" />
-                                        <circle cx="19" cy="6" r="2" />
-                                        <circle cx="19" cy="18" r="2" />
-                                        <path d="M7 12h4" />
-                                        <path d="M13 12l4-4" />
-                                        <path d="M13 12l4 4" />
-                                    </svg>
-                                    network
-                                </button>
-                            </span>
-                            <span className="mt-1 block">and I love taking new ideas and build it into a functioning product.</span>
-                        </p>
+                        <div className="banner-description slide-up-and-fade mt-5 max-w-[52ch] text-base sm:text-lg leading-relaxed text-muted-foreground">
+                            <button
+                                type="button"
+                                onClick={() => goToProjectsCategory('web_development')}
+                                className="inline-flex items-center gap-1.5 mx-1.5 text-foreground text-[1.08em] transition-all duration-200 hover:text-primary hover:[text-shadow:0_0_10px_rgba(52,211,153,0.55)] hover:[&>svg]:[filter:drop-shadow(0_0_6px_rgba(52,211,153,0.75))]"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-primary transition-all duration-200">
+                                    <polyline points="16 18 22 12 16 6" />
+                                    <polyline points="8 6 2 12 8 18" />
+                                </svg>
+                                web development
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => goToProjectsCategory('cybersecurity')}
+                                className="inline-flex items-center gap-1.5 mx-1.5 text-foreground text-[1.08em] transition-all duration-200 hover:text-primary hover:[text-shadow:0_0_10px_rgba(52,211,153,0.55)] hover:[&>svg]:[filter:drop-shadow(0_0_6px_rgba(52,211,153,0.75))]"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-primary transition-all duration-200">
+                                    <path d="M12 2 4 5v6c0 5 3.4 9.6 8 11 4.6-1.4 8-6 8-11V5l-8-3z" />
+                                </svg>
+                                cybersecurity
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => goToProjectsCategory('network')}
+                                className="inline-flex items-center gap-1.5 mx-1.5 text-foreground text-[1.08em] transition-all duration-200 hover:text-primary hover:[text-shadow:0_0_10px_rgba(52,211,153,0.55)] hover:[&>svg]:[filter:drop-shadow(0_0_6px_rgba(52,211,153,0.75))]"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-primary transition-all duration-200">
+                                    <circle cx="5" cy="12" r="2" />
+                                    <circle cx="19" cy="6" r="2" />
+                                    <circle cx="19" cy="18" r="2" />
+                                    <path d="M7 12h4" />
+                                    <path d="M13 12l4-4" />
+                                    <path d="M13 12l4 4" />
+                                </svg>
+                                network
+                            </button>
+                        </div>
                         <div className="flex gap-4 flex-wrap mt-9 banner-button slide-up-and-fade">
                             <Button
                                 as="button"
@@ -355,7 +351,7 @@ const Banner = () => {
                                             marginLeft: 4, fontSize: 14, lineHeight: 1,
                                             animation: 'emoji-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both',
                                         }}>
-                                            👋
+                                            ヾ(＾∇＾)
                                         </span>
                                     )}
                                 </div>

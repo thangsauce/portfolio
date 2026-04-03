@@ -3,7 +3,6 @@ import { cn } from '@/lib/utils';
 import { useState, useEffect, useRef } from 'react';
 import { useLenis } from 'lenis/react';
 import gsap from 'gsap';
-import { MoveUpRight } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { SOCIAL_LINKS } from '@/lib/data';
@@ -52,6 +51,7 @@ const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+    const [showDesktopThemeToggle, setShowDesktopThemeToggle] = useState(true);
     const router = useRouter();
     const pathname = usePathname();
     const lenis = useLenis();
@@ -167,6 +167,38 @@ const Navbar = () => {
         }
         window.addEventListener('scroll', handleScroll, { passive: true });
         return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    useEffect(() => {
+        const onResize = () => {
+            if (window.innerWidth >= 768) setIsMenuOpen(false);
+        };
+        window.addEventListener('resize', onResize, { passive: true });
+        return () => window.removeEventListener('resize', onResize);
+    }, []);
+
+    useEffect(() => {
+        let timer: ReturnType<typeof setTimeout> | null = null;
+
+        const startDesktopThemeTimer = () => {
+            if (timer) clearTimeout(timer);
+            if (window.innerWidth < 768) {
+                setShowDesktopThemeToggle(false);
+                return;
+            }
+
+            setShowDesktopThemeToggle(true);
+            timer = setTimeout(() => {
+                setShowDesktopThemeToggle(false);
+            }, 10000);
+        };
+
+        startDesktopThemeTimer();
+        window.addEventListener('resize', startDesktopThemeTimer, { passive: true });
+        return () => {
+            if (timer) clearTimeout(timer);
+            window.removeEventListener('resize', startDesktopThemeTimer);
+        };
     }, []);
 
     useEffect(() => {
@@ -361,7 +393,7 @@ const Navbar = () => {
                 <button
                     ref={menuButtonRef}
                     className={cn(
-                        'group absolute top-5 right-5 md:right-10 z-[2] h-14 min-w-14 px-4 rounded-full bg-background/5 backdrop-blur-sm transition-all duration-300 touch-none',
+                        'group absolute top-5 right-5 z-[2] h-14 min-w-14 px-4 rounded-full bg-background/5 backdrop-blur-sm transition-all duration-300 touch-none md:hidden',
                     )}
                     style={{ transform: `translate(${menuBtnOffset.x}px, ${menuBtnOffset.y}px)` }}
                     onPointerDown={handleMenuPointerDown}
@@ -403,11 +435,41 @@ const Navbar = () => {
                         </span>
                     </span>
                 </button>
+
+                <button
+                    onClick={toggleTheme}
+                    aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                    title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+                    className={cn(
+                        'absolute top-5 right-5 md:right-10 z-[2] hidden md:inline-flex h-8 w-8 items-center justify-center rounded-full border border-border/70 bg-background/30 text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all duration-500',
+                        showDesktopThemeToggle
+                            ? 'md:opacity-100 md:pointer-events-auto'
+                            : 'md:opacity-0 md:pointer-events-none',
+                    )}
+                >
+                    {theme === 'dark' ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <circle cx="12" cy="12" r="5" />
+                            <path d="M12 1v2" />
+                            <path d="M12 21v2" />
+                            <path d="m4.22 4.22 1.42 1.42" />
+                            <path d="m18.36 18.36 1.42 1.42" />
+                            <path d="M1 12h2" />
+                            <path d="M21 12h2" />
+                            <path d="m4.22 19.78 1.42-1.42" />
+                            <path d="m18.36 5.64 1.42-1.42" />
+                        </svg>
+                    ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+                        </svg>
+                    )}
+                </button>
             </div>
 
             <div
                 className={cn(
-                    'overlay fixed inset-0 z-[2] bg-black/70 transition-all duration-150',
+                    'overlay fixed inset-0 z-[2] bg-black/70 transition-all duration-150 md:hidden',
                     {
                         'opacity-0 invisible pointer-events-none': !isMenuOpen,
                     },
@@ -419,27 +481,27 @@ const Navbar = () => {
                 className={cn(
                     'fixed top-20 right-4 z-[3] overflow-hidden gap-y-2 transform transition-all duration-300 ease-linear',
                     'w-max max-w-[calc(100vw-2rem)] rounded-xl border border-border/70 -translate-y-3 opacity-0 invisible pointer-events-none',
-                    'md:top-5 md:left-1/2 md:right-auto md:w-max md:max-w-[calc(100vw-5rem)] md:h-auto md:min-h-0 md:rounded-xl md:border md:border-border/70 md:-translate-y-full md:-translate-x-1/2',
+                    'md:top-5 md:left-1/2 md:right-auto md:max-w-none md:-translate-x-1/2 md:translate-y-0 md:opacity-100 md:visible md:pointer-events-auto',
                     'flex flex-col py-2 md:py-1',
                     {
-                        'translate-y-0 opacity-100 visible pointer-events-auto md:translate-y-0 md:-translate-x-1/2': isMenuOpen,
+                        'translate-y-0 opacity-100 visible pointer-events-auto md:-translate-x-1/2': isMenuOpen,
                     },
                 )}
             >
                 <div className="absolute inset-0 bg-background/85 backdrop-blur-md z-[-1]" />
-                <div className="grow flex md:items-start w-auto px-4 md:px-5 lg:px-6">
-                    <div className="flex gap-6 md:gap-6 lg:gap-8 md:justify-center md:items-start md:flex-row flex-col w-auto">
-                        <div className="order-2 md:order-2">
-                            <p className="text-primary mb-3 md:mb-2">
+                <div className="grow flex w-auto px-4 md:px-4 lg:px-5">
+                    <div className="flex gap-6 flex-col md:flex-row md:items-center md:gap-4 w-auto">
+                        <div className="order-2">
+                            <p className="text-primary mb-3 md:mb-0 md:mr-2 text-xs md:text-[11px] tracking-[0.14em]">
                                 SOCIAL
                             </p>
-                            <ul className="space-y-1">
+                            <ul className="space-y-1 md:space-y-0 md:flex md:items-center md:gap-4">
                                 {SOCIAL_MENU_LINKS.map((link) => (
                                     <li key={link.name}>
                                         {'internal' in link && link.internal ? (
                                             <button
                                                 onClick={() => navigateTo(link.url)}
-                                            className="group flex items-center gap-2.5 text-base md:text-lg capitalize text-foreground transition-colors duration-200 hover:text-white"
+                                            className="group flex items-center gap-2 md:gap-2.5 text-base md:text-[15px] capitalize text-foreground transition-colors duration-200 hover:text-white"
                                             >
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-foreground/75 transition-all duration-200 group-hover:text-white group-hover:[filter:drop-shadow(0_0_8px_rgba(255,255,255,0.95))]">
                                                     <path d="M4 19.5V4.5a.5.5 0 0 1 .8-.4L10 8h10a.5.5 0 0 1 .5.5v10.5a.5.5 0 0 1-.5.5H4.5a.5.5 0 0 1-.5-.5Z" />
@@ -453,7 +515,7 @@ const Navbar = () => {
                                                 href={link.url}
                                                 target="_blank"
                                                 rel="noreferrer"
-                                                className="group flex items-center gap-2.5 text-base md:text-lg capitalize text-foreground hover:text-primary transition-colors duration-200"
+                                                className="group flex items-center gap-2 md:gap-2.5 text-base md:text-[15px] capitalize text-foreground hover:text-primary transition-colors duration-200"
                                             >
                                                 {link.name === 'github' && (
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="text-foreground/75 transition-all duration-200 group-hover:text-green-400 group-hover:[filter:drop-shadow(0_0_6px_#4ade80)]">
@@ -472,18 +534,18 @@ const Navbar = () => {
                                 ))}
                             </ul>
                         </div>
-                        <div className="order-1 md:order-1">
-                            <p className="text-primary mb-3 md:mb-2">
+                        <div className="order-1 md:hidden">
+                            <p className="text-primary mb-3">
                                 MENU
                             </p>
-                            <ul className="space-y-1 md:space-y-0 md:grid md:grid-rows-3 md:grid-flow-col md:gap-x-8 md:gap-y-1">
+                            <ul className="space-y-1">
                                 {MENU_LINKS.map((link) => (
                                     <li key={link.name}>
                                         <button
                                             onClick={() => {
                                                 navigateTo(link.url);
                                             }}
-                                            className="group text-base md:text-lg flex items-center gap-3 text-left"
+                                            className="group text-base flex items-center gap-3 text-left"
                                         >
                                             <span
                                                 className="size-4 flex items-center justify-center text-foreground/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all"
@@ -506,22 +568,14 @@ const Navbar = () => {
                                 ))}
                             </ul>
                         </div>
-                        <div className="order-3">
-                            <p className="text-primary mb-3 md:mb-2">ACTION</p>
-                            <div className="flex flex-col gap-2.5">
-                                <button
-                                    onClick={() => {
-                                        navigateTo('/#contact');
-                                    }}
-                                    className="group flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors duration-200"
-                                >
-                                    <MoveUpRight size={16} className="group-hover:-translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-200" />
-                                    <span className="text-sm md:text-base uppercase tracking-widest">Let's Connect</span>
-                                </button>
-
+                        <div className="order-3 md:hidden">
+                            <p className="text-primary mb-3 md:mb-0 md:mr-2 text-xs md:text-[11px] tracking-[0.14em]">PORTFOLIO MODE</p>
+                            <div className="flex flex-col gap-2.5 md:flex-row md:items-center md:gap-4">
                                 <button
                                     onClick={toggleTheme}
-                                    className="group inline-flex items-center gap-2.5 text-muted-foreground hover:text-foreground transition-colors duration-200"
+                                    aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                                    title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+                                    className="group inline-flex h-8 w-8 items-center justify-center rounded-full border border-border/70 bg-background/30 text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors duration-200"
                                 >
                                     {theme === 'dark' ? (
                                         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -540,9 +594,6 @@ const Navbar = () => {
                                             <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
                                         </svg>
                                     )}
-                                    <span className="text-sm md:text-base uppercase tracking-widest">
-                                        {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-                                    </span>
                                 </button>
                             </div>
                         </div>
