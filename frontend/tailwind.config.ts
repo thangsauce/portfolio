@@ -64,6 +64,7 @@ export default {
                 anton: ['var(--font-anton)'],
                 'roboto-flex': ['var(--font-roboto-flex)'],
                 'google-sans': ['var(--font-google-sans)'],
+                'space-grotesk': ['var(--font-space-grotesk)'],
             },
             padding: {
                 section: '250px',

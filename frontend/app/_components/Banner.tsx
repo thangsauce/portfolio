@@ -154,10 +154,10 @@ const Banner = () => {
                         <div className="relative w-full max-w-[700px]">
                             <h1
                                 ref={titleRef}
-                                className="banner-title slide-up-and-fade leading-[0.92] font-sans font-bold tracking-tight"
+                                className="banner-title slide-up-and-fade leading-[0.92] font-space-grotesk font-bold tracking-tight"
                             >
-                                {renderAnimatedWord('IT', 'text-primary block text-[32px] sm:text-[42px] md:text-[48px] font-anton uppercase tracking-[0.24em] [[data-theme="light"]_&]:text-foreground')}
-                                <span className="block text-[52px] sm:text-[80px] md:text-[96px] lg:text-[102px]">
+                                {renderAnimatedWord('IT', 'hero-shine-text block text-[32px] sm:text-[42px] md:text-[48px] font-space-grotesk uppercase tracking-[0.24em]')}
+                                <span className="hero-shine-text block text-[52px] sm:text-[80px] md:text-[96px] lg:text-[102px]">
                                     {'SPECIALIST'.split('').map((char, idx) => (
                                         <span
                                             key={`specialist-${idx}`}
@@ -212,7 +212,7 @@ const Banner = () => {
                             <button
                                 type="button"
                                 onClick={goToContact}
-                                className="group relative overflow-hidden h-12 px-8 inline-flex justify-center items-center text-lg uppercase font-anton tracking-widest rounded-full border border-border transition-all duration-300 ease-out bg-transparent text-foreground hover:border-white/50 hover:text-primary hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] [[data-theme='light']_&]:border-foreground/35 [[data-theme='dark']_&]:border-white/35"
+                                className="group relative overflow-hidden h-12 px-8 inline-flex justify-center items-center text-lg uppercase font-anton tracking-widest rounded-full border border-border transition-all duration-300 ease-out bg-transparent text-foreground hover:border-white/50 hover:text-primary hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] [[data-theme='light']_&]:border-zinc-400 [[data-theme='dark']_&]:border-white/35"
                             >
                                 <span className="absolute inset-0 flex items-center justify-center transition-all duration-300 group-hover:-translate-y-full group-hover:opacity-0">
                                     Let&apos;s Connect
@@ -225,7 +225,7 @@ const Banner = () => {
                             <a
                                 href={resumeUrl}
                                 download="Thang_Le_Resume.pdf"
-                                className="group h-12 px-8 inline-flex justify-center items-center text-lg uppercase font-anton tracking-widest border border-border hover:border-white/50 hover:text-primary hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all overflow-hidden relative rounded-full [[data-theme='light']_&]:text-foreground [[data-theme='light']_&]:border-foreground/35 [[data-theme='dark']_&]:border-white/35"
+                                className="group h-12 px-8 inline-flex justify-center items-center text-lg uppercase font-anton tracking-widest border border-border hover:border-white/50 hover:text-primary hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all overflow-hidden relative rounded-full [[data-theme='light']_&]:text-foreground [[data-theme='light']_&]:border-zinc-400 [[data-theme='dark']_&]:border-white/35"
                             >
                                 <span className="transition-all duration-300 group-hover:-translate-y-full group-hover:opacity-0 absolute [[data-theme='light']_&]:text-foreground">Résumé</span>
                                 <span className="transition-all duration-300 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 absolute [[data-theme='light']_&]:text-foreground">Download</span>
@@ -262,6 +262,24 @@ const Banner = () => {
                     </div>
                 </div>
             </div>
+            <style jsx>{`
+                .hero-shine-text {
+                    color: #e5e7eb;
+                    display: inline-block;
+                    text-shadow:
+                        0 -1px 0 rgba(255, 255, 255, 0.45),
+                        0 1px 0 rgba(148, 163, 184, 0.42),
+                        0 0 10px rgba(255, 255, 255, 0.14);
+                }
+
+                :global([data-theme='light']) .hero-shine-text {
+                    color: #1f2937;
+                    text-shadow:
+                        0 -1px 0 rgba(255, 255, 255, 0.72),
+                        0 1px 0 rgba(17, 24, 39, 0.18),
+                        0 0 8px rgba(255, 255, 255, 0.16);
+                }
+            `}</style>
         </section>
     );
 };

@@ -97,9 +97,9 @@ const CurrentlyUsing = () => {
         <section className="pt-0 pb-section" id="currently-using" ref={containerRef}>
             <div className="container">
                 <div className="flex items-center gap-3 mb-10">
-                    <span className="text-primary font-mono text-xl leading-none select-none">&lt;</span>
+                    <span className="text-primary [[data-theme='light']_&]:text-foreground/80 font-mono text-xl leading-none select-none">&lt;</span>
                     <h2 className="text-xl uppercase leading-none tracking-widest">CURRENTLY USING</h2>
-                    <span className="text-primary font-mono text-xl leading-none select-none">&gt;</span>
+                    <span className="text-primary [[data-theme='light']_&]:text-foreground/80 font-mono text-xl leading-none select-none">&gt;</span>
                 </div>
 
                 {skills.length > 0 ? (

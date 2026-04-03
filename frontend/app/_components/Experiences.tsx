@@ -96,11 +96,11 @@ const Experiences = () => {
         <section className="-mt-4 md:mt-0 pb-section" id="my-experience">
             <div className="container" ref={containerRef}>
                 <div className="flex items-center gap-3 mb-10">
-                    <span className="text-primary font-mono text-2xl leading-none select-none">&lt;</span>
+                    <span className="text-primary [[data-theme='light']_&]:text-foreground/80 font-mono text-2xl leading-none select-none">&lt;</span>
                     <h2 className="text-2xl uppercase leading-none tracking-widest">
                         MY EXPERIENCE
                     </h2>
-                    <span className="text-primary font-mono text-2xl leading-none select-none">&gt;</span>
+                    <span className="text-primary [[data-theme='light']_&]:text-foreground/80 font-mono text-2xl leading-none select-none">&gt;</span>
                 </div>
 
                 <div className="grid gap-14">

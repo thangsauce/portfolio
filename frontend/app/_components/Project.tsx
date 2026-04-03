@@ -184,6 +184,17 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
                                         aria-label={`${project.title} website`}
                                         onClick={(e) => e.stopPropagation()}
                                     >
+                                        <span className="live-demo-cursor inline-flex items-center justify-center" aria-hidden="true">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="14"
+                                                height="14"
+                                                viewBox="0 0 24 24"
+                                                fill="currentColor"
+                                            >
+                                                <path d="M3 3l7.4 17 2.3-5.4 5.3-2.2L3 3z" />
+                                            </svg>
+                                        </span>
                                         <span className="live-demo-dot inline-block size-2 rounded-full bg-red-500" />
                                         <span>LIVE</span>
                                     </a>
@@ -224,8 +235,10 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
                     animation: liveDotBlink 1.15s ease-in-out infinite;
                 }
 
-                .live-demo-link {
-                    cursor: url('/cursor-live.svg') 4 4, pointer;
+                .live-demo-cursor {
+                    color: currentColor;
+                    opacity: 0.85;
+                    animation: liveCursorHint 1.1s ease-in-out infinite;
                 }
 
                 @keyframes liveDotBlink {
@@ -234,6 +247,18 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
                         opacity: 0.25;
                     }
                     50% {
+                        opacity: 1;
+                    }
+                }
+
+                @keyframes liveCursorHint {
+                    0%,
+                    100% {
+                        transform: translateX(0);
+                        opacity: 0.75;
+                    }
+                    50% {
+                        transform: translateX(2px);
                         opacity: 1;
                     }
                 }

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Anton, DM_Sans, Roboto_Flex } from 'next/font/google';
+import { Anton, DM_Sans, Roboto_Flex, Space_Grotesk } from 'next/font/google';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ReactLenis } from 'lenis/react';
 
@@ -33,6 +33,12 @@ const dmSans = DM_Sans({
     variable: '--font-google-sans',
 });
 
+const spaceGrotesk = Space_Grotesk({
+    weight: ['700'],
+    subsets: ['latin'],
+    variable: '--font-space-grotesk',
+});
+
 export const metadata: Metadata = {
     title: 'Thang Le — IT Specialist',
     description:
@@ -61,7 +67,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body
-                className={`${antonFont.variable} ${robotoFlex.variable} ${dmSans.variable} antialiased`}
+                className={`${antonFont.variable} ${robotoFlex.variable} ${dmSans.variable} ${spaceGrotesk.variable} antialiased`}
             >
                 <AuthProvider>
                 <ReactLenis
