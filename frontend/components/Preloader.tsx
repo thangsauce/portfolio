@@ -156,26 +156,29 @@ const Preloader = () => {
                     stroke: rgba(0, 0, 0, 0.7);
                 }
                 :global([data-theme='dark']) .preloader-core {
-                    fill: #f3f4f6;
-                    stroke: rgba(255, 255, 255, 0.82);
+                    fill: #d1d5db;
+                    stroke: rgba(17, 24, 39, 0.88);
                 }
                 :global([data-theme='dark']) .preloader-petal {
-                    fill: #9ca3af;
-                    stroke: rgba(255, 255, 255, 0.86);
+                    fill: #6b7280;
+                    stroke: rgba(17, 24, 39, 0.88);
                 }
                 :global([data-theme='dark']) .preloader-stem {
                     stroke: #d1d5db;
                 }
                 :global([data-theme='dark']) .preloader-leaf-main {
-                    fill: #6b7280;
-                    stroke: rgba(255, 255, 255, 0.85);
+                    fill: #4b5563;
+                    stroke: rgba(17, 24, 39, 0.92);
                 }
                 :global([data-theme='dark']) .preloader-fall-leaf {
-                    fill: #9ca3af;
-                    stroke: rgba(255, 255, 255, 0.88);
+                    fill: #6b7280;
+                    stroke: rgba(17, 24, 39, 0.9);
                 }
                 :global([data-theme='dark']) .preloader-fall-leaf-vein {
-                    stroke: rgba(17, 24, 39, 0.95);
+                    stroke: rgba(243, 244, 246, 0.9);
+                }
+                :global([data-theme='dark']) .preloader-flower {
+                    filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.32));
                 }
                 @keyframes preloaderLeafFall {
                     0% {

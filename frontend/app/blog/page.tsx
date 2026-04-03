@@ -3,7 +3,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { apiFetch } from '@/lib/api'
-import BlogPostClient from './[slug]/BlogPostClient'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type PostItem = {
@@ -54,7 +53,6 @@ function postIsoDate(post: PostItem): string | null {
 export default function BlogPage() {
   const [posts,   setPosts]   = useState<PostItem[]>([])
   const [loading, setLoading] = useState(true)
-  const [selectedSlug, setSelectedSlug] = useState<string | null>(null)
   const [query, setQuery] = useState('')
   const [dateQuery, setDateQuery] = useState('')
   const [page, setPage] = useState(1)
@@ -66,17 +64,6 @@ export default function BlogPage() {
   const [draggingCalendar, setDraggingCalendar] = useState(false)
 
   useEffect(() => {
-    const syncSlugFromUrl = () => {
-      const sp = new URLSearchParams(window.location.search)
-      const raw = (sp.get('slug') || '').trim()
-      setSelectedSlug(raw.length > 0 ? raw : null)
-    }
-    syncSlugFromUrl()
-    window.addEventListener('popstate', syncSlugFromUrl)
-    return () => window.removeEventListener('popstate', syncSlugFromUrl)
-  }, [])
-
-  useEffect(() => {
     apiFetch<PostItem[]>('/api/blog')
       .then((data) => {
         const sorted = [...data].sort((a, b) => postTime(b) - postTime(a))
@@ -85,10 +72,6 @@ export default function BlogPage() {
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
-
-  if (selectedSlug) {
-    return <BlogPostClient slug={selectedSlug} />
-  }
 
   const normalizedQuery = query.trim().toLowerCase()
   const postDays = useMemo(() => {
@@ -349,10 +332,17 @@ export default function BlogPage() {
   )
 }
 
-function PostRow({ post }: { post: PostItem }) {
+function PostRow({
+  post,
+}: {
+  post: PostItem
+}) {
   const raw = post.published_at ?? post.created_at
   return (
-    <Link href={`/blog?slug=${encodeURIComponent(post.slug)}`} className="block text-inherit no-underline">
+    <Link
+      href={`/blog/${encodeURIComponent(post.slug)}`}
+      className="block text-inherit no-underline"
+    >
       <article className="group rounded-xl border border-border bg-background-light/35 px-5 py-5 sm:px-6 sm:py-6 transition-all duration-300 hover:border-primary/45 hover:bg-background-light/55">
         <div className="flex flex-wrap items-center gap-3 text-[11px] uppercase tracking-[0.2em] text-muted-foreground/70 mb-3">
           {post.published_at ? (

@@ -82,249 +82,6 @@ type SpriteMeta = {
     frameBounds?: Array<{ sx: number; sy: number; sw: number; sh: number }>;
 };
 
-function computeComponentFrameBounds(
-    img: HTMLImageElement,
-    frameCount = SPRITE_FRAMES,
-    rowMajor = false,
-): Array<{ sx: number; sy: number; sw: number; sh: number }> | undefined {
-    const w = img.naturalWidth;
-    const h = img.naturalHeight;
-    if (!w || !h) return undefined;
-
-    const canvas = document.createElement('canvas');
-    canvas.width = w;
-    canvas.height = h;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return undefined;
-    ctx.clearRect(0, 0, w, h);
-    ctx.drawImage(img, 0, 0);
-
-    const image = ctx.getImageData(0, 0, w, h);
-    const data = image.data;
-    const visited = new Uint8Array(w * h);
-    const comps: Array<{
-        minX: number;
-        minY: number;
-        maxX: number;
-        maxY: number;
-        area: number;
-    }> = [];
-
-    const idx = (x: number, y: number) => y * w + x;
-    const alphaAt = (x: number, y: number) => data[idx(x, y) * 4 + 3];
-
-    const qx = new Int32Array(w * h);
-    const qy = new Int32Array(w * h);
-
-    for (let y = 0; y < h; y += 1) {
-        for (let x = 0; x < w; x += 1) {
-            const i = idx(x, y);
-            if (visited[i]) continue;
-            visited[i] = 1;
-            if (alphaAt(x, y) <= ALPHA_THRESHOLD) continue;
-
-            let head = 0;
-            let tail = 0;
-            qx[tail] = x;
-            qy[tail] = y;
-            tail += 1;
-
-            let minX = x;
-            let maxX = x;
-            let minY = y;
-            let maxY = y;
-            let area = 0;
-
-            while (head < tail) {
-                const cx = qx[head];
-                const cy = qy[head];
-                head += 1;
-                area += 1;
-                if (cx < minX) minX = cx;
-                if (cx > maxX) maxX = cx;
-                if (cy < minY) minY = cy;
-                if (cy > maxY) maxY = cy;
-
-                const neighbors = [
-                    [cx - 1, cy],
-                    [cx + 1, cy],
-                    [cx, cy - 1],
-                    [cx, cy + 1],
-                ] as const;
-                for (const [nx, ny] of neighbors) {
-                    if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
-                    const ni = idx(nx, ny);
-                    if (visited[ni]) continue;
-                    visited[ni] = 1;
-                    if (alphaAt(nx, ny) <= ALPHA_THRESHOLD) continue;
-                    qx[tail] = nx;
-                    qy[tail] = ny;
-                    tail += 1;
-                }
-            }
-
-            if (area >= 80) {
-                comps.push({ minX, minY, maxX, maxY, area });
-            }
-        }
-    }
-
-    if (comps.length === 0) return undefined;
-
-    const ordered = comps
-        .sort((a, b) =>
-            rowMajor
-                ? a.minY === b.minY
-                    ? a.minX - b.minX
-                    : a.minY - b.minY
-                : a.minX - b.minX,
-        )
-        .slice(0, frameCount);
-    if (ordered.length !== frameCount) return undefined;
-
-    const pad = 1;
-    return ordered.map((c) => {
-        const sx = Math.max(0, c.minX - pad);
-        const sy = Math.max(0, c.minY - pad);
-        const ex = Math.min(w - 1, c.maxX + pad);
-        const ey = Math.min(h - 1, c.maxY + pad);
-        return {
-            sx,
-            sy,
-            sw: Math.max(1, ex - sx + 1),
-            sh: Math.max(1, ey - sy + 1),
-        };
-    });
-}
-
-function computeSeededFrameBounds(
-    img: HTMLImageElement,
-    frames: number,
-): Array<{ sx: number; sy: number; sw: number; sh: number }> | undefined {
-    const w = img.naturalWidth;
-    const h = img.naturalHeight;
-    if (!w || !h) return undefined;
-
-    const canvas = document.createElement('canvas');
-    canvas.width = w;
-    canvas.height = h;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return undefined;
-    ctx.clearRect(0, 0, w, h);
-    ctx.drawImage(img, 0, 0);
-
-    const image = ctx.getImageData(0, 0, w, h);
-    const data = image.data;
-    const idx = (x: number, y: number) => y * w + x;
-    const alphaAt = (x: number, y: number) => data[idx(x, y) * 4 + 3];
-    const qx = new Int32Array(w * h);
-    const qy = new Int32Array(w * h);
-
-    const findSeed = (cx: number, cy: number, r: number) => {
-        let bestX = -1;
-        let bestY = -1;
-        let bestDist = Number.POSITIVE_INFINITY;
-        const minX = Math.max(0, cx - r);
-        const maxX = Math.min(w - 1, cx + r);
-        const minY = Math.max(0, cy - r);
-        const maxY = Math.min(h - 1, cy + r);
-        for (let y = minY; y <= maxY; y += 1) {
-            for (let x = minX; x <= maxX; x += 1) {
-                if (alphaAt(x, y) <= ALPHA_THRESHOLD) continue;
-                const dx = x - cx;
-                const dy = y - cy;
-                const d2 = dx * dx + dy * dy;
-                if (d2 < bestDist) {
-                    bestDist = d2;
-                    bestX = x;
-                    bestY = y;
-                }
-            }
-        }
-        return bestX >= 0 ? { x: bestX, y: bestY } : null;
-    };
-
-    const bounds: Array<{ sx: number; sy: number; sw: number; sh: number }> =
-        [];
-    const visited = new Uint8Array(w * h);
-
-    for (let i = 0; i < frames; i += 1) {
-        const cellStart = Math.round((i * w) / frames);
-        const cellEnd = Math.round(((i + 1) * w) / frames);
-        const cellW = Math.max(1, cellEnd - cellStart);
-        const cx = Math.round((cellStart + cellEnd - 1) / 2);
-        const cy = Math.round(h * 0.55);
-
-        const seed =
-            findSeed(cx, cy, Math.round(cellW * 0.45)) ??
-            findSeed(cx, cy, Math.round(cellW * 0.9)) ??
-            null;
-
-        if (!seed) {
-            bounds.push({ sx: cellStart, sy: 0, sw: cellW, sh: h });
-            continue;
-        }
-
-        visited.fill(0);
-        let head = 0;
-        let tail = 0;
-        qx[tail] = seed.x;
-        qy[tail] = seed.y;
-        tail += 1;
-        visited[idx(seed.x, seed.y)] = 1;
-
-        let minX = seed.x;
-        let maxX = seed.x;
-        let minY = seed.y;
-        let maxY = seed.y;
-
-        while (head < tail) {
-            const x = qx[head];
-            const y = qy[head];
-            head += 1;
-            if (x < minX) minX = x;
-            if (x > maxX) maxX = x;
-            if (y < minY) minY = y;
-            if (y > maxY) maxY = y;
-
-            const neighbors = [
-                [x - 1, y],
-                [x + 1, y],
-                [x, y - 1],
-                [x, y + 1],
-            ] as const;
-
-            for (const [nx, ny] of neighbors) {
-                if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
-                // Hard stop at cell walls — prevents flood-fill from leaking
-                // into an adjacent character even if their pixels are touching.
-                if (nx < cellStart || nx >= cellEnd) continue;
-                if (alphaAt(nx, ny) <= ALPHA_THRESHOLD) continue;
-                const ni = idx(nx, ny);
-                if (visited[ni]) continue;
-                visited[ni] = 1;
-                qx[tail] = nx;
-                qy[tail] = ny;
-                tail += 1;
-            }
-        }
-
-        const pad = 1;
-        const sx = Math.max(cellStart, minX - pad);
-        const sy = Math.max(0, minY - pad);
-        const ex = Math.min(cellEnd - 1, maxX + pad);
-        const ey = Math.min(h - 1, maxY + pad);
-        bounds.push({
-            sx,
-            sy,
-            sw: Math.max(1, ex - sx + 1),
-            sh: Math.max(1, ey - sy + 1),
-        });
-    }
-
-    return bounds;
-}
-
 function computeGridFrameAlphaBounds(
     img: HTMLImageElement,
     cols: number,
@@ -484,11 +241,26 @@ const SpriteWalker = () => {
     const [mode, setMode] = useState<
         'idle' | 'walk' | 'run' | 'air' | 'duck' | 'blown' | 'fly' | 'fall'
     >('idle');
+    const [isDarkTheme, setIsDarkTheme] = useState(true);
     const [frameW, setFrameW] = useState(DEFAULT_FRAME_W);
     const [frameH, setFrameH] = useState(DEFAULT_FRAME_H);
 
     const playerW = Math.max(1, Math.round(frameW * SPRITE_SCALE));
     const playerH = Math.max(1, Math.round(frameH * SPRITE_SCALE));
+
+    useEffect(() => {
+        const syncTheme = () => {
+            const theme = document.documentElement.getAttribute('data-theme');
+            setIsDarkTheme(theme !== 'light');
+        };
+        syncTheme();
+        const observer = new MutationObserver(syncTheme);
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme'],
+        });
+        return () => observer.disconnect();
+    }, []);
 
     useEffect(() => {
         const loadSprite = (key: SpriteKey, src: string) => {
@@ -1240,18 +1012,27 @@ const SpriteWalker = () => {
         ctx.drawImage(meta.img, sx, sy, sw, sh, dx, dy, dw, dh);
         const imageData = ctx.getImageData(0, 0, renderW, renderH);
         const px = imageData.data;
+        const darkModeRamp = [26, 88, 156, 232] as const;
+        const lightModeRamp = [0, 48, 140, 255] as const;
+        const ramp = isDarkTheme ? darkModeRamp : lightModeRamp;
         for (let i = 0; i < px.length; i += 4) {
             const a = px[i + 3];
             if (a === 0) continue;
             const luma = 0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2];
             const tone =
-                luma < 45 ? 0 : luma < 95 ? 48 : luma < 170 ? 140 : 255;
+                luma < 45
+                    ? ramp[0]
+                    : luma < 95
+                      ? ramp[1]
+                      : luma < 170
+                        ? ramp[2]
+                        : ramp[3];
             px[i] = tone;
             px[i + 1] = tone;
             px[i + 2] = tone;
         }
         ctx.putImageData(imageData, 0, 0);
-    }, [frame, mode, playerW, playerH]);
+    }, [frame, mode, playerW, playerH, isDarkTheme]);
 
     return (
         <div
@@ -1275,7 +1056,12 @@ const SpriteWalker = () => {
                     width={mode === 'blown' ? Math.max(playerW, Math.round(playerW * BLOWN_RENDER_WIDTH_MULT)) : playerW}
                     height={playerH}
                     className="block h-full w-full"
-                    style={{ imageRendering: 'pixelated' }}
+                    style={{
+                        imageRendering: 'pixelated',
+                        filter: isDarkTheme
+                            ? 'drop-shadow(0 0 1px rgba(255,255,255,0.18))'
+                            : 'none',
+                    }}
                 />
             </div>
         </div>

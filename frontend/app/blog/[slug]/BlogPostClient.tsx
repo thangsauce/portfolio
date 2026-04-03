@@ -32,7 +32,13 @@ function formatTime(dateStr: string): string {
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
-export default function BlogPostClient({ slug }: { slug: string }) {
+export default function BlogPostClient({
+  slug,
+  onBack,
+}: {
+  slug: string
+  onBack?: () => void
+}) {
   const [post,     setPost]     = useState<Post | null>(null)
   const [loading,  setLoading]  = useState(true)
   const [notFound, setNotFound] = useState(false)
@@ -54,7 +60,7 @@ export default function BlogPostClient({ slug }: { slug: string }) {
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
 
         {/* Back link */}
-        <BackLink />
+        <BackLink onBack={onBack} />
 
         {loading && (
           <div style={{ fontSize: 10, letterSpacing: '0.3em', color: 'hsl(0 0% 24%)', textTransform: 'uppercase' }}>
@@ -221,7 +227,7 @@ export default function BlogPostClient({ slug }: { slug: string }) {
 
             {/* Footer */}
             <div style={{ marginTop: 72, paddingTop: 32, borderTop: '1px solid hsl(0 0% 11%)' }}>
-              <BackLink />
+              <BackLink onBack={onBack} />
             </div>
           </>
         )}
@@ -230,11 +236,12 @@ export default function BlogPostClient({ slug }: { slug: string }) {
   )
 }
 
-function BackLink() {
+function BackLink({ onBack }: { onBack?: () => void }) {
   const [hovered, setHovered] = useState(false)
   return (
     <Link
       href="/blog"
+      onClick={() => onBack?.()}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
