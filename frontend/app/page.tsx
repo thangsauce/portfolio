@@ -7,7 +7,7 @@ import HorizontalScrollLayout from './_components/HorizontalScrollLayout';
 import CurrentlyUsing from './_components/CurrentlyUsing';
 import Skills from './_components/Skills';
 import ProjectList from './_components/ProjectList';
-import SpriteWalker from '@/components/SpriteWalker';
+import SpriteGate from '@/components/SpriteGate';
 
 export default function Home() {
     return (
@@ -38,7 +38,7 @@ export default function Home() {
                     <ContactSection />
                 </div>
             </HorizontalScrollLayout>
-            <SpriteWalker />
+            <SpriteGate />
         </>
     );
 }

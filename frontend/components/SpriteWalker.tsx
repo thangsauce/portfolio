@@ -31,24 +31,39 @@ const FALL_FRAME_STEP_MS = 95;
 const BLOWN_ACTIVE_MS = 260;
 const FLY_SPEED_X = 4.7;
 const FLY_SPEED_Y = 4.7;
-const FLY_SAFE_INSET_PX = 5;
-const RUN_FRAME_INSET_LEFT_PX = 12;
-const RUN_FRAME_INSET_RIGHT_PX = 3;
-const JUMP_FRAME_INSET_LEFT_PX = 8;
-const JUMP_FRAME_INSET_RIGHT_PX = 1;
 const ALPHA_THRESHOLD = 10;
 const FALL_SPRITE_COLS = 2;
 const FALL_SPRITE_ROWS = 3;
+const JUMP_SPRITE_COLS = 3;
+const JUMP_SPRITE_ROWS = 3;
+const DUCK_SPRITE_COLS = 3;
+const DUCK_SPRITE_ROWS = 3;
+const FLY_SPRITE_COLS = 3;
+const FLY_SPRITE_ROWS = 3;
+const FLY_SIZE_MULT = 0.88;
+const WALK_SPRITE_COLS = 3;
+const WALK_SPRITE_ROWS = 3;
+const WALK_BOUND_PAD_X = 8;
+const WALK_BOUND_PAD_Y = 14;
+const RUN_SPRITE_COLS = 3;
+const RUN_SPRITE_ROWS = 3;
 const BLOWN_SPRITE_COLS = 2;
 const BLOWN_SPRITE_ROWS = 3;
 const BLOWN_RENDER_WIDTH_MULT = 1.9;
 const BLOWN_BOUND_PAD_X = 28;
 const BLOWN_BOUND_PAD_Y = 10;
+const SPRITE_HEAD_SAFE_PAD_X = 8;
+const SPRITE_HEAD_SAFE_PAD_Y = 14;
 const IDLE_SPRITE_COLS = 4;
 const IDLE_SPRITE_ROWS = 2;
 const IDLE_SPRITE_FRAMES = IDLE_SPRITE_COLS * IDLE_SPRITE_ROWS;
 const BLOWN_SPRITE_FRAMES = BLOWN_SPRITE_COLS * BLOWN_SPRITE_ROWS;
 const FALL_SPRITE_FRAMES = FALL_SPRITE_COLS * FALL_SPRITE_ROWS;
+const JUMP_SPRITE_FRAMES = JUMP_SPRITE_COLS * JUMP_SPRITE_ROWS;
+const DUCK_SPRITE_FRAMES = DUCK_SPRITE_COLS * DUCK_SPRITE_ROWS;
+const FLY_SPRITE_FRAMES = FLY_SPRITE_COLS * FLY_SPRITE_ROWS;
+const WALK_SPRITE_FRAMES = WALK_SPRITE_COLS * WALK_SPRITE_ROWS;
+const RUN_SPRITE_FRAMES = RUN_SPRITE_COLS * RUN_SPRITE_ROWS;
 
 type SpriteKey =
     | 'walk'
@@ -66,73 +81,6 @@ type SpriteMeta = {
     frameH: number;
     frameBounds?: Array<{ sx: number; sy: number; sw: number; sh: number }>;
 };
-
-function computeFrameAlphaBounds(
-    img: HTMLImageElement,
-    frames: number,
-    cellInset = 0,
-): Array<{ sx: number; sy: number; sw: number; sh: number }> | undefined {
-    const w = img.naturalWidth;
-    const h = img.naturalHeight;
-    if (!w || !h) return undefined;
-
-    const canvas = document.createElement('canvas');
-    canvas.width = w;
-    canvas.height = h;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return undefined;
-    ctx.clearRect(0, 0, w, h);
-    ctx.drawImage(img, 0, 0);
-
-    const data = ctx.getImageData(0, 0, w, h).data;
-    const bounds: Array<{ sx: number; sy: number; sw: number; sh: number }> =
-        [];
-
-    for (let i = 0; i < frames; i += 1) {
-        const cellStart = Math.round((i * w) / frames);
-        const cellEnd = Math.round(((i + 1) * w) / frames);
-        const cellW = Math.max(1, cellEnd - cellStart);
-        // Pull the scan window in by cellInset on each side so tightly-packed
-        // adjacent characters don't bleed during drawImage sub-pixel sampling.
-        const scanStart = cellStart + cellInset;
-        const scanEnd = cellEnd - cellInset;
-
-        let minX = scanEnd;
-        let maxX = scanStart - 1;
-        let minY = h;
-        let maxY = -1;
-
-        for (let y = 0; y < h; y += 1) {
-            for (let x = scanStart; x < scanEnd; x += 1) {
-                const a = data[(y * w + x) * 4 + 3];
-                if (a <= ALPHA_THRESHOLD) continue;
-                if (x < minX) minX = x;
-                if (x > maxX) maxX = x;
-                if (y < minY) minY = y;
-                if (y > maxY) maxY = y;
-            }
-        }
-
-        if (maxX < minX || maxY < minY) {
-            bounds.push({ sx: cellStart, sy: 0, sw: cellW, sh: h });
-            continue;
-        }
-
-        const pad = 1;
-        const sx = Math.max(cellStart, minX - pad);
-        const ex = Math.min(cellEnd - 1, maxX + pad);
-        const sy = Math.max(0, minY - pad);
-        const ey = Math.min(h - 1, maxY + pad);
-        bounds.push({
-            sx,
-            sy,
-            sw: Math.max(1, ex - sx + 1),
-            sh: Math.max(1, ey - sy + 1),
-        });
-    }
-
-    return bounds;
-}
 
 function computeComponentFrameBounds(
     img: HTMLImageElement,
@@ -381,6 +329,8 @@ function computeGridFrameAlphaBounds(
     img: HTMLImageElement,
     cols: number,
     rows: number,
+    padX = 1,
+    padY = 1,
 ): Array<{ sx: number; sy: number; sw: number; sh: number }> | undefined {
     const w = img.naturalWidth;
     const h = img.naturalHeight;
@@ -435,11 +385,10 @@ function computeGridFrameAlphaBounds(
             continue;
         }
 
-        const pad = 1;
-        const sx = Math.max(cellStartX, minX - pad);
-        const ex = Math.min(cellEndX - 1, maxX + pad);
-        const sy = Math.max(cellStartY, minY - pad);
-        const ey = Math.min(cellEndY - 1, maxY + pad);
+        const sx = Math.max(cellStartX, minX - padX);
+        const ex = Math.min(cellEndX - 1, maxX + padX);
+        const sy = Math.max(cellStartY, minY - padY);
+        const ey = Math.min(cellEndY - 1, maxY + padY);
         bounds.push({
             sx,
             sy,
@@ -551,6 +500,16 @@ const SpriteWalker = () => {
                     frameW:
                         key === 'fall'
                             ? img.naturalWidth / FALL_SPRITE_COLS
+                            : key === 'fly'
+                              ? img.naturalWidth / FLY_SPRITE_COLS
+                            : key === 'jump'
+                              ? img.naturalWidth / JUMP_SPRITE_COLS
+                            : key === 'duck'
+                              ? img.naturalWidth / DUCK_SPRITE_COLS
+                            : key === 'walk'
+                              ? img.naturalWidth / WALK_SPRITE_COLS
+                            : key === 'run'
+                              ? img.naturalWidth / RUN_SPRITE_COLS
                             : key === 'blown'
                               ? img.naturalWidth / BLOWN_SPRITE_COLS
                               : key === 'idle'
@@ -559,6 +518,16 @@ const SpriteWalker = () => {
                     frameH:
                         key === 'fall'
                             ? img.naturalHeight / FALL_SPRITE_ROWS
+                            : key === 'fly'
+                              ? img.naturalHeight / FLY_SPRITE_ROWS
+                            : key === 'jump'
+                              ? img.naturalHeight / JUMP_SPRITE_ROWS
+                            : key === 'duck'
+                              ? img.naturalHeight / DUCK_SPRITE_ROWS
+                            : key === 'walk'
+                              ? img.naturalHeight / WALK_SPRITE_ROWS
+                            : key === 'run'
+                              ? img.naturalHeight / RUN_SPRITE_ROWS
                             : key === 'blown'
                               ? img.naturalHeight / BLOWN_SPRITE_ROWS
                               : key === 'idle'
@@ -566,34 +535,62 @@ const SpriteWalker = () => {
                                 : img.naturalHeight,
                     frameBounds:
                         key === 'fly'
-                            ? (computeSeededFrameBounds(img, SPRITE_FRAMES) ??
-                              computeComponentFrameBounds(img) ??
-                              computeFrameAlphaBounds(img, SPRITE_FRAMES))
+                            ? undefined
+                            : key === 'walk'
+                              ? computeGridFrameAlphaBounds(
+                                    img,
+                                    WALK_SPRITE_COLS,
+                                    WALK_SPRITE_ROWS,
+                                    WALK_BOUND_PAD_X,
+                                    WALK_BOUND_PAD_Y,
+                                )
                             : key === 'fall'
                               ? computeGridFrameAlphaBounds(
                                     img,
                                     FALL_SPRITE_COLS,
                                     FALL_SPRITE_ROWS,
+                                    SPRITE_HEAD_SAFE_PAD_X,
+                                    SPRITE_HEAD_SAFE_PAD_Y,
+                                )
+                            : key === 'jump'
+                              ? computeGridFrameAlphaBounds(
+                                    img,
+                                    JUMP_SPRITE_COLS,
+                                    JUMP_SPRITE_ROWS,
+                                    SPRITE_HEAD_SAFE_PAD_X,
+                                    SPRITE_HEAD_SAFE_PAD_Y,
+                                )
+                            : key === 'duck'
+                              ? computeGridFrameAlphaBounds(
+                                    img,
+                                    DUCK_SPRITE_COLS,
+                                    DUCK_SPRITE_ROWS,
+                                    SPRITE_HEAD_SAFE_PAD_X,
+                                    SPRITE_HEAD_SAFE_PAD_Y,
                                 )
                               : key === 'blown'
                                 ? computeGridFrameAlphaBounds(
                                       img,
                                       BLOWN_SPRITE_COLS,
                                       BLOWN_SPRITE_ROWS,
+                                      SPRITE_HEAD_SAFE_PAD_X,
+                                      SPRITE_HEAD_SAFE_PAD_Y,
                                   )
                                 : key === 'run'
-                                  ? (computeSeededFrameBounds(
+                                  ? computeGridFrameAlphaBounds(
                                         img,
-                                        SPRITE_FRAMES,
-                                    ) ??
-                                    computeFrameAlphaBounds(img, SPRITE_FRAMES))
+                                        RUN_SPRITE_COLS,
+                                        RUN_SPRITE_ROWS,
+                                        SPRITE_HEAD_SAFE_PAD_X,
+                                        SPRITE_HEAD_SAFE_PAD_Y,
+                                    )
                                   : undefined,
                 };
 
                 // Use walk sprite as canonical display proportion.
                 if (key === 'walk') {
-                    setFrameW(img.naturalWidth / SPRITE_FRAMES);
-                    setFrameH(img.naturalHeight);
+                    setFrameW(img.naturalWidth / WALK_SPRITE_COLS);
+                    setFrameH(img.naturalHeight / WALK_SPRITE_ROWS);
                 }
             };
             img.src = src;
@@ -857,6 +854,16 @@ const SpriteWalker = () => {
                     const activeFrameCount =
                         modeRef.current === 'idle'
                             ? IDLE_SPRITE_FRAMES
+                            : modeRef.current === 'walk'
+                              ? WALK_SPRITE_FRAMES
+                            : modeRef.current === 'air'
+                              ? JUMP_SPRITE_FRAMES
+                            : modeRef.current === 'duck'
+                              ? DUCK_SPRITE_FRAMES
+                            : modeRef.current === 'fly'
+                              ? FLY_SPRITE_FRAMES
+                            : modeRef.current === 'run'
+                              ? RUN_SPRITE_FRAMES
                             : modeRef.current === 'blown'
                               ? BLOWN_SPRITE_FRAMES
                               : modeRef.current === 'fall'
@@ -943,6 +950,16 @@ const SpriteWalker = () => {
         const spriteFrameCount =
             spriteKey === 'idle'
                 ? IDLE_SPRITE_FRAMES
+                : spriteKey === 'walk'
+                  ? WALK_SPRITE_FRAMES
+                : spriteKey === 'jump'
+                  ? JUMP_SPRITE_FRAMES
+                : spriteKey === 'duck'
+                  ? DUCK_SPRITE_FRAMES
+                : spriteKey === 'fly'
+                  ? FLY_SPRITE_FRAMES
+                : spriteKey === 'run'
+                  ? RUN_SPRITE_FRAMES
                 : spriteKey === 'blown'
                   ? BLOWN_SPRITE_FRAMES
                   : spriteKey === 'fall'
@@ -951,10 +968,6 @@ const SpriteWalker = () => {
         const frameIndex = Math.max(0, Math.min(spriteFrameCount - 1, frame));
         const srcW = meta.img.naturalWidth;
         const srcH = meta.img.naturalHeight;
-        const specialBound =
-            spriteKey === 'fly' || spriteKey === 'run'
-                ? meta.frameBounds?.[frameIndex]
-                : undefined;
         let sx = 0;
         let sy = 0;
         let sw = 1;
@@ -964,41 +977,98 @@ const SpriteWalker = () => {
         let dw = renderW;
         let dh = renderH;
 
-        if (spriteKey === 'fly' || spriteKey === 'run') {
-            const cellStart = Math.round((frameIndex * srcW) / SPRITE_FRAMES);
-            const cellEnd = Math.round(
-                ((frameIndex + 1) * srcW) / SPRITE_FRAMES,
+        if (spriteKey === 'fly') {
+            const cols = FLY_SPRITE_COLS;
+            const rows = FLY_SPRITE_ROWS;
+            const clampedIndex = Math.max(
+                0,
+                Math.min(cols * rows - 1, frameIndex),
             );
-            const cellW = Math.max(1, cellEnd - cellStart);
-            const frameH = Math.max(1, meta.frameH);
+            const col = clampedIndex % cols;
+            const row = Math.floor(clampedIndex / cols);
+            const cellW = Math.max(1, Math.floor(srcW / cols));
+            const cellH = Math.max(1, Math.floor(srcH / rows));
+            const insetX = Math.max(0, Math.floor(cellW * 0.03));
+            const insetY = Math.max(0, Math.floor(cellH * 0.03));
+            sx = col * cellW + insetX;
+            sy = row * cellH + insetY;
+            sw = Math.max(1, Math.min(cellW - insetX * 2, srcW - sx));
+            sh = Math.max(1, Math.min(cellH - insetY * 2, srcH - sy));
 
-            if (specialBound) {
-                sx = specialBound.sx;
-                sy = specialBound.sy;
-                sw = specialBound.sw;
-                sh = specialBound.sh;
+            const targetHeight = playerH * 0.98 * FLY_SIZE_MULT;
+            const maxWidth = playerW * 0.98;
+            const scale = Math.min(targetHeight / sh, maxWidth / sw);
+            dw = Math.max(1, Math.round(sw * scale));
+            dh = Math.max(1, Math.round(sh * scale));
+            dx = Math.round((playerW - dw) / 2);
+            dy = Math.round(playerH - dh);
+        } else if (spriteKey === 'walk') {
+            const cols = WALK_SPRITE_COLS;
+            const rows = WALK_SPRITE_ROWS;
+            const clampedIndex = Math.max(
+                0,
+                Math.min(cols * rows - 1, frameIndex),
+            );
+            const col = clampedIndex % cols;
+            const row = Math.floor(clampedIndex / cols);
+            const cellW = Math.max(1, Math.floor(srcW / cols));
+            const cellH = Math.max(1, Math.floor(srcH / rows));
+            const cellSx = col * cellW;
+            const cellSy = row * cellH;
+            const bound = meta.frameBounds?.[clampedIndex];
+            sx = bound?.sx ?? cellSx;
+            sy = bound?.sy ?? cellSy;
+            sw = Math.max(1, Math.min(bound?.sw ?? cellW, srcW - sx));
+            sh = Math.max(1, Math.min(bound?.sh ?? cellH, srcH - sy));
 
-                dw = Math.max(1, Math.round((sw * playerW) / cellW));
-                dh = Math.max(1, Math.round((sh * playerH) / frameH));
-                if (spriteKey === 'run') {
-                    // Center horizontally so per-frame x-offset variation doesn't
-                    // cause visible jitter that looks like bleeding.
-                    dx = Math.round((playerW - dw) / 2);
-                    dy = Math.round((playerH - dh) / 2);
-                } else {
-                    // Position-preserving for fly: maps bounds to their
-                    // exact relative position within the canvas.
-                    dx = Math.round(((sx - cellStart) * playerW) / cellW);
-                    dy = Math.round((sy * playerH) / frameH);
-                }
-            } else {
-                const maxInset = Math.max(0, Math.floor((cellW - 1) / 2));
-                const inset = Math.min(FLY_SAFE_INSET_PX, maxInset);
-                sx = cellStart + inset;
-                sy = 0;
-                sw = Math.max(1, cellW - inset * 2);
-                sh = frameH;
-            }
+            const widths = (meta.frameBounds ?? []).map((b) => b.sw);
+            const heights = (meta.frameBounds ?? []).map((b) => b.sh);
+            const refW = widths.length ? Math.max(...widths) : sw;
+            const refH = heights.length ? Math.max(...heights) : sh;
+
+            const targetHeight = playerH * 0.9;
+            const maxWidth = playerW * 0.9;
+            const scale = Math.min(targetHeight / refH, maxWidth / refW);
+            dw = Math.max(1, Math.round(refW * scale));
+            dh = Math.max(1, Math.round(refH * scale));
+            dx = Math.round((playerW - dw) / 2);
+            dy = Math.round(playerH - dh);
+        } else if (spriteKey === 'run') {
+            const cols = RUN_SPRITE_COLS;
+            const rows = RUN_SPRITE_ROWS;
+            const clampedIndex = Math.max(
+                0,
+                Math.min(cols * rows - 1, frameIndex),
+            );
+            const col = clampedIndex % cols;
+            const row = Math.floor(clampedIndex / cols);
+            const cellW = Math.max(1, Math.floor(srcW / cols));
+            const cellH = Math.max(1, Math.floor(srcH / rows));
+            const cellSx = col * cellW;
+            const cellSy = row * cellH;
+            const bound = meta.frameBounds?.[clampedIndex];
+            const widths = (meta.frameBounds ?? []).map((b) => b.sw).sort((a, b) => a - b);
+            const heights = (meta.frameBounds ?? []).map((b) => b.sh).sort((a, b) => a - b);
+            const mid = Math.floor(widths.length / 2);
+            const refW = Math.max(1, Math.min(cellW, widths.length > 0 ? widths[mid] : cellW));
+            const refH = Math.max(1, Math.min(cellH, heights.length > 0 ? heights[mid] : cellH));
+            const centerX = bound ? bound.sx + bound.sw / 2 : cellSx + cellW / 2;
+            const centerY = bound ? bound.sy + bound.sh / 2 : cellSy + cellH / 2;
+            const desiredSx = Math.round(centerX - refW / 2);
+            const desiredSy = Math.round(centerY - refH / 2);
+            sx = Math.max(cellSx, Math.min(cellSx + cellW - refW, desiredSx));
+            sy = Math.max(cellSy, Math.min(cellSy + cellH - refH, desiredSy));
+            sw = refW;
+            sh = refH;
+
+            const targetHeight = playerH * 0.98;
+            const maxWidth = playerW * 0.98;
+            const scale = Math.min(targetHeight / refH, maxWidth / refW);
+            // Keep run output size/baseline stable across frames to avoid bobbing.
+            dw = Math.max(1, Math.round(refW * scale));
+            dh = Math.max(1, Math.round(refH * scale));
+            dx = Math.round((playerW - dw) / 2);
+            dy = Math.round(playerH - dh);
         } else if (spriteKey === 'blown') {
             const cols = BLOWN_SPRITE_COLS;
             const rows = BLOWN_SPRITE_ROWS;
@@ -1037,10 +1107,15 @@ const SpriteWalker = () => {
             // Match blown visual body size to idle:
             // use stable reference height, and allow blown's wider render box.
             const targetHeight = playerH * 0.98;
-            const maxWidth = renderW * 0.98;
+            const maxWidth = playerW * 0.98;
             const scale = Math.min(targetHeight / refH, maxWidth / sw);
             dw = Math.max(1, Math.round(sw * scale));
             dh = Math.max(1, Math.round(sh * scale));
+            if (dh > renderH || dw > renderW) {
+                const fitScale = Math.min(renderH / dh, renderW / dw);
+                dw = Math.max(1, Math.round(dw * fitScale));
+                dh = Math.max(1, Math.round(dh * fitScale));
+            }
             dx = Math.round((renderW - dw) / 2);
             dy = Math.round(renderH - dh);
         } else if (spriteKey === 'fall') {
@@ -1070,6 +1145,62 @@ const SpriteWalker = () => {
             dh = Math.max(1, Math.round(sh * scale));
             dx = Math.round((playerW - dw) / 2);
             dy = Math.round(playerH - dh);
+        } else if (spriteKey === 'jump') {
+            const cols = JUMP_SPRITE_COLS;
+            const rows = JUMP_SPRITE_ROWS;
+            const clampedIndex = Math.max(
+                0,
+                Math.min(cols * rows - 1, frameIndex),
+            );
+            const col = clampedIndex % cols;
+            const row = Math.floor(clampedIndex / cols);
+            const cellW = Math.max(1, Math.floor(srcW / cols));
+            const cellH = Math.max(1, Math.floor(srcH / rows));
+            const cellSx = col * cellW;
+            const cellSy = row * cellH;
+            const bound = meta.frameBounds?.[clampedIndex];
+            sx = bound?.sx ?? cellSx;
+            sy = bound?.sy ?? cellSy;
+            sw = Math.max(1, Math.min(bound?.sw ?? cellW, srcW - sx));
+            sh = Math.max(1, Math.min(bound?.sh ?? cellH, srcH - sy));
+
+            const heights = (meta.frameBounds ?? []).map((b) => b.sh);
+            const refH = heights.length ? Math.max(...heights) : sh;
+            const targetHeight = playerH * 0.98;
+            const maxWidth = playerW * 0.98;
+            const scale = Math.min(targetHeight / refH, maxWidth / sw);
+            dw = Math.max(1, Math.round(sw * scale));
+            dh = Math.max(1, Math.round(sh * scale));
+            dx = Math.round((playerW - dw) / 2);
+            dy = Math.round(playerH - dh);
+        } else if (spriteKey === 'duck') {
+            const cols = DUCK_SPRITE_COLS;
+            const rows = DUCK_SPRITE_ROWS;
+            const clampedIndex = Math.max(
+                0,
+                Math.min(cols * rows - 1, frameIndex),
+            );
+            const col = clampedIndex % cols;
+            const row = Math.floor(clampedIndex / cols);
+            const cellW = Math.max(1, Math.floor(srcW / cols));
+            const cellH = Math.max(1, Math.floor(srcH / rows));
+            const cellSx = col * cellW;
+            const cellSy = row * cellH;
+            const bound = meta.frameBounds?.[clampedIndex];
+            sx = bound?.sx ?? cellSx;
+            sy = bound?.sy ?? cellSy;
+            sw = Math.max(1, Math.min(bound?.sw ?? cellW, srcW - sx));
+            sh = Math.max(1, Math.min(bound?.sh ?? cellH, srcH - sy));
+
+            const heights = (meta.frameBounds ?? []).map((b) => b.sh);
+            const refH = heights.length ? Math.max(...heights) : sh;
+            const targetHeight = playerH * 0.98;
+            const maxWidth = playerW * 0.98;
+            const scale = Math.min(targetHeight / refH, maxWidth / sw);
+            dw = Math.max(1, Math.round(sw * scale));
+            dh = Math.max(1, Math.round(sh * scale));
+            dx = Math.round((playerW - dw) / 2);
+            dy = Math.round(playerH - dh);
         } else if (spriteKey === 'idle') {
             const cols = IDLE_SPRITE_COLS;
             const rows = IDLE_SPRITE_ROWS;
@@ -1088,8 +1219,8 @@ const SpriteWalker = () => {
             sw = Math.max(1, Math.min(cellW, srcW - sx));
             sh = Math.max(1, Math.min(cellH, srcH - sy));
 
-            const targetHeight = playerH * 1.15;
-            const maxWidth = playerW * 1.15;
+            const targetHeight = playerH * 0.98;
+            const maxWidth = playerW * 0.98;
             const scale = Math.min(targetHeight / sh, maxWidth / sw);
             dw = Math.max(1, Math.round(sw * scale));
             dh = Math.max(1, Math.round(sh * scale));
@@ -1100,18 +1231,8 @@ const SpriteWalker = () => {
             const sxEnd = Math.round(((frameIndex + 1) * srcW) / SPRITE_FRAMES);
             const baseSx = Math.max(0, Math.min(srcW - 1, sxStart));
             const baseSw = Math.max(1, Math.min(srcW - baseSx, sxEnd - baseSx));
-            const maxInset = Math.max(0, Math.floor((baseSw - 1) / 2));
-            const jumpLeft = Math.min(JUMP_FRAME_INSET_LEFT_PX, maxInset);
-            const jumpRight = Math.min(JUMP_FRAME_INSET_RIGHT_PX, maxInset);
-            const insetLeft = spriteKey === 'jump' ? jumpLeft : 0;
-            const insetRight = spriteKey === 'jump' ? jumpRight : 0;
-            const safeInsetLeft = Math.min(insetLeft, Math.max(0, baseSw - 1));
-            const safeInsetRight = Math.min(
-                insetRight,
-                Math.max(0, baseSw - safeInsetLeft - 1),
-            );
-            sx = baseSx + safeInsetLeft;
-            sw = Math.max(1, baseSw - safeInsetLeft - safeInsetRight);
+            sx = baseSx;
+            sw = baseSw;
             sy = 0;
             sh = Math.floor(meta.frameH);
         }
