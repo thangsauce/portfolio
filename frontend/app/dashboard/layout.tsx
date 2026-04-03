@@ -135,8 +135,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     let rafId = 0
 
     const render = () => {
-      current.x += (target.x - current.x) * 0.18
-      current.y += (target.y - current.y) * 0.18
+      current.x += (target.x - current.x) * 0.2
+      current.y += (target.y - current.y) * 0.2
       pupil.setAttribute(
         'transform',
         `translate(${current.x.toFixed(2)} ${current.y.toFixed(2)})`,
@@ -150,7 +150,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       const cy   = rect.top + rect.height / 2
       const dx   = e.clientX - cx
       const dy   = e.clientY - cy
-      const max  = 6.8
+      const max  = 7.8
       const dist = Math.hypot(dx, dy) || 1
       const clamped = Math.min(max, dist)
       target.x = (dx / dist) * clamped
@@ -207,7 +207,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center gap-0' : 'gap-3'}`}>
               <div
                 className={`w-[42px] h-[34px] flex-shrink-0 flex items-center justify-center rounded-[14px] ${isLight ? 'text-foreground' : 'text-primary'}`}
-                style={{ boxShadow: '0 0 0 1px hsl(158 64% 36% / 0.28), 0 4px 14px hsl(158 64% 36% / 0.16)' }}
+                style={{ boxShadow: 'none' }}
               >
                 <svg
                   ref={logoEyeRef}

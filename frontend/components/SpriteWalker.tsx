@@ -337,11 +337,30 @@ const SpriteWalker = () => {
     const [isDarkTheme, setIsDarkTheme] = useState(true);
     const [frameW, setFrameW] = useState(DEFAULT_FRAME_W);
     const [frameH, setFrameH] = useState(DEFAULT_FRAME_H);
+    const [showControlsHint, setShowControlsHint] = useState(true);
+    const [viewportW, setViewportW] = useState(1280);
     const obstacleRectsRef = useRef<ObstacleRect[]>([]);
     const lastObstacleScanAtRef = useRef(0);
 
     const playerW = Math.max(1, Math.round(frameW * SPRITE_SCALE));
     const playerH = Math.max(1, Math.round(frameH * SPRITE_SCALE));
+
+    useEffect(() => {
+        const syncViewport = () => setViewportW(window.innerWidth);
+        syncViewport();
+        window.addEventListener('resize', syncViewport, { passive: true });
+        return () => window.removeEventListener('resize', syncViewport);
+    }, []);
+
+    useEffect(() => {
+        const timer = window.setTimeout(() => setShowControlsHint(false), 8200);
+        const onAnyKey = () => setShowControlsHint(false);
+        window.addEventListener('keydown', onAnyKey, { passive: true });
+        return () => {
+            window.clearTimeout(timer);
+            window.removeEventListener('keydown', onAnyKey);
+        };
+    }, []);
 
     useEffect(() => {
         const syncTheme = () => {
@@ -718,15 +737,21 @@ const SpriteWalker = () => {
                 playerW,
                 window.innerHeight,
             );
-            const supportBottomNow =
-                platformBottomsNow.length > 0
-                    ? Math.max(...platformBottomsNow)
-                    : 0;
+            const standingCandidates = platformBottomsNow.filter(
+                (pb) => Math.abs(currentBottomPx - pb) <= 2.5,
+            );
             const standingOnPlatform =
                 !dropThroughActive &&
-                supportBottomNow > 0 &&
-                Math.abs(currentBottomPx - supportBottomNow) <= 1.5 &&
+                standingCandidates.length > 0 &&
                 vyRef.current <= 0;
+            const supportBottomNow = standingOnPlatform
+                ? standingCandidates.reduce((best, pb) =>
+                    Math.abs(pb - currentBottomPx) <
+                    Math.abs(best - currentBottomPx)
+                        ? pb
+                        : best,
+                  )
+                : 0;
             const canTriggerDrop =
                 downPressed &&
                 !duckDropLatchRef.current &&
@@ -1319,6 +1344,40 @@ const SpriteWalker = () => {
             className="pointer-events-none fixed inset-0 z-[30]"
             aria-hidden="true"
         >
+            {showControlsHint && (
+                <div
+                    className="absolute sprite-controls-hint"
+                    style={{
+                        left: `${Math.max(
+                            8,
+                            Math.min(
+                                viewportW - 126,
+                                x +
+                                    (mode === 'blown'
+                                        ? Math.max(
+                                              playerW,
+                                              Math.round(
+                                                  playerW *
+                                                      BLOWN_RENDER_WIDTH_MULT,
+                                              ),
+                                          )
+                                        : playerW) +
+                                    12,
+                            ),
+                        )}px`,
+                        bottom: `${Math.max(8, FLOOR_OFFSET + y + 2)}px`,
+                    }}
+                >
+                    <div className="key-row key-row-top">
+                        <span className="keycap keycap-w">W</span>
+                    </div>
+                    <div className="key-row key-row-bottom">
+                        <span className="keycap keycap-a">A</span>
+                        <span className="keycap keycap-s">S</span>
+                        <span className="keycap keycap-d">D</span>
+                    </div>
+                </div>
+            )}
             <div
                 id="sprite-anchor"
                 className="absolute will-change-transform"
@@ -1344,6 +1403,120 @@ const SpriteWalker = () => {
                     }}
                 />
             </div>
+            <style jsx>{`
+                .sprite-controls-hint {
+                    display: inline-flex;
+                    flex-direction: column;
+                    gap: 4px;
+                    padding: 6px;
+                    border-radius: 10px;
+                    border: 1px solid rgba(255, 255, 255, 0.18);
+                    background: rgba(20, 20, 20, 0.35);
+                    backdrop-filter: blur(2px);
+                    animation: hintFadeIn 0.35s ease-out both;
+                }
+                .key-row {
+                    display: flex;
+                    justify-content: center;
+                    gap: 4px;
+                }
+                .keycap {
+                    width: 24px;
+                    height: 24px;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 5px;
+                    font-size: 11px;
+                    font-weight: 700;
+                    font-family: var(--font-roboto-flex);
+                    color: rgba(255, 255, 255, 0.92);
+                    border: 1px solid rgba(255, 255, 255, 0.42);
+                    background: rgba(255, 255, 255, 0.08);
+                    box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.2);
+                    transform-origin: center center;
+                }
+                .keycap-w {
+                    animation: keyPressW 1.8s ease-in-out infinite;
+                }
+                .keycap-a {
+                    animation: keyPressA 2.1s ease-in-out infinite;
+                }
+                .keycap-s {
+                    animation: keyPressS 1.6s ease-in-out infinite;
+                }
+                .keycap-d {
+                    animation: keyPressD 2.0s ease-in-out infinite;
+                }
+                :global([data-theme='light']) .sprite-controls-hint {
+                    border-color: rgba(24, 24, 27, 0.28);
+                    background: rgba(255, 255, 255, 0.78);
+                }
+                :global([data-theme='light']) .keycap {
+                    color: rgba(24, 24, 27, 0.95);
+                    border-color: rgba(24, 24, 27, 0.34);
+                    background: rgba(24, 24, 27, 0.06);
+                    box-shadow: inset 0 -1px 0 rgba(24, 24, 27, 0.12);
+                }
+                @keyframes hintFadeIn {
+                    from {
+                        opacity: 0;
+                        transform: translateY(6px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+                @keyframes keyPressW {
+                    0%,
+                    100% {
+                        transform: translateY(0) scale(1);
+                    }
+                    18% {
+                        transform: translateY(1.5px) scale(0.97);
+                    }
+                    28% {
+                        transform: translateY(0) scale(1);
+                    }
+                }
+                @keyframes keyPressA {
+                    0%,
+                    100% {
+                        transform: translateY(0) scale(1);
+                    }
+                    45% {
+                        transform: translateY(1.5px) scale(0.97);
+                    }
+                    55% {
+                        transform: translateY(0) scale(1);
+                    }
+                }
+                @keyframes keyPressS {
+                    0%,
+                    100% {
+                        transform: translateY(0) scale(1);
+                    }
+                    62% {
+                        transform: translateY(1.5px) scale(0.97);
+                    }
+                    72% {
+                        transform: translateY(0) scale(1);
+                    }
+                }
+                @keyframes keyPressD {
+                    0%,
+                    100% {
+                        transform: translateY(0) scale(1);
+                    }
+                    80% {
+                        transform: translateY(1.5px) scale(0.97);
+                    }
+                    90% {
+                        transform: translateY(0) scale(1);
+                    }
+                }
+            `}</style>
         </div>
     );
 };
