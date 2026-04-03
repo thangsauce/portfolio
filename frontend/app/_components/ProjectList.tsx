@@ -278,9 +278,9 @@ const ProjectList = () => {
     if (projects.length === 0) return null;
 
     return (
-        <section className="pb-section -mt-7 md:mt-0" id="selected-projects">
+        <section className="pb-section -mt-10 md:mt-0" id="selected-projects">
             <div className="container">
-                <div className="flex items-center gap-3 mb-1 md:mb-10">
+                <div className="flex items-center gap-3 mb-0 md:mb-10">
                     <span className="text-primary [[data-theme='light']_&]:text-foreground/80 font-mono text-2xl leading-none select-none">&lt;</span>
                     <h2 className="text-2xl uppercase leading-none tracking-widest">
                         PROJECTS
@@ -320,8 +320,8 @@ const ProjectList = () => {
                         </div>
                     )}
 
-                    <div className="flex flex-col max-md:gap-1 md:pr-[230px] xl:pr-[390px]" ref={projectListRef}>
-                        <div className="mb-1 md:mb-6 flex flex-wrap items-center gap-2.5">
+                    <div className="flex flex-col max-md:gap-0 md:pr-[230px] xl:pr-[390px]" ref={projectListRef}>
+                        <div className="mb-0 md:mb-6 flex flex-wrap items-center gap-2">
                             {categories.map((category) => (
                                 <button
                                     key={category.key}
@@ -332,7 +332,7 @@ const ProjectList = () => {
                                         setActiveCategory(category.key);
                                     }}
                                     className={cn(
-                                        'rounded-full border px-4 py-1.5 text-xs sm:text-sm uppercase tracking-[0.16em] transition-all',
+                                        'rounded-full border px-3 py-1 text-xs sm:text-sm uppercase tracking-[0.16em] transition-all',
                                         activeCategory === category.key
                                             ? 'border-primary/55 text-primary'
                                             : 'border-border text-muted-foreground hover:border-primary/35 hover:text-foreground',

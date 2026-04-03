@@ -126,19 +126,21 @@ const ProjectDetails = ({ project }: Props) => {
                                         rel="noreferrer noopener"
                                         className="inline-flex items-center gap-2 text-xs sm:text-sm uppercase tracking-[0.14em] text-foreground/80 hover:text-primary transition-colors live-demo-link"
                                     >
-                                        <span className="live-demo-cursor inline-flex items-center justify-center" aria-hidden="true">
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                width="14"
-                                                height="14"
-                                                viewBox="0 0 24 24"
-                                                fill="currentColor"
-                                            >
-                                                <path d="M3 3l7.4 17 2.3-5.4 5.3-2.2L3 3z" />
-                                            </svg>
-                                        </span>
                                         <span className="live-demo-dot inline-block size-2.5 rounded-full bg-red-500" />
-                                        <span>LIVE</span>
+                                        <span className="live-demo-target relative inline-flex items-center justify-center min-w-[40px]">
+                                            <span>LIVE</span>
+                                            <span className="live-demo-cursor-orbit absolute" aria-hidden="true">
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    width="14"
+                                                    height="14"
+                                                    viewBox="0 0 24 24"
+                                                    fill="currentColor"
+                                                >
+                                                    <path d="M3 3l7.4 17 2.3-5.4 5.3-2.2L3 3z" />
+                                                </svg>
+                                            </span>
+                                        </span>
                                     </a>
                                 )}
                             </div>
@@ -227,10 +229,11 @@ const ProjectDetails = ({ project }: Props) => {
                     animation: liveDotBlink 1.15s ease-in-out infinite;
                 }
 
-                .live-demo-cursor {
+                .live-demo-cursor-orbit {
                     color: currentColor;
-                    opacity: 0.85;
-                    animation: liveCursorHint 1.1s ease-in-out infinite;
+                    opacity: 0.9;
+                    transform-origin: 50% 50%;
+                    animation: liveCursorOrbit 1.9s ease-in-out infinite;
                 }
 
                 @keyframes liveDotBlink {
@@ -243,14 +246,22 @@ const ProjectDetails = ({ project }: Props) => {
                     }
                 }
 
-                @keyframes liveCursorHint {
+                @keyframes liveCursorOrbit {
                     0%,
                     100% {
-                        transform: translateX(0);
-                        opacity: 0.75;
+                        transform: translate(-14px, -10px) rotate(-18deg);
+                        opacity: 0.85;
+                    }
+                    25% {
+                        transform: translate(12px, -9px) rotate(8deg);
+                        opacity: 1;
                     }
                     50% {
-                        transform: translateX(2px);
+                        transform: translate(12px, 10px) rotate(18deg);
+                        opacity: 0.95;
+                    }
+                    75% {
+                        transform: translate(-13px, 10px) rotate(-8deg);
                         opacity: 1;
                     }
                 }
