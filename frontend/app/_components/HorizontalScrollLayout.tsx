@@ -79,6 +79,34 @@ const HorizontalScrollLayout = ({ children }: Props) => {
         };
     }, []);
 
+    useEffect(() => {
+        const onEdgePush = (ev: Event) => {
+            if (window.innerWidth < 768) return;
+            const root = rootRef.current;
+            const track = trackRef.current;
+            if (!root || !track) return;
+
+            const horizontalDistance = Math.max(0, track.scrollWidth - window.innerWidth);
+            if (horizontalDistance <= 0) return;
+
+            const custom = ev as CustomEvent<{ deltaY?: number }>;
+            const delta = custom.detail?.deltaY ?? 0;
+            if (Math.abs(delta) < 0.1) return;
+
+            const nextY = window.scrollY + delta;
+            if (lenisRef.current) {
+                lenisRef.current.scrollTo(nextY, { immediate: true });
+            } else {
+                window.scrollTo({ top: nextY, left: 0, behavior: 'auto' });
+            }
+        };
+
+        window.addEventListener('sprite:edge-push', onEdgePush as EventListener);
+        return () => {
+            window.removeEventListener('sprite:edge-push', onEdgePush as EventListener);
+        };
+    }, []);
+
     useGSAP(
         () => {
             const root = rootRef.current;

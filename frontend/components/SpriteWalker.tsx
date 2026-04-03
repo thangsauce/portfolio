@@ -18,6 +18,7 @@ const SPRITE_SCALE = 0.52;
 const FLOOR_OFFSET = 0;
 const WALK_SPEED = 4.2;
 const RUN_SPEED = 6.2;
+const EDGE_PUSH_SCROLL_SPEED = 0.42; // px per ms when pushing against viewport edge
 const GRAVITY = 0.7;
 const JUMP_VELOCITY = 12;
 const RUN_TRIGGER_MS = 700;
@@ -82,6 +83,95 @@ type SpriteMeta = {
     frameH: number;
     frameBounds?: Array<{ sx: number; sy: number; sw: number; sh: number }>;
 };
+
+type ObstacleRect = { left: number; top: number; right: number; bottom: number };
+
+function collectObstacleRects(): ObstacleRect[] {
+    const root = document.querySelector('main');
+    if (!root) return [];
+    const elements = Array.from(root.querySelectorAll<HTMLElement>('*'));
+    const rects: ObstacleRect[] = [];
+
+    for (const el of elements) {
+        const forceObstacle = el.dataset.spriteObstacle === 'true';
+        if (!forceObstacle) {
+            if (el.closest('[data-sprite-pass="true"]')) continue;
+            if (el.dataset.spritePass === 'true') continue;
+        }
+        const style = window.getComputedStyle(el);
+        if (style.display === 'none' || style.visibility === 'hidden') continue;
+        if (style.pointerEvents === 'none') continue;
+
+        const rect = el.getBoundingClientRect();
+        if (rect.width < 12 || rect.height < 12) continue;
+        if (rect.bottom < 0 || rect.top > window.innerHeight) continue;
+        if (rect.right < 0 || rect.left > window.innerWidth) continue;
+
+        const hasBorder =
+            Number.parseFloat(style.borderTopWidth) > 0 ||
+            Number.parseFloat(style.borderRightWidth) > 0 ||
+            Number.parseFloat(style.borderBottomWidth) > 0 ||
+            Number.parseFloat(style.borderLeftWidth) > 0;
+        const visualTag = /^(img|video|canvas|svg|iframe)$/i.test(
+            el.tagName,
+        );
+        const isVisual = hasBorder || visualTag;
+        if (!isVisual) continue;
+
+        rects.push({
+            left: rect.left,
+            top: rect.top,
+            right: rect.right,
+            bottom: rect.bottom,
+        });
+    }
+
+    return rects;
+}
+
+function intersects(
+    a: { left: number; top: number; right: number; bottom: number },
+    b: { left: number; top: number; right: number; bottom: number },
+): boolean {
+    return (
+        a.left < b.right &&
+        a.right > b.left &&
+        a.top < b.bottom &&
+        a.bottom > b.top
+    );
+}
+
+function intersectsLoose(
+    a: { left: number; top: number; right: number; bottom: number },
+    b: { left: number; top: number; right: number; bottom: number },
+    epsilon = 2,
+): boolean {
+    return (
+        a.left <= b.right + epsilon &&
+        a.right >= b.left - epsilon &&
+        a.top <= b.bottom + epsilon &&
+        a.bottom >= b.top - epsilon
+    );
+}
+
+function platformBottomsForX(
+    obstacles: ObstacleRect[],
+    spriteX: number,
+    spriteW: number,
+    viewportH: number,
+): number[] {
+    const footInset = Math.max(2, spriteW * 0.22);
+    const footLeft = spriteX + footInset;
+    const footRight = spriteX + spriteW - footInset;
+    const values: number[] = [];
+    for (const obs of obstacles) {
+        if (obs.right <= footLeft || obs.left >= footRight) continue;
+        const bottomPx = viewportH - obs.top;
+        if (bottomPx <= 0) continue;
+        values.push(bottomPx);
+    }
+    return values;
+}
 
 function computeGridFrameAlphaBounds(
     img: HTMLImageElement,
@@ -177,6 +267,8 @@ const SpriteWalker = () => {
     const lastTickRef = useRef(0);
     const scrollBurstUntilRef = useRef(0);
     const scrollDirRef = useRef<1 | -1>(1);
+    const dropThroughUntilRef = useRef(0);
+    const duckDropLatchRef = useRef(false);
     const lastScrollYRef = useRef(0);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const spritesRef = useRef<Record<SpriteKey, SpriteMeta>>({
@@ -245,6 +337,8 @@ const SpriteWalker = () => {
     const [isDarkTheme, setIsDarkTheme] = useState(true);
     const [frameW, setFrameW] = useState(DEFAULT_FRAME_W);
     const [frameH, setFrameH] = useState(DEFAULT_FRAME_H);
+    const obstacleRectsRef = useRef<ObstacleRect[]>([]);
+    const lastObstacleScanAtRef = useRef(0);
 
     const playerW = Math.max(1, Math.round(frameW * SPRITE_SCALE));
     const playerH = Math.max(1, Math.round(frameH * SPRITE_SCALE));
@@ -481,6 +575,8 @@ const SpriteWalker = () => {
                   : 0;
             const downPressed = keysRef.current.down;
             const upPressed = keysRef.current.up;
+            const dropThroughActive = t < dropThroughUntilRef.current;
+            if (!downPressed) duckDropLatchRef.current = false;
 
             if (requestedDir !== 0 && moveDirRef.current !== requestedDir) {
                 moveDirRef.current = requestedDir;
@@ -530,9 +626,77 @@ const SpriteWalker = () => {
                 facingRef.current = scrollDirRef.current;
             }
 
+            if (t - lastObstacleScanAtRef.current > 120) {
+                obstacleRectsRef.current = collectObstacleRects();
+                lastObstacleScanAtRef.current = t;
+            }
+
             let nextX = xRef.current + vx;
             nextX = Math.max(8, Math.min(maxX, nextX));
+
+            // Prevent "falling backwards" loops: only apply side wall collision
+            // while grounded. Airborne movement should not be snapped by side walls.
+            if (vx !== 0 && !inAirEarly) {
+                const spriteBottomPx = FLOOR_OFFSET + yRef.current;
+                const spriteTop = window.innerHeight - spriteBottomPx - playerH;
+                const spriteBottom = spriteTop + playerH;
+                const testRect = {
+                    left: nextX,
+                    right: nextX + playerW,
+                    top: spriteTop,
+                    bottom: spriteBottom,
+                };
+
+                for (const obs of obstacleRectsRef.current) {
+                    // Only treat obstacle faces as side-colliders when the sprite
+                    // body is meaningfully below the obstacle top. This prevents
+                    // "running in place" loops while traversing platform tops.
+                    if (spriteBottom <= obs.top + 2) continue;
+                    if (!intersects(testRect, obs)) continue;
+                    if (vx > 0) {
+                        const blockedX = obs.left - playerW - 0.5;
+                        nextX = Math.min(nextX, blockedX);
+                    } else if (vx < 0) {
+                        const blockedX = obs.right + 0.5;
+                        nextX = Math.max(nextX, blockedX);
+                    }
+                    testRect.left = nextX;
+                    testRect.right = nextX + playerW;
+                }
+                nextX = Math.max(8, Math.min(maxX, nextX));
+            }
             xRef.current = nextX;
+
+            // If the sprite is pressed against a viewport edge and the user keeps
+            // moving in that direction, advance/reverse the page timeline.
+            const isDesktopHorizontal =
+                window.innerWidth >= 768 &&
+                !!document.querySelector('.horizontal-mode');
+            const heldIntoRightEdge = requestedDir > 0 && nextX >= maxX - 0.5;
+            const heldIntoLeftEdge = requestedDir < 0 && nextX <= 8.5;
+            const shouldEdgePush =
+                isDesktopHorizontal &&
+                !downPressed &&
+                (heldIntoRightEdge || heldIntoLeftEdge);
+            if (shouldEdgePush) {
+                const pageMaxY = Math.max(
+                    0,
+                    document.documentElement.scrollHeight - window.innerHeight,
+                );
+                const dir = heldIntoRightEdge ? 1 : -1;
+                const deltaY = dir * EDGE_PUSH_SCROLL_SPEED * dt;
+                const nextY = Math.max(
+                    0,
+                    Math.min(pageMaxY, window.scrollY + deltaY),
+                );
+                if (Math.abs(nextY - window.scrollY) > 0.1) {
+                    window.dispatchEvent(
+                        new CustomEvent('sprite:edge-push', {
+                            detail: { deltaY: nextY - window.scrollY },
+                        }),
+                    );
+                }
+            }
 
             if (flyCombo) {
                 const maxY = Math.max(
@@ -547,25 +711,130 @@ const SpriteWalker = () => {
                 jumpQueuedRef.current = false;
             }
 
-            const onGround = yRef.current <= 0;
+            const currentBottomPx = FLOOR_OFFSET + yRef.current;
+            const platformBottomsNow = platformBottomsForX(
+                obstacleRectsRef.current,
+                xRef.current,
+                playerW,
+                window.innerHeight,
+            );
+            const supportBottomNow =
+                platformBottomsNow.length > 0
+                    ? Math.max(...platformBottomsNow)
+                    : 0;
+            const standingOnPlatform =
+                !dropThroughActive &&
+                supportBottomNow > 0 &&
+                Math.abs(currentBottomPx - supportBottomNow) <= 1.5 &&
+                vyRef.current <= 0;
+            const canTriggerDrop =
+                downPressed &&
+                !duckDropLatchRef.current &&
+                !flyCombo &&
+                !dropThroughActive;
+            // Duck on a platform drops the sprite down to the next border/platform.
+            if (canTriggerDrop && standingOnPlatform) {
+                dropThroughUntilRef.current = t + 220;
+                yRef.current = Math.max(0, yRef.current - 4);
+                vyRef.current = Math.min(vyRef.current, -1.8);
+                duckDropLatchRef.current = true;
+            } else if (canTriggerDrop) {
+                // Also allow drop-through when squished/embedded between borders.
+                const spriteTopNow = window.innerHeight - currentBottomPx - playerH;
+                const spriteRectNow = {
+                    left: xRef.current,
+                    right: xRef.current + playerW,
+                    top: spriteTopNow,
+                    bottom: spriteTopNow + playerH,
+                };
+                const squishedNow = obstacleRectsRef.current.some((obs) =>
+                    intersectsLoose(spriteRectNow, obs, 2),
+                );
+                if (squishedNow) {
+                    dropThroughUntilRef.current = t + 240;
+                    yRef.current = Math.max(0, yRef.current - 6);
+                    vyRef.current = Math.min(vyRef.current, -2.2);
+                    duckDropLatchRef.current = true;
+                }
+            }
+            if (!flyCombo && standingOnPlatform) {
+                yRef.current = Math.max(0, supportBottomNow - FLOOR_OFFSET);
+                vyRef.current = 0;
+            }
+
+            const preJumpSpriteTop = window.innerHeight - currentBottomPx - playerH;
+            const preJumpSpriteRect = {
+                left: xRef.current,
+                right: xRef.current + playerW,
+                top: preJumpSpriteTop,
+                bottom: preJumpSpriteTop + playerH,
+            };
+            const squishedForJump =
+                !flyCombo &&
+                obstacleRectsRef.current.some((obs) =>
+                    intersectsLoose(preJumpSpriteRect, obs, 2),
+                );
+
+            const onGround =
+                !flyCombo &&
+                (yRef.current <= 0 || standingOnPlatform || squishedForJump);
             if (!flyCombo && jumpQueuedRef.current && onGround) {
                 vyRef.current = JUMP_VELOCITY;
             }
             jumpQueuedRef.current = false;
 
             if (!flyCombo && (!onGround || vyRef.current > 0)) {
+                const prevBottomPx = FLOOR_OFFSET + yRef.current;
                 let nextY = yRef.current + vyRef.current;
                 let nextVy = vyRef.current - GRAVITY;
+                let landedBottomPx = 0;
 
                 if (nextY <= 0) {
                     nextY = 0;
                     nextVy = 0;
+                    landedBottomPx = FLOOR_OFFSET;
+                }
+
+                if (nextVy <= 0) {
+                    const nextBottomPx = FLOOR_OFFSET + nextY;
+                    const platformBottoms = platformBottomsForX(
+                        obstacleRectsRef.current,
+                        xRef.current,
+                        playerW,
+                        window.innerHeight,
+                    );
+                    for (const platformBottom of dropThroughActive ? [] : platformBottoms) {
+                        if (
+                            prevBottomPx >= platformBottom - 0.5 &&
+                            nextBottomPx <= platformBottom + 0.5
+                        ) {
+                            landedBottomPx = Math.max(landedBottomPx, platformBottom);
+                        }
+                    }
+                    if (landedBottomPx > 0) {
+                        nextY = Math.max(0, landedBottomPx - FLOOR_OFFSET);
+                        nextVy = 0;
+                    }
                 }
                 yRef.current = nextY;
                 vyRef.current = nextVy;
             }
 
-            const inAir = yRef.current > 0;
+            const spriteBottomPxNow = FLOOR_OFFSET + yRef.current;
+            const spriteTopNow = window.innerHeight - spriteBottomPxNow - playerH;
+            const spriteRectNow = {
+                left: xRef.current,
+                right: xRef.current + playerW,
+                top: spriteTopNow,
+                bottom: spriteTopNow + playerH,
+            };
+            const embeddedInObstacle =
+                !flyCombo &&
+                obstacleRectsRef.current.some((obs) =>
+                    intersectsLoose(spriteRectNow, obs, 2),
+                );
+            const groundedForMode = onGround || embeddedInObstacle;
+            const inAir = !groundedForMode && yRef.current > 0;
             const fallingFromSky = inAir && vyRef.current < -0.35;
             const nextMode:
                 | 'idle'
@@ -577,6 +846,16 @@ const SpriteWalker = () => {
                 | 'fly'
                 | 'fall' = flyCombo
                 ? 'fly'
+                : embeddedInObstacle
+                  ? upPressed || vyRef.current > 0
+                    ? 'air'
+                    : downPressed
+                    ? 'duck'
+                    : requestedDir === 0
+                      ? 'idle'
+                      : isRunning
+                        ? 'run'
+                        : 'walk'
                 : fallingFromSky
                   ? 'fall'
                   : inAir

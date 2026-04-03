@@ -174,6 +174,7 @@ const Banner = () => {
                             <button
                                 type="button"
                                 onClick={() => goToProjectsCategory('web_development')}
+                                data-sprite-pass="true"
                                 className="inline-flex items-center gap-1.5 mx-1.5 text-foreground text-[1.08em] transition-all duration-200 hover:text-primary [[data-theme='light']_&]:hover:text-black hover:[text-shadow:0_0_10px_rgba(255,255,255,0.55)] [[data-theme='light']_&]:hover:[text-shadow:0_0_0_rgba(0,0,0,0)] hover:[&>svg]:[filter:drop-shadow(0_0_6px_rgba(255,255,255,0.75))] [[data-theme='light']_&]:hover:[&>svg]:[filter:drop-shadow(0_0_0_rgba(0,0,0,0))]"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-primary transition-all duration-200 [[data-theme='light']_&]:text-black">
@@ -185,6 +186,7 @@ const Banner = () => {
                             <button
                                 type="button"
                                 onClick={() => goToProjectsCategory('cybersecurity')}
+                                data-sprite-pass="true"
                                 className="inline-flex items-center gap-1.5 mx-1.5 text-foreground text-[1.08em] transition-all duration-200 hover:text-primary [[data-theme='light']_&]:hover:text-black hover:[text-shadow:0_0_10px_rgba(255,255,255,0.55)] [[data-theme='light']_&]:hover:[text-shadow:0_0_0_rgba(0,0,0,0)] hover:[&>svg]:[filter:drop-shadow(0_0_6px_rgba(255,255,255,0.75))] [[data-theme='light']_&]:hover:[&>svg]:[filter:drop-shadow(0_0_0_rgba(0,0,0,0))]"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-primary transition-all duration-200 [[data-theme='light']_&]:text-black">
@@ -195,6 +197,7 @@ const Banner = () => {
                             <button
                                 type="button"
                                 onClick={() => goToProjectsCategory('network')}
+                                data-sprite-pass="true"
                                 className="inline-flex items-center gap-1.5 mx-1.5 text-foreground text-[1.08em] transition-all duration-200 hover:text-primary [[data-theme='light']_&]:hover:text-black hover:[text-shadow:0_0_10px_rgba(255,255,255,0.55)] [[data-theme='light']_&]:hover:[text-shadow:0_0_0_rgba(0,0,0,0)] hover:[&>svg]:[filter:drop-shadow(0_0_6px_rgba(255,255,255,0.75))] [[data-theme='light']_&]:hover:[&>svg]:[filter:drop-shadow(0_0_0_rgba(0,0,0,0))]"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-primary transition-all duration-200 [[data-theme='light']_&]:text-black">
@@ -235,7 +238,7 @@ const Banner = () => {
                     </div>
                 </div>
 
-                <div className="md:absolute bottom-8 left-0 right-0 flex gap-8 md:gap-0 md:justify-between pt-6 mt-8 md:mt-0">
+                <div className="md:absolute md:bottom-20 left-0 right-0 flex gap-8 md:gap-0 md:justify-between pt-6 mt-8 md:mt-0">
                     <div className="slide-up-and-fade">
                         <h5 className="text-2xl sm:text-3xl font-anton text-primary mb-1 [[data-theme='light']_&]:text-black">
                             University of Central Florida
@@ -263,6 +266,42 @@ const Banner = () => {
                 </div>
             </div>
             <style jsx>{`
+                .cta-border-pulse {
+                    animation: ctaBorderPulseDark 4.6s ease-in-out infinite;
+                }
+
+                :global([data-theme='light']) .cta-border-pulse {
+                    animation-name: ctaBorderPulseLight;
+                }
+
+                @keyframes ctaBorderPulseDark {
+                    0%,
+                    100% {
+                        box-shadow:
+                            0 0 0 1px rgba(255, 255, 255, 0.18),
+                            0 0 0 rgba(255, 255, 255, 0);
+                    }
+                    50% {
+                        box-shadow:
+                            0 0 0 1px rgba(255, 255, 255, 0.4),
+                            0 0 16px rgba(255, 255, 255, 0.25);
+                    }
+                }
+
+                @keyframes ctaBorderPulseLight {
+                    0%,
+                    100% {
+                        box-shadow:
+                            0 0 0 1px rgba(63, 63, 70, 0.28),
+                            0 0 0 rgba(24, 24, 27, 0);
+                    }
+                    50% {
+                        box-shadow:
+                            0 0 0 1px rgba(39, 39, 42, 0.44),
+                            0 0 14px rgba(24, 24, 27, 0.16);
+                    }
+                }
+
                 .hero-shine-text {
                     color: #e5e7eb;
                     display: inline-block;
@@ -278,38 +317,6 @@ const Banner = () => {
                         0 -1px 0 rgba(255, 255, 255, 0.72),
                         0 1px 0 rgba(17, 24, 39, 0.18),
                         0 0 8px rgba(255, 255, 255, 0.16);
-                }
-
-                .cta-border-pulse {
-                    animation: ctaBorderPulseDark 3.9s ease-in-out infinite;
-                }
-
-                :global([data-theme='light']) .cta-border-pulse {
-                    animation: ctaBorderPulseLight 3.9s ease-in-out infinite;
-                }
-
-                @keyframes ctaBorderPulseDark {
-                    0%,
-                    100% {
-                        box-shadow: 0 0 0 rgba(255, 255, 255, 0);
-                    }
-                    50% {
-                        box-shadow:
-                            0 0 0 1px rgba(255, 255, 255, 0.28),
-                            0 0 16px rgba(255, 255, 255, 0.18);
-                    }
-                }
-
-                @keyframes ctaBorderPulseLight {
-                    0%,
-                    100% {
-                        box-shadow: 0 0 0 rgba(17, 24, 39, 0);
-                    }
-                    50% {
-                        box-shadow:
-                            0 0 0 1px rgba(17, 24, 39, 0.18),
-                            0 0 14px rgba(17, 24, 39, 0.12);
-                    }
                 }
             `}</style>
         </section>

@@ -105,7 +105,7 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
     return (
         <>
             <div
-                className="project-item group leading-none py-1.5 md:py-5 first:!pt-0 last:pb-0 md:group-hover/projects:opacity-30 md:hover:!opacity-100 transition-all"
+                className="project-item group leading-none max-md:py-0.5 py-1.5 md:py-5 first:!pt-0 last:pb-0 md:group-hover/projects:opacity-30 md:hover:!opacity-100 transition-all"
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
             >
@@ -114,7 +114,7 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
                     src={project.thumbnail}
                     alt="Project"
                     className={cn(
-                        'w-full object-cover mb-2.5 md:mb-6 aspect-[3/2] object-top',
+                        'w-full object-cover mb-1.5 md:mb-6 aspect-[3/2] object-top',
                     )}
                     key={project.slug}
                     loading="lazy"
@@ -135,8 +135,8 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
                 </div>
                 <div className="">
                     <div className="flex items-start justify-between gap-4">
-                        <TransitionLink href={`/projects?slug=${encodeURIComponent(project.slug)}`} className="min-w-0">
-                            <h4 className="text-4xl xs:text-6xl flex gap-4 font-anton transition-all duration-700 bg-gradient-to-r from-primary to-foreground from-[50%] to-[50%] bg-[length:200%] bg-right bg-clip-text text-transparent group-hover:bg-left">
+                        <TransitionLink href={`/projects?slug=${encodeURIComponent(project.slug)}`} className="min-w-0 no-click-glow">
+                            <h4 className="project-title-soft-glow text-4xl xs:text-6xl flex gap-4 font-anton transition-all duration-700 bg-gradient-to-r from-primary to-foreground from-[50%] to-[50%] bg-[length:200%] bg-right bg-clip-text text-transparent group-hover:bg-left">
                                 {project.title}
                                 <span className="text-foreground opacity-0 group-hover:opacity-100 transition-all">
                                     <svg
@@ -190,8 +190,8 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
                                             <span className="live-demo-cursor-orbit absolute" aria-hidden="true">
                                                 <svg
                                                     xmlns="http://www.w3.org/2000/svg"
-                                                    width="14"
-                                                    height="14"
+                                                    width="20"
+                                                    height="20"
                                                     viewBox="0 0 24 24"
                                                     fill="currentColor"
                                                 >
@@ -220,7 +220,7 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
                             ))}
                     </div>
                     {project.description && (
-                        <p className="max-w-3xl text-sm md:text-base text-muted-foreground leading-relaxed overflow-hidden transition-all duration-500 ease-out max-md:mt-3 max-md:max-h-40 max-md:opacity-100 md:mt-0 md:max-h-0 md:opacity-0 md:group-hover:mt-3 md:group-hover:max-h-40 md:group-hover:opacity-100">
+                        <p className="max-w-3xl text-sm md:text-base text-muted-foreground leading-relaxed overflow-hidden transition-all duration-500 ease-out max-md:mt-2 max-md:max-h-16 max-md:opacity-100 md:mt-0 md:max-h-0 md:opacity-0 md:group-hover:mt-3 md:group-hover:max-h-40 md:group-hover:opacity-100">
                             {project.description}
                         </p>
                     )}
@@ -239,9 +239,9 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
 
                 .live-demo-cursor-orbit {
                     color: currentColor;
-                    opacity: 0.9;
+                    opacity: 0.95;
                     transform-origin: 50% 50%;
-                    animation: liveCursorOrbit 1.9s ease-in-out infinite;
+                    animation: liveCursorGuide 3.3s cubic-bezier(0.25, 0.1, 0.2, 1) infinite;
                 }
 
                 @keyframes liveDotBlink {
@@ -254,23 +254,60 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
                     }
                 }
 
-                @keyframes liveCursorOrbit {
+                @keyframes liveCursorGuide {
                     0%,
-                    100% {
-                        transform: translate(-14px, -10px) rotate(-18deg);
-                        opacity: 0.85;
+                    8% {
+                        transform: translate(-24px, -16px) rotate(-20deg) scale(1);
+                        opacity: 0.75;
                     }
-                    25% {
-                        transform: translate(12px, -9px) rotate(8deg);
+                    22% {
+                        transform: translate(18px, -10px) rotate(14deg) scale(1.02);
                         opacity: 1;
                     }
-                    50% {
-                        transform: translate(12px, 10px) rotate(18deg);
+                    37% {
+                        transform: translate(-10px, 14px) rotate(-12deg) scale(0.98);
                         opacity: 0.95;
                     }
-                    75% {
-                        transform: translate(-13px, 10px) rotate(-8deg);
+                    54% {
+                        transform: translate(14px, 8px) rotate(8deg) scale(1.03);
                         opacity: 1;
+                    }
+                    68%,
+                    82% {
+                        transform: translate(0px, 0px) rotate(0deg) scale(1.06);
+                        opacity: 1;
+                    }
+                    100% {
+                        transform: translate(-24px, -16px) rotate(-20deg) scale(1);
+                        opacity: 0.75;
+                    }
+                }
+
+                .project-title-soft-glow {
+                    animation: projectTitleSoftGlow 5.8s ease-in-out infinite;
+                }
+
+                @keyframes projectTitleSoftGlow {
+                    0%,
+                    100% {
+                        filter: drop-shadow(0 0 0 rgba(255, 255, 255, 0));
+                    }
+                    50% {
+                        filter: drop-shadow(0 0 7px rgba(255, 255, 255, 0.22));
+                    }
+                }
+
+                :global([data-theme='light']) .project-title-soft-glow {
+                    animation-name: projectTitleSoftGlowLight;
+                }
+
+                @keyframes projectTitleSoftGlowLight {
+                    0%,
+                    100% {
+                        filter: drop-shadow(0 0 0 rgba(17, 24, 39, 0));
+                    }
+                    50% {
+                        filter: drop-shadow(0 0 6px rgba(17, 24, 39, 0.18));
                     }
                 }
             `}</style>

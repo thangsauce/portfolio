@@ -283,7 +283,7 @@ const Navbar = () => {
                     <Link
                         href="/#banner"
                         aria-label="Go to homepage"
-                        className="absolute top-2 left-5 md:top-1 md:left-6 z-[2] h-20 w-28 md:h-24 md:w-36 flex items-center justify-center text-primary/85"
+                        className="absolute top-2 left-5 md:top-1 md:left-6 z-[2] h-20 w-28 md:h-24 md:w-36 flex items-center justify-center text-primary/85 [[data-theme='light']_&]:text-zinc-900"
                     >
                         <svg
                             viewBox="0 0 120 72"
@@ -551,6 +551,12 @@ const Navbar = () => {
                     transform-origin: 94px 38px;
                     animation: starTwinkle 2.8s ease-in-out infinite;
                 }
+                :global([data-theme='light']) .shooting-star-tail {
+                    animation-name: tailPulseLight;
+                }
+                :global([data-theme='light']) .shooting-star-head {
+                    animation-name: starTwinkleLight;
+                }
                 .menu-dot-blink {
                     animation: menuDotBlink 2.4s ease-in-out infinite;
                 }
@@ -564,9 +570,17 @@ const Navbar = () => {
                     0%, 100% { opacity: 0.24; }
                     50% { opacity: 0.58; }
                 }
+                @keyframes tailPulseLight {
+                    0%, 100% { opacity: 0.48; }
+                    50% { opacity: 0.9; }
+                }
                 @keyframes starTwinkle {
                     0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0px currentColor); }
                     50% { transform: scale(1.08); filter: drop-shadow(0 0 6px currentColor); }
+                }
+                @keyframes starTwinkleLight {
+                    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(24, 24, 27, 0)); }
+                    50% { transform: scale(1.08); filter: drop-shadow(0 0 7px rgba(24, 24, 27, 0.36)); }
                 }
                 .nav-shake:hover {
                     animation: navShake 0.34s ease-in-out;

@@ -186,10 +186,10 @@ const AboutMe = () => {
                             className="slide-up-and-fade pointer-events-none select-none relative h-28 w-28 md:h-36 md:w-36"
                             aria-hidden="true"
                         >
-                            <div className="absolute inset-0 rounded-full bg-primary/15 blur-2xl" />
+                            <div className="absolute inset-0 rounded-full bg-transparent" />
                             <svg
                                 viewBox="0 0 120 120"
-                                className="relative h-full w-full text-primary drop-shadow-[0_0_18px_rgba(255,255,255,0.45)]"
+                                className="relative h-full w-full text-primary [[data-theme='light']_&]:text-zinc-900"
                                 fill="none"
                                 xmlns="http://www.w3.org/2000/svg"
                             >
@@ -224,7 +224,7 @@ const AboutMe = () => {
                 </div>
 
                 <div className="slide-up-and-fade mt-10 md:mt-14">
-                    <div className="relative overflow-hidden rounded-2xl border border-border/70 bg-background/20 backdrop-blur-sm h-52 md:h-60">
+                    <div data-sprite-pass="true" className="relative overflow-hidden rounded-2xl border border-border/70 bg-background/20 backdrop-blur-sm h-44 md:h-52">
                         <div className="absolute inset-0 opacity-80">
                             <svg
                                 viewBox="0 0 800 280"
@@ -243,8 +243,9 @@ const AboutMe = () => {
                         </div>
                         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/75 via-background/20 to-transparent" />
 
-                        <div className="absolute left-4 top-4 rounded-full border border-primary/45 bg-background/70 px-4 py-1.5 text-sm sm:text-base tracking-wide text-foreground shadow-[0_0_14px_rgba(255,255,255,0.25)]">
-                            Based in <span className="text-primary">Orlando, FL</span>
+                        <div data-sprite-obstacle="true" className="absolute left-4 top-4 rounded-full border border-primary/45 [[data-theme='light']_&]:border-zinc-500/70 bg-background/70 px-4 py-1.5 text-sm sm:text-base tracking-wide shadow-[0_0_14px_rgba(255,255,255,0.25)]">
+                            <span className="text-muted-foreground [[data-theme='light']_&]:text-zinc-600">Based in </span>
+                            <span className="text-primary [[data-theme='light']_&]:text-zinc-900">Orlando, FL</span>
                         </div>
 
                         <div
@@ -252,8 +253,8 @@ const AboutMe = () => {
                             className="pointer-events-none absolute left-0 right-0 bottom-2 h-12"
                             aria-hidden="true"
                         >
-                            <div className="absolute left-3 right-3 top-6 border-t border-dashed border-primary/55" />
-                            <div ref={planeRef} className="absolute top-1 left-0 text-primary drop-shadow-[0_0_8px_rgba(255,255,255,0.45)]">
+                            <div className="absolute left-3 right-3 top-6 border-t border-dashed border-primary/55 [[data-theme='light']_&]:border-zinc-700/75" />
+                            <div ref={planeRef} className="absolute top-1 left-0 text-primary [[data-theme='light']_&]:text-zinc-900 drop-shadow-[0_0_8px_rgba(255,255,255,0.45)] [[data-theme='light']_&]:drop-shadow-[0_0_8px_rgba(24,24,27,0.3)]">
                                 <svg
                                     width="30"
                                     height="30"

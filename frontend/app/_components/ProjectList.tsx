@@ -288,7 +288,7 @@ const ProjectList = () => {
                     <span className="text-primary [[data-theme='light']_&]:text-foreground/80 font-mono text-2xl leading-none select-none">&gt;</span>
                 </div>
 
-                <div className="group/projects relative" ref={containerRef}>
+                <div className="group/projects relative max-md:-mt-1" ref={containerRef}>
                     {selectedProject !== null && projects.some((p) => p.thumbnail || p.longThumbnail) && (
                         <div
                             className="max-md:hidden absolute -right-20 xl:-right-28 top-0 z-[1] pointer-events-none w-[200px] xl:w-[350px] aspect-[3/4] overflow-hidden opacity-100"
@@ -321,7 +321,7 @@ const ProjectList = () => {
                     )}
 
                     <div className="flex flex-col max-md:gap-0 md:pr-[230px] xl:pr-[390px]" ref={projectListRef}>
-                        <div className="mb-0 md:mb-6 flex flex-wrap items-center gap-2">
+                        <div className="mb-0 max-md:pb-1 md:mb-6 flex flex-wrap items-center gap-2">
                             {categories.map((category) => (
                                 <button
                                     key={category.key}
@@ -371,7 +371,7 @@ const ProjectList = () => {
 
                         {currentProjects.length > 0 ? (
                             <div
-                                className="flex flex-col"
+                                className="flex flex-col max-md:-mt-1"
                                 ref={pagePanelRef}
                                 key={`${activeCategory}-${currentPage}`}
                             >
