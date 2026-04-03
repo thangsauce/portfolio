@@ -124,7 +124,7 @@ const ProjectDetails = ({ project }: Props) => {
                                         href={project.liveUrl}
                                         target="_blank"
                                         rel="noreferrer noopener"
-                                        className="inline-flex items-center gap-2 text-xs sm:text-sm uppercase tracking-[0.14em] text-foreground/80 hover:text-primary transition-colors"
+                                        className="inline-flex items-center gap-2 text-xs sm:text-sm uppercase tracking-[0.14em] text-foreground/80 hover:text-primary transition-colors live-demo-link"
                                     >
                                         <span className="live-demo-dot inline-block size-2.5 rounded-full bg-red-500" />
                                         <span>LIVE</span>
@@ -214,6 +214,10 @@ const ProjectDetails = ({ project }: Props) => {
             <style jsx>{`
                 .live-demo-dot {
                     animation: liveDotBlink 1.15s ease-in-out infinite;
+                }
+
+                .live-demo-link {
+                    cursor: url('/cursor-live.svg') 4 4, pointer;
                 }
 
                 @keyframes liveDotBlink {

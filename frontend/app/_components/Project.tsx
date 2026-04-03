@@ -224,6 +224,10 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
                     animation: liveDotBlink 1.15s ease-in-out infinite;
                 }
 
+                .live-demo-link {
+                    cursor: url('/cursor-live.svg') 4 4, pointer;
+                }
+
                 @keyframes liveDotBlink {
                     0%,
                     100% {

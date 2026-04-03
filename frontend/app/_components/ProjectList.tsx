@@ -278,9 +278,9 @@ const ProjectList = () => {
     if (projects.length === 0) return null;
 
     return (
-        <section className="pb-section" id="selected-projects">
+        <section className="pb-section -mt-5 md:mt-0" id="selected-projects">
             <div className="container">
-                <div className="flex items-center gap-3 mb-6 md:mb-10">
+                <div className="flex items-center gap-3 mb-3 md:mb-10">
                     <span className="text-primary font-mono text-xl leading-none select-none">&lt;</span>
                     <h2 className="text-xl uppercase leading-none tracking-widest">
                         PROJECTS
@@ -320,8 +320,8 @@ const ProjectList = () => {
                         </div>
                     )}
 
-                    <div className="flex flex-col max-md:gap-4 md:pr-[230px] xl:pr-[390px]" ref={projectListRef}>
-                        <div className="mb-4 md:mb-6 flex flex-wrap items-center gap-2.5">
+                    <div className="flex flex-col max-md:gap-2 md:pr-[230px] xl:pr-[390px]" ref={projectListRef}>
+                        <div className="mb-2 md:mb-6 flex flex-wrap items-center gap-2.5">
                             {categories.map((category) => (
                                 <button
                                     key={category.key}
