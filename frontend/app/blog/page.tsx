@@ -181,9 +181,9 @@ export default function BlogPage() {
     <section className="relative min-h-screen pt-28 pb-20 md:pt-36">
       <div className="container max-w-5xl">
         <div className="flex items-center gap-3 mb-4">
-          <span className="text-primary font-mono text-xl leading-none select-none">&lt;</span>
-          <h2 className="text-xl uppercase leading-none tracking-widest">BLOG</h2>
-          <span className="text-primary font-mono text-xl leading-none select-none">&gt;</span>
+          <span className="text-primary font-mono text-2xl leading-none select-none">&lt;</span>
+          <h2 className="text-2xl uppercase leading-none tracking-widest">BLOG</h2>
+          <span className="text-primary font-mono text-2xl leading-none select-none">&gt;</span>
         </div>
 
         <div className="mb-6 flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
@@ -343,7 +343,7 @@ function PostRow({
       href={`/blog/${encodeURIComponent(post.slug)}`}
       className="block text-inherit no-underline"
     >
-      <article className="group rounded-xl border border-border bg-background-light/35 px-5 py-5 sm:px-6 sm:py-6 transition-all duration-300 hover:border-primary/45 hover:bg-background-light/55">
+      <article className="group rounded-xl border border-border bg-white/[0.04] backdrop-blur-sm px-5 py-5 sm:px-6 sm:py-6 transition-all duration-300 hover:border-white/30 hover:bg-white/[0.07] hover:shadow-[0_0_28px_rgba(255,255,255,0.06)]">
         <div className="flex flex-wrap items-center gap-3 text-[11px] uppercase tracking-[0.2em] text-muted-foreground/70 mb-3">
           {post.published_at ? (
             <span>{formatDate(raw)} · {formatTime(raw)}</span>
@@ -352,7 +352,7 @@ function PostRow({
           )}
         </div>
 
-        <h3 className="font-anton text-2xl sm:text-3xl uppercase tracking-[0.06em] leading-tight text-foreground transition-colors duration-300 group-hover:text-primary mb-3">
+        <h3 className="font-anton text-2xl sm:text-3xl md:text-4xl uppercase tracking-[0.06em] leading-tight text-foreground transition-colors duration-300 group-hover:text-primary mb-3">
           {post.title}
         </h3>
 

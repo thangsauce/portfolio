@@ -212,7 +212,7 @@ const Banner = () => {
                             <button
                                 type="button"
                                 onClick={goToContact}
-                                className="group relative overflow-hidden h-12 px-8 inline-flex justify-center items-center text-lg uppercase font-anton tracking-widest rounded-full border border-border transition-colors duration-300 ease-out bg-transparent text-foreground hover:border-primary hover:text-primary [[data-theme='light']_&]:border-foreground/35 [[data-theme='dark']_&]:border-white/35"
+                                className="group relative overflow-hidden h-12 px-8 inline-flex justify-center items-center text-lg uppercase font-anton tracking-widest rounded-full border border-border transition-all duration-300 ease-out bg-transparent text-foreground hover:border-white/50 hover:text-primary hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] [[data-theme='light']_&]:border-foreground/35 [[data-theme='dark']_&]:border-white/35"
                             >
                                 <span className="absolute inset-0 flex items-center justify-center transition-all duration-300 group-hover:-translate-y-full group-hover:opacity-0">
                                     Let&apos;s Connect
@@ -225,7 +225,7 @@ const Banner = () => {
                             <a
                                 href={resumeUrl}
                                 download="Thang_Le_Resume.pdf"
-                                className="group h-12 px-8 inline-flex justify-center items-center text-lg uppercase font-anton tracking-widest border border-border hover:border-primary hover:text-primary transition-colors overflow-hidden relative rounded-full [[data-theme='light']_&]:text-foreground [[data-theme='light']_&]:border-foreground/35 [[data-theme='dark']_&]:border-white/35"
+                                className="group h-12 px-8 inline-flex justify-center items-center text-lg uppercase font-anton tracking-widest border border-border hover:border-white/50 hover:text-primary hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all overflow-hidden relative rounded-full [[data-theme='light']_&]:text-foreground [[data-theme='light']_&]:border-foreground/35 [[data-theme='dark']_&]:border-white/35"
                             >
                                 <span className="transition-all duration-300 group-hover:-translate-y-full group-hover:opacity-0 absolute [[data-theme='light']_&]:text-foreground">Résumé</span>
                                 <span className="transition-all duration-300 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 absolute [[data-theme='light']_&]:text-foreground">Download</span>

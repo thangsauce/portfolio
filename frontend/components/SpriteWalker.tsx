@@ -3,14 +3,14 @@
 import { useEffect, useRef, useState } from 'react';
 
 const SPRITE_ASSET_VERSION = '2026-04-03-01';
-const WALK_SPRITE_SRC = `/sprite-walking.png?v=${SPRITE_ASSET_VERSION}`;
-const RUN_SPRITE_SRC = `/sprite-running.png?v=${SPRITE_ASSET_VERSION}`;
-const IDLE_SPRITE_SRC = `/sprite-idling.png?v=${SPRITE_ASSET_VERSION}`;
-const JUMP_SPRITE_SRC = `/sprite-jumping.png?v=${SPRITE_ASSET_VERSION}`;
-const DUCK_SPRITE_SRC = `/sprite-ducking.png?v=${SPRITE_ASSET_VERSION}`;
-const BLOWN_SPRITE_SRC = `/sprite-blown-away.png?v=${SPRITE_ASSET_VERSION}`;
-const FLY_SPRITE_SRC = `/sprite-flying.png?v=${SPRITE_ASSET_VERSION}`;
-const FALL_SPRITE_SRC = `/sprite-falling-down.png?v=${SPRITE_ASSET_VERSION}`;
+const WALK_SPRITE_SRC = `/sprites/sprite-walking.png?v=${SPRITE_ASSET_VERSION}`;
+const RUN_SPRITE_SRC = `/sprites/sprite-running.png?v=${SPRITE_ASSET_VERSION}`;
+const IDLE_SPRITE_SRC = `/sprites/sprite-idling.png?v=${SPRITE_ASSET_VERSION}`;
+const JUMP_SPRITE_SRC = `/sprites/sprite-jumping.png?v=${SPRITE_ASSET_VERSION}`;
+const DUCK_SPRITE_SRC = `/sprites/sprite-ducking.png?v=${SPRITE_ASSET_VERSION}`;
+const BLOWN_SPRITE_SRC = `/sprites/sprite-blown-away.png?v=${SPRITE_ASSET_VERSION}`;
+const FLY_SPRITE_SRC = `/sprites/sprite-flying.png?v=${SPRITE_ASSET_VERSION}`;
+const FALL_SPRITE_SRC = `/sprites/sprite-falling-down.png?v=${SPRITE_ASSET_VERSION}`;
 const SPRITE_FRAMES = 6;
 const DEFAULT_FRAME_W = 84;
 const DEFAULT_FRAME_H = 84;

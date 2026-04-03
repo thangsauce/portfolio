@@ -65,11 +65,11 @@ const Certifications = () => {
         <section className="pt-20 md:pt-0 pb-section" id="certifications" ref={containerRef}>
             <div className="container">
                 <div className="flex items-center gap-3 mb-10">
-                    <span className="text-primary font-mono text-xl leading-none select-none">&lt;</span>
-                    <h2 className="text-xl uppercase leading-none tracking-widest">
+                    <span className="text-primary font-mono text-2xl leading-none select-none">&lt;</span>
+                    <h2 className="text-2xl uppercase leading-none tracking-widest">
                         CERTIFICATION
                     </h2>
-                    <span className="text-primary font-mono text-xl leading-none select-none">&gt;</span>
+                    <span className="text-primary font-mono text-2xl leading-none select-none">&gt;</span>
                 </div>
 
                 <div className="space-y-4 max-w-2xl">
@@ -80,7 +80,7 @@ const Certifications = () => {
                                 href={cert.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="cert-item flex items-center justify-between border border-border rounded px-5 py-4 hover:border-primary transition-colors group"
+                                className="cert-item flex items-center justify-between border border-border rounded px-5 py-4 bg-white/[0.03] backdrop-blur-sm hover:border-white/30 hover:bg-white/[0.07] hover:shadow-[0_0_20px_rgba(255,255,255,0.06)] transition-all group"
                             >
                                 <div>
                                     <p className="text-lg font-medium group-hover:text-primary transition-colors">{cert.name}</p>
@@ -95,7 +95,7 @@ const Certifications = () => {
                         ) : (
                             <div
                                 key={cert.id}
-                                className="cert-item flex items-center justify-between border border-border rounded px-5 py-4"
+                                className="cert-item flex items-center justify-between border border-border rounded px-5 py-4 bg-white/[0.03] backdrop-blur-sm"
                             >
                                 <div>
                                     <p className="text-lg font-medium">{cert.name}</p>

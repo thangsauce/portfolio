@@ -281,11 +281,11 @@ const ProjectList = () => {
         <section className="pb-section -mt-5 md:mt-0" id="selected-projects">
             <div className="container">
                 <div className="flex items-center gap-3 mb-3 md:mb-10">
-                    <span className="text-primary font-mono text-xl leading-none select-none">&lt;</span>
-                    <h2 className="text-xl uppercase leading-none tracking-widest">
+                    <span className="text-primary font-mono text-2xl leading-none select-none">&lt;</span>
+                    <h2 className="text-2xl uppercase leading-none tracking-widest">
                         PROJECTS
                     </h2>
-                    <span className="text-primary font-mono text-xl leading-none select-none">&gt;</span>
+                    <span className="text-primary font-mono text-2xl leading-none select-none">&gt;</span>
                 </div>
 
                 <div className="group/projects relative" ref={containerRef}>
@@ -349,7 +349,7 @@ const ProjectList = () => {
                                     type="button"
                                     onClick={() => flipProject(-1)}
                                     disabled={totalPages <= 1}
-                                    className="h-9 w-9 rounded-full border border-border text-foreground disabled:opacity-35 disabled:cursor-not-allowed hover:border-primary/45 hover:text-primary transition-colors"
+                                    className="h-9 w-9 rounded-full border border-border text-foreground disabled:opacity-35 disabled:cursor-not-allowed hover:border-white/40 hover:text-primary hover:shadow-[0_0_14px_rgba(255,255,255,0.1)] transition-all"
                                     aria-label="Previous project"
                                 >
                                     ‹
@@ -361,7 +361,7 @@ const ProjectList = () => {
                                     type="button"
                                     onClick={() => flipProject(1)}
                                     disabled={totalPages <= 1}
-                                    className="h-9 w-9 rounded-full border border-border text-foreground disabled:opacity-35 disabled:cursor-not-allowed hover:border-primary/45 hover:text-primary transition-colors"
+                                    className="h-9 w-9 rounded-full border border-border text-foreground disabled:opacity-35 disabled:cursor-not-allowed hover:border-white/40 hover:text-primary hover:shadow-[0_0_14px_rgba(255,255,255,0.1)] transition-all"
                                     aria-label="Next project"
                                 >
                                     ›
