@@ -5,6 +5,7 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
 import { useLenis } from 'lenis/react';
+import Image from 'next/image';
 import React from 'react';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -236,6 +237,22 @@ const Banner = () => {
                             </a>
                         </div>
                     </div>
+
+                    <div className="w-full lg:w-auto flex justify-center lg:justify-end self-center lg:self-end">
+                        <div className="relative slide-up-and-fade">
+                            <span className="pointer-events-none absolute -inset-6 sm:-inset-7 lg:-inset-8 rounded-full hero-orbit-ring" />
+                            <div className="relative h-[250px] w-[250px] sm:h-[300px] sm:w-[300px] lg:h-[360px] lg:w-[360px] rounded-full border border-white/35 [[data-theme='light']_&]:border-black/35 overflow-hidden shadow-[0_0_0_1px_rgba(255,255,255,0.1),0_20px_60px_rgba(0,0,0,0.35)] [[data-theme='light']_&]:shadow-[0_0_0_1px_rgba(0,0,0,0.12),0_20px_60px_rgba(0,0,0,0.18)]">
+                                <Image
+                                    src="/CartoonMe.png"
+                                    alt="Cartoon portrait of Thang Le"
+                                    fill
+                                    priority
+                                    className="object-cover grayscale saturate-0 contrast-125 brightness-105"
+                                />
+                            </div>
+                            <span className="pointer-events-none absolute -inset-4 rounded-full border border-white/10 [[data-theme='light']_&]:border-black/10" />
+                        </div>
+                    </div>
                 </div>
 
                 <div className="md:absolute md:bottom-20 left-0 right-0 flex gap-8 md:gap-0 md:justify-between pt-6 mt-56 md:mt-0">
@@ -317,6 +334,23 @@ const Banner = () => {
                         0 -1px 0 rgba(255, 255, 255, 0.72),
                         0 1px 0 rgba(17, 24, 39, 0.18),
                         0 0 8px rgba(255, 255, 255, 0.16);
+                }
+
+                .hero-orbit-ring {
+                    border: 1.5px solid rgba(255, 255, 255, 0.38);
+                    box-shadow:
+                        0 0 0 6px rgba(255, 255, 255, 0.07),
+                        0 0 0 14px rgba(255, 255, 255, 0.03),
+                        0 0 18px rgba(255, 255, 255, 0.18);
+                    opacity: 1;
+                }
+
+                :global([data-theme='light']) .hero-orbit-ring {
+                    border-color: rgba(17, 24, 39, 0.36);
+                    box-shadow:
+                        0 0 0 6px rgba(17, 24, 39, 0.08),
+                        0 0 0 14px rgba(17, 24, 39, 0.03),
+                        0 0 14px rgba(17, 24, 39, 0.14);
                 }
             `}</style>
         </section>
