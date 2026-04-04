@@ -5,6 +5,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { useLenis } from 'lenis/react';
+import PanelFireflies from '@/components/PanelFireflies';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -226,9 +227,10 @@ const HorizontalScrollLayout = ({ children }: Props) => {
                 {panels.map((panel, idx) => (
                     <div
                         key={idx}
-                        className="horizontal-panel w-full shrink-0 md:w-screen md:min-h-[100svh]"
+                        className="horizontal-panel relative w-full shrink-0 md:w-screen md:min-h-[100svh]"
                     >
-                        <div className={`horizontal-panel-content md:will-change-transform ${idx === 0 ? '' : 'md:pt-20 md:pl-20 lg:pt-24 lg:pl-28 xl:pt-32 xl:pl-36'}`}>
+                        <PanelFireflies seed={idx + 1} />
+                        <div className={`horizontal-panel-content relative z-[1] md:will-change-transform ${idx === 0 ? '' : 'md:pt-20 md:pl-20 lg:pt-24 lg:pl-28 xl:pt-32 xl:pl-36'}`}>
                             {panel}
                         </div>
                     </div>

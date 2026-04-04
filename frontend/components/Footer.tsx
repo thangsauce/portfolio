@@ -3,6 +3,7 @@ import { GENERAL_INFO } from '@/lib/data';
 import { useLenis } from 'lenis/react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
+import PanelFireflies from '@/components/PanelFireflies';
 
 const FIRE_W = 24;
 const FIRE_H = 22;
@@ -163,7 +164,7 @@ function Campfire() {
 const PAGES_ALL_LINKS = [
     { label: 'Home', href: '/#banner' },
     { label: 'About Me', href: '/#about-me' },
-    { label: 'Projects', href: '/projects' },
+    { label: 'Projects', href: '/#selected-projects' },
     { label: 'Experience', href: '/#my-experience' },
     { label: 'Stack', href: '/#my-stack' },
     { label: 'Certifications', href: '/#certifications' },
@@ -265,12 +266,13 @@ const Footer = () => {
 
     return (
         <footer
-            className="border-t border-border bg-background"
+            className="relative overflow-hidden border-t border-border bg-background"
             itemScope
             itemType="https://schema.org/Person"
             data-sprite-pass="true"
         >
-            <div className="container pt-12 pb-6">
+            <PanelFireflies seed={99} />
+            <div className="container relative z-[1] pt-12 pb-6">
                 {/* Link columns */}
                 <div className="relative grid grid-cols-2 gap-x-8 gap-y-4 sm:gap-y-6 mb-16 sm:mb-20 md:flex md:gap-12 md:items-start md:justify-start">
                     <div className="order-1 text-left relative z-10">

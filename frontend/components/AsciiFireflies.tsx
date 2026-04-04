@@ -1,6 +1,8 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { useState } from 'react';
 
 const CHARS = ["'", '.', '*', '`', '·', '+', '°', '✦'];
 const COUNT = 55;
@@ -38,58 +40,82 @@ function makeFly(W: number, H: number): Fly {
     };
 }
 
-export default function AsciiFireflies() {
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    const fliesRef = useRef<Fly[]>([]);
-    const rafRef = useRef(0);
-    const lastRef = useRef(0);
-
+function FireflyCanvas() {
     useEffect(() => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
+        const canvas = document.createElement('canvas');
+        canvas.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            pointer-events: none;
+            width: 100%;
+        `;
+        canvas.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(canvas);
 
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
+        const ctx = canvas.getContext('2d')!;
 
         const resize = () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+            const doc = document.documentElement;
+            const body = document.body;
+            const width = Math.max(window.innerWidth, doc.clientWidth, body.scrollWidth);
+            const height = Math.max(
+                window.innerHeight,
+                doc.scrollHeight,
+                body.scrollHeight,
+            );
+            canvas.width = width;
+            canvas.height = height;
+            canvas.style.height = `${height}px`;
         };
         resize();
         window.addEventListener('resize', resize);
 
-        fliesRef.current = Array.from({ length: COUNT }, () =>
+        let fgColor = '#ffffff';
+        const resolveColor = () => {
+            const raw = getComputedStyle(document.documentElement)
+                .getPropertyValue('--foreground')
+                .trim();
+            fgColor = raw ? `hsl(${raw})` : '#ffffff';
+        };
+        resolveColor();
+        const themeObserver = new MutationObserver(resolveColor);
+        themeObserver.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme'],
+        });
+
+        const flies: Fly[] = Array.from({ length: COUNT }, () =>
             makeFly(window.innerWidth, window.innerHeight),
         );
 
+        let last = 0;
+        let raf = 0;
         const INTERVAL = 1000 / FPS;
 
         const tick = (time: number) => {
-            if (time - lastRef.current >= INTERVAL) {
-                lastRef.current = time;
-
+            if (time - last >= INTERVAL) {
+                last = time;
                 const W = canvas.width;
                 const H = canvas.height;
                 ctx.clearRect(0, 0, W, H);
+                ctx.fillStyle = fgColor;
 
-                for (const f of fliesRef.current) {
-                    // Move
+                for (const f of flies) {
                     f.x += f.vx;
                     f.y += f.vy;
 
-                    // Wrap
                     if (f.x < -20) f.x = W + 20;
                     if (f.x > W + 20) f.x = -20;
                     if (f.y < -20) f.y = H + 20;
                     if (f.y > H + 20) f.y = -20;
 
-                    // Subtle drift
                     f.vx += rand(-0.003, 0.003);
                     f.vy += rand(-0.002, 0.002);
                     f.vx = Math.max(-0.3, Math.min(0.3, f.vx));
                     f.vy = Math.max(-0.22, Math.min(0.22, f.vy));
 
-                    // Pulse
                     f.pulseTimer += 1;
                     if (f.pulseTimer >= f.pulseInterval) {
                         f.pulseTimer = 0;
@@ -101,36 +127,39 @@ export default function AsciiFireflies() {
                         }
                     }
 
-                    // Lerp opacity
                     f.opacity += (f.targetOpacity - f.opacity) * 0.045;
 
-                    // Draw
                     ctx.globalAlpha = f.opacity;
                     ctx.font = `${f.size}px ui-monospace, monospace`;
-                    ctx.fillStyle = 'currentColor';
                     ctx.fillText(f.char, f.x, f.y);
                 }
 
                 ctx.globalAlpha = 1;
             }
 
-            rafRef.current = requestAnimationFrame(tick);
+            raf = requestAnimationFrame(tick);
         };
 
-        rafRef.current = requestAnimationFrame(tick);
+        raf = requestAnimationFrame(tick);
 
         return () => {
-            cancelAnimationFrame(rafRef.current);
+            cancelAnimationFrame(raf);
             window.removeEventListener('resize', resize);
+            themeObserver.disconnect();
+            canvas.remove();
         };
     }, []);
 
-    return (
-        <canvas
-            ref={canvasRef}
-            className="pointer-events-none fixed inset-0 z-0 text-foreground"
-            style={{ color: 'var(--foreground)' }}
-            aria-hidden="true"
-        />
-    );
+    return null;
+}
+
+export default function AsciiFireflies() {
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) return null;
+    return createPortal(<FireflyCanvas />, document.body);
 }

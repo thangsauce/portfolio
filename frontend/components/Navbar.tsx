@@ -336,7 +336,7 @@ const Navbar = () => {
                         <span className="relative inline-flex size-8 items-center justify-center">
                             <span
                                 className={cn(
-                                    'absolute h-0.5 w-5 rounded-full bg-foreground transition-transform duration-300',
+                                    'menu-plus absolute h-0.5 w-5 rounded-full bg-foreground transition-transform duration-300',
                                     {
                                         'rotate-45': isMenuOpen,
                                         'group-hover:rotate-12': !isMenuOpen,
@@ -345,7 +345,7 @@ const Navbar = () => {
                             />
                             <span
                                 className={cn(
-                                    'absolute h-5 w-0.5 rounded-full bg-foreground transition-transform duration-300',
+                                    'menu-plus absolute h-5 w-0.5 rounded-full bg-foreground transition-transform duration-300',
                                     {
                                         '-rotate-45': isMenuOpen,
                                         'group-hover:-rotate-12': !isMenuOpen,
@@ -571,6 +571,15 @@ const Navbar = () => {
                 .menu-dot-glow {
                     animation: menuDotGlow 3.2s ease-in-out infinite;
                 }
+                .menu-plus {
+                    animation: menuPlusPulse 2.8s ease-in-out infinite;
+                }
+                .group:hover .menu-plus {
+                    background: #facc15;
+                    box-shadow:
+                        0 0 8px rgba(250, 204, 21, 0.7),
+                        0 0 16px rgba(250, 204, 21, 0.45);
+                }
                 @keyframes starDrift {
                     0% { transform: translate(0px, 0px) rotate(-4deg); opacity: 0.84; }
                     35% { transform: translate(3px, -2px) rotate(-2deg); opacity: 1; }
@@ -623,6 +632,15 @@ const Navbar = () => {
                         opacity: 0.95;
                         transform: scale(1.08);
                         box-shadow: 0 0 8px rgba(255, 255, 255, 0.42);
+                    }
+                }
+                @keyframes menuPlusPulse {
+                    0%,
+                    100% {
+                        filter: drop-shadow(0 0 0 rgba(250, 204, 21, 0));
+                    }
+                    50% {
+                        filter: drop-shadow(0 0 5px rgba(250, 204, 21, 0.35));
                     }
                 }
             `}</style>

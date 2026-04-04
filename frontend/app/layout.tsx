@@ -10,7 +10,6 @@ import ScrollProgressIndicator from '@/components/ScrollProgressIndicator';
 import Navbar from '@/components/Navbar';
 import Preloader from '../components/Preloader';
 import StickyEmail from './_components/StickyEmail';
-import AsciiFireflies from '@/components/AsciiFireflies';
 
 
 const antonFont = Anton({
@@ -71,7 +70,6 @@ export default function RootLayout({
                 className={`${antonFont.variable} ${robotoFlex.variable} ${dmSans.variable} ${spaceGrotesk.variable} antialiased`}
             >
                 <AuthProvider>
-                <AsciiFireflies />
                 <ReactLenis
                         root
                         options={{
