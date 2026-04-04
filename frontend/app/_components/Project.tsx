@@ -138,7 +138,7 @@ const Project = ({
                     src={project.thumbnail}
                     alt="Project"
                     className={cn(
-                        'w-full object-cover mb-4 md:mb-6 aspect-[16/7] md:aspect-[3/2] object-top',
+                        'max-md:hidden w-full object-cover mb-4 md:mb-6 aspect-[16/7] md:aspect-[3/2] object-top',
                     )}
                     key={project.slug}
                     loading="lazy"
