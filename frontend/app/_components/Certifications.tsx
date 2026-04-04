@@ -78,7 +78,7 @@ const Certifications = () => {
 
                 <div className="space-y-4 max-w-2xl">
                     {certs.length === 0 && (
-                        <div className="cert-item border border-border rounded px-5 py-4 bg-white/[0.03] backdrop-blur-sm [[data-theme='light']_&]:bg-black/[0.03]">
+                        <div className="cert-item px-0 py-1">
                             <p className="text-sm text-muted-foreground [[data-theme='light']_&]:text-zinc-700">
                                 {loadError ? 'Unable to load certifications right now.' : 'No certifications yet.'}
                             </p>
