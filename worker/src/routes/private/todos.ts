@@ -16,7 +16,6 @@ const todoBody = z.object({
 const TODO_TABLE_CANDIDATES = ['todos', 'todo_items'] as const
 
 async function withTodoTable<T>(
-  c: { env: Env },
   run: (table: string) => Promise<{ data: T | null; error: { message: string } | null }>
 ) {
   let lastError: string | null = null
@@ -31,7 +30,7 @@ async function withTodoTable<T>(
 // List all todos
 todos.get('/', async (c) => {
   const supabase = getSupabase(c.env) as any
-  const { data, error } = await withTodoTable(c, (table) =>
+  const { data, error } = await withTodoTable((table) =>
     supabase
       .from(table)
       .select('*')
@@ -78,7 +77,7 @@ todos.post('/', zValidator('json', todoBody), async (c) => {
 todos.put('/:id', zValidator('json', todoBody.partial()), async (c) => {
   const body = c.req.valid('json')
   const supabase = getSupabase(c.env) as any
-  const { data, error } = await withTodoTable(c, (table) =>
+  const { data, error } = await withTodoTable((table) =>
     supabase
       .from(table)
       .update(body)
@@ -93,7 +92,7 @@ todos.put('/:id', zValidator('json', todoBody.partial()), async (c) => {
 // Delete todo
 todos.delete('/:id', async (c) => {
   const supabase = getSupabase(c.env) as any
-  const { error } = await withTodoTable(c, (table) =>
+  const { error } = await withTodoTable((table) =>
     supabase
       .from(table)
       .delete()
