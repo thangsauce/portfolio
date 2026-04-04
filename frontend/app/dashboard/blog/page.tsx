@@ -67,6 +67,7 @@ function PostEditor({
   const [content,    setContent]    = useState(post.content)
   const [status,     setStatus]     = useState<'idle' | 'saving' | 'saved'>('idle')
   const [confirmDel, setConfirmDel] = useState(false)
+  const [showSaveConfirm, setShowSaveConfirm] = useState(false)
   const [slugManual, setSlugManual] = useState(false)
 
   const titleRef   = useRef(post.title)
@@ -76,6 +77,7 @@ function PostEditor({
   const contentRef = useRef(post.content)
   const timerRef   = useRef<ReturnType<typeof setTimeout> | null>(null)
   const changeConfirmedRef = useRef(false)
+  const saveConfirmResolveRef = useRef<((ok: boolean) => void) | null>(null)
 
   useEffect(() => {
     setTitle(post.title);   titleRef.current   = post.title
@@ -90,13 +92,37 @@ function PostEditor({
     if (timerRef.current) clearTimeout(timerRef.current)
   }, [post.id])
 
+  useEffect(() => {
+    return () => {
+      if (saveConfirmResolveRef.current) {
+        saveConfirmResolveRef.current(false)
+        saveConfirmResolveRef.current = null
+      }
+    }
+  }, [])
+
+  const askSaveConfirm = useCallback(() => {
+    return new Promise<boolean>((resolve) => {
+      saveConfirmResolveRef.current = resolve
+      setShowSaveConfirm(true)
+    })
+  }, [])
+
+  const closeSaveConfirm = useCallback((ok: boolean) => {
+    setShowSaveConfirm(false)
+    if (saveConfirmResolveRef.current) {
+      saveConfirmResolveRef.current(ok)
+      saveConfirmResolveRef.current = null
+    }
+  }, [])
+
   const scheduleSave = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current)
     setStatus('saving')
     timerRef.current = setTimeout(async () => {
       try {
         if (!changeConfirmedRef.current) {
-          const confirmed = window.confirm('Are you sure you want to apply these blog changes?')
+          const confirmed = await askSaveConfirm()
           if (!confirmed) {
             setStatus('idle')
             return
@@ -117,7 +143,7 @@ function PostEditor({
         setStatus('idle')
       }
     }, 2000)
-  }, [post.id, onSave])
+  }, [askSaveConfirm, post.id, onSave])
 
   function handleTitle(val: string) {
     setTitle(val); titleRef.current = val
@@ -218,6 +244,91 @@ function PostEditor({
           }}
         />
       </div>
+
+      {showSaveConfirm && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 80,
+            display: 'grid',
+            placeItems: 'center',
+            background: 'rgba(0,0,0,0.46)',
+            backdropFilter: 'blur(4px)',
+          }}
+        >
+          <div
+            style={{
+              width: 'min(92vw, 460px)',
+              borderRadius: 14,
+              border: '1px solid hsl(var(--dash-border-subtle))',
+              background: 'hsl(var(--dash-bg-card))',
+              boxShadow: '0 16px 48px rgba(0,0,0,0.35)',
+              padding: '18px 18px 14px',
+            }}
+          >
+            <p
+              style={{
+                margin: 0,
+                fontFamily: 'var(--font-anton)',
+                fontSize: 18,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                color: 'hsl(var(--dash-fg))',
+              }}
+            >
+              Confirm Blog Update
+            </p>
+            <p
+              style={{
+                margin: '8px 0 16px',
+                fontFamily: 'var(--font-roboto-flex)',
+                fontSize: 12,
+                lineHeight: 1.55,
+                color: 'hsl(var(--dash-fg-dim))',
+              }}
+            >
+              Are you sure you want to apply these blog changes?
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+              <button
+                type="button"
+                onClick={() => closeSaveConfirm(false)}
+                style={{
+                  border: '1px solid hsl(var(--dash-border-subtle))',
+                  background: 'transparent',
+                  color: 'hsl(var(--dash-fg-dim))',
+                  borderRadius: 8,
+                  padding: '8px 12px',
+                  fontSize: 11,
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  cursor: 'pointer',
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => closeSaveConfirm(true)}
+                style={{
+                  border: '1px solid hsl(158 64% 36%)',
+                  background: 'hsl(158 64% 36% / 0.14)',
+                  color: 'hsl(var(--dash-fg))',
+                  borderRadius: 8,
+                  padding: '8px 12px',
+                  fontSize: 11,
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  cursor: 'pointer',
+                }}
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Content */}
       <div style={{ flex: 1, overflow: 'hidden', padding: '14px 36px 0', display: 'flex', flexDirection: 'column' }}>
