@@ -680,7 +680,7 @@ export default function PortfolioPage() {
       q.length === 0 || values.some((v) => (v ?? '').toLowerCase().includes(q))
 
     if (tab === 'projects') return {
-      headers: ['// title', '// slug', '// done for', '// category', '// links', '// thumb', '// long', '// tech', '// featured', '// order'],
+      headers: ['title', 'slug', 'done for', 'category', 'links', 'thumb', 'long', 'tech', 'featured', 'order'],
       rows: projects
         .filter((p) => {
           const categoryPass = projectCategoryFilter === 'all' || normalizeProjectCategory(p.category) === projectCategoryFilter
@@ -742,7 +742,7 @@ export default function PortfolioPage() {
     }
 
     if (tab === 'stacks') return {
-      headers: ['// name', '// category', '// icon', '// order'],
+      headers: ['name', 'category', 'icon', 'order'],
       rows: stacks
         .filter((s) => includesQ(s.name, s.category ?? '', s.icon_url ?? ''))
         .map(s => ({ id: s.id, item: s, cells: [
@@ -754,7 +754,7 @@ export default function PortfolioPage() {
     }
 
     if (tab === 'skills') return {
-      headers: ['// name', '// icon', '// order'],
+      headers: ['name', 'icon', 'order'],
       rows: skills
         .filter((s) => includesQ(s.name, s.icon_url ?? ''))
         .map(s => ({ id: s.id, item: s, cells: [
@@ -765,7 +765,7 @@ export default function PortfolioPage() {
     }
 
     if (tab === 'certs') return {
-      headers: ['// name', '// issuer', '// date', '// id'],
+      headers: ['name', 'issuer', 'date', 'id'],
       rows: certs
         .filter((c) => includesQ(c.name, c.issuer ?? '', c.credential_id ?? '', c.url ?? ''))
         .map(c => ({ id: c.id, item: c, cells: [
@@ -777,7 +777,7 @@ export default function PortfolioPage() {
     }
 
     return {
-      headers: ['// role', '// company', '// featured', '// start', '// end'],
+      headers: ['role', 'company', 'featured', 'start', 'end'],
       rows: experiences
         .filter((e) => includesQ(e.role, e.company, (e.description ?? []).join(' ')))
         .map(e => ({ id: e.id, item: e, cells: [
@@ -815,9 +815,6 @@ export default function PortfolioPage() {
 
       {/* Page header */}
       <div style={{ marginBottom: 28 }}>
-        <p style={{ fontSize: 10, letterSpacing: '0.35em', textTransform: 'uppercase', color: 'hsl(var(--dash-fg-dim))', marginBottom: 8 }}>
-          $ portfolio.cms --mode manage
-        </p>
         <h1 style={{ fontFamily: 'var(--font-anton)', fontSize: 26, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'hsl(var(--dash-fg))', lineHeight: 1 }}>
           PORTFOLIO CMS
         </h1>
@@ -854,7 +851,6 @@ export default function PortfolioPage() {
               onMouseEnter={e => { if (!active) (e.currentTarget).style.color = 'hsl(var(--dash-fg-muted))' }}
               onMouseLeave={e => { if (!active) (e.currentTarget).style.color = 'hsl(var(--dash-fg-dim))' }}
             >
-              {'// '}
               {TAB_LABELS[t]}
             </button>
           )
@@ -899,7 +895,7 @@ export default function PortfolioPage() {
             )}
           </div>
           <span style={{ fontSize: 10, letterSpacing: '0.22em', color: 'hsl(var(--dash-fg-dim))' }}>
-            {loading ? '// loading...' : `// ${rows.length} shown (${counts[tab]} total)`}
+            {loading ? 'loading...' : `${rows.length} shown (${counts[tab]} total)`}
           </span>
           <button onClick={openAdd}
             style={{
@@ -930,14 +926,14 @@ export default function PortfolioPage() {
             <thead>
               <tr>
                 {headers.map(h => <th key={h} style={thSt}>{h}</th>)}
-                <th style={{ ...thSt, width: 90, textAlign: 'right' }}>{'// act'}</th>
+                <th style={{ ...thSt, width: 90, textAlign: 'right' }}>{'act'}</th>
               </tr>
             </thead>
             <tbody>
               {rows.length === 0 && !loading && (
                 <tr>
                   <td colSpan={headers.length + 1} style={{ ...tdSt, textAlign: 'center', color: 'hsl(var(--dash-border))', padding: '28px 0', letterSpacing: '0.2em', fontSize: 10, textTransform: 'uppercase' }}>
-                    {'// no records'}
+                    {'no records'}
                   </td>
                 </tr>
               )}
@@ -983,7 +979,7 @@ export default function PortfolioPage() {
         <div style={{ border: '1px solid hsl(var(--dash-border))', borderTop: 'none', background: 'hsl(var(--dash-panel))' }}>
           <div style={{ padding: '11px 16px', borderBottom: '1px solid hsl(var(--dash-border-subtle))', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
             <span style={{ fontSize: 10, letterSpacing: '0.22em', color: 'hsl(var(--dash-fg-dim))' }}>
-              {loading ? '// loading...' : `// ${resumeInfo.hasCustom ? 'custom resume active' : 'using default /resume.pdf'}`}
+              {loading ? 'loading...' : `${resumeInfo.hasCustom ? 'custom resume active' : 'using default /resume.pdf'}`}
             </span>
             <a
               href={resumeInfo.url}
@@ -1052,7 +1048,6 @@ export default function PortfolioPage() {
         <div style={{ padding: '15px 20px', borderBottom: '1px solid hsl(var(--dash-border-subtle))', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
           <div>
             <div style={{ fontSize: 9, letterSpacing: '0.3em', color: 'hsl(158 64% 36%)', textTransform: 'uppercase', marginBottom: 3 }}>
-              {'// '}
               {editingId ? 'edit' : 'new'} record
             </div>
             <div style={{ fontFamily: 'var(--font-anton)', fontSize: 14, letterSpacing: '0.18em', color: 'hsl(var(--dash-fg))', textTransform: 'uppercase' }}>
