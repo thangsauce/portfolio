@@ -24,27 +24,27 @@ const COL_CONFIG: Record<
 > = {
   to_learn: {
     label:       'Lesson',
-    headerColor: 'hsl(35 85% 58%)',
-    bg:          'hsl(35 85% 45% / 0.07)',
-    countColor:  'hsl(35 70% 38%)',
-    addColor:    'hsl(35 85% 58%)',
-    addHoverColor:'hsl(35 95% 68%)',
+    headerColor: 'hsl(var(--dash-fg))',
+    bg:          'hsl(var(--dash-panel))',
+    countColor:  'hsl(var(--dash-fg-dim))',
+    addColor:    'hsl(var(--dash-fg-muted))',
+    addHoverColor:'hsl(var(--dash-fg))',
   },
   learning: {
     label:       'Learning',
-    headerColor: 'hsl(210 88% 62%)',
-    bg:          'hsl(210 88% 52% / 0.08)',
-    countColor:  'hsl(210 70% 42%)',
-    addColor:    'hsl(210 88% 62%)',
-    addHoverColor:'hsl(210 98% 72%)',
+    headerColor: 'hsl(var(--dash-fg))',
+    bg:          'hsl(var(--dash-panel))',
+    countColor:  'hsl(var(--dash-fg-dim))',
+    addColor:    'hsl(var(--dash-fg-muted))',
+    addHoverColor:'hsl(var(--dash-fg))',
   },
   learned: {
     label:       'Learned',
-    headerColor: 'hsl(152 62% 45%)',
-    bg:          'hsl(152 62% 34% / 0.08)',
-    countColor:  'hsl(152 62% 30%)',
-    addColor:    'hsl(152 62% 45%)',
-    addHoverColor:'hsl(152 70% 56%)',
+    headerColor: 'hsl(var(--dash-fg))',
+    bg:          'hsl(var(--dash-panel))',
+    countColor:  'hsl(var(--dash-fg-dim))',
+    addColor:    'hsl(var(--dash-fg-muted))',
+    addHoverColor:'hsl(var(--dash-fg))',
   },
 }
 
@@ -115,81 +115,31 @@ function AddCard({
       style={{
         width: '100%',
         textAlign: 'left',
-        background: 'hsl(var(--dash-card))',
-        border: `1px dashed ${color}`,
+        background: 'transparent',
+        border: '1px dashed hsl(var(--dash-border))',
         borderRadius: 8,
         padding: '10px 12px',
         marginTop: 4,
         fontFamily: 'var(--font-roboto-flex)',
         fontSize: 11,
         letterSpacing: '0.02em',
-        color,
+        color: 'hsl(var(--dash-fg-muted))',
         cursor: 'pointer',
-        transition: 'filter 0.12s, transform 0.12s',
+        transition: 'filter 0.12s, border-color 0.12s, color 0.12s',
       }}
       onMouseEnter={e => {
         e.currentTarget.style.filter = 'brightness(1.08)'
+        e.currentTarget.style.borderColor = color
+        e.currentTarget.style.color = color
       }}
       onMouseLeave={e => {
         e.currentTarget.style.filter = 'brightness(1)'
+        e.currentTarget.style.borderColor = 'hsl(var(--dash-border))'
+        e.currentTarget.style.color = 'hsl(var(--dash-fg-muted))'
       }}
     >
       + {label}
     </button>
-  )
-}
-
-function AsciiFireflies() {
-  const flies = [
-    { id: 1, ch: '.',  x: '8%',  y: '14%', s: 11, d: 0.0, t: 4.2 },
-    { id: 2, ch: '*',  x: '22%', y: '68%', s: 12, d: 0.7, t: 5.1 },
-    { id: 3, ch: '+',  x: '38%', y: '26%', s: 10, d: 1.1, t: 4.8 },
-    { id: 4, ch: '.',  x: '57%', y: '74%', s: 11, d: 0.4, t: 5.7 },
-    { id: 5, ch: '*',  x: '72%', y: '18%', s: 12, d: 1.5, t: 4.9 },
-    { id: 6, ch: '.',  x: '86%', y: '58%', s: 10, d: 0.2, t: 5.4 },
-    { id: 7, ch: '+',  x: '64%', y: '42%', s: 11, d: 1.0, t: 4.4 },
-  ]
-
-  return (
-    <div
-      aria-hidden="true"
-      style={{
-        position: 'absolute',
-        inset: 0,
-        pointerEvents: 'none',
-        overflow: 'hidden',
-        zIndex: 0,
-      }}
-    >
-      {flies.map(f => (
-        <span
-          key={f.id}
-          style={{
-            position: 'absolute',
-            left: f.x,
-            top: f.y,
-            fontFamily: 'var(--font-roboto-flex)',
-            fontSize: f.s,
-            color: 'hsl(var(--dash-fg-dim) / 0.42)',
-            textShadow: '0 0 8px hsl(var(--dash-fg-dim) / 0.18)',
-            animation: `fireflyFloat ${f.t}s ease-in-out ${f.d}s infinite alternate, fireflyBlink 2.6s ease-in-out ${f.d}s infinite`,
-          }}
-        >
-          {f.ch}
-        </span>
-      ))}
-
-      <style>{`
-        @keyframes fireflyFloat {
-          0% { transform: translate3d(0, 0, 0); }
-          100% { transform: translate3d(0, -9px, 0); }
-        }
-        @keyframes fireflyBlink {
-          0%, 100% { opacity: 0.22; }
-          50% { opacity: 0.75; }
-        }
-      `}</style>
-    </div>
   )
 }
 
@@ -264,9 +214,10 @@ function LearningCard({
       style={{
         background: 'hsl(var(--dash-card))',
         border: `1px solid ${hovered ? 'hsl(var(--dash-fg-dim) / 0.3)' : 'hsl(var(--dash-border))'}`,
-        borderRadius: 8,
-        padding: '10px 12px', marginBottom: 6,
-        transition: 'border-color 0.12s',
+        borderRadius: 10,
+        padding: '11px 12px', marginBottom: 8,
+        transition: 'border-color 0.12s, box-shadow 0.12s',
+        boxShadow: hovered ? '0 6px 16px hsl(0 0% 0% / 0.12)' : 'none',
         cursor: 'grab',
       }}
     >
@@ -322,7 +273,7 @@ function LearningCard({
           onClick={() => setEditCat(true)}
           style={{
             fontSize: 9, letterSpacing: '0.04em',
-            color: item.category ? 'hsl(158 64% 30%)' : 'hsl(var(--dash-border))',
+            color: item.category ? 'hsl(var(--dash-fg-muted))' : 'hsl(var(--dash-border))',
             cursor: 'text', marginBottom: 6,
           }}
         >
@@ -509,14 +460,13 @@ export default function LearningPage() {
   }
 
   return (
-    <div style={{ position: 'relative', isolation: 'isolate' }}>
-      <AsciiFireflies />
+    <div style={{ position: 'relative', isolation: 'isolate', maxWidth: 1120, margin: '0 auto' }}>
       {loading ? (
         <div style={{ fontSize: 12, color: 'hsl(var(--dash-fg-dim))', position: 'relative', zIndex: 1 }}>
           Loading...
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, alignItems: 'start', position: 'relative', zIndex: 1 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14, alignItems: 'start', position: 'relative', zIndex: 1 }}>
           {STATUSES.map((status, colIdx) => {
             const conf = COL_CONFIG[status]
             const colItems = items.filter(i => i.status === status)
@@ -540,7 +490,8 @@ export default function LearningPage() {
                 }}
                 style={{
                   background: conf.bg,
-                  borderRadius: 8,
+                  border: '1px solid hsl(var(--dash-border))',
+                  borderRadius: 12,
                   padding: 12,
                   outline: isDropTarget ? '1px dashed hsl(158 64% 42% / 0.7)' : 'none',
                   boxShadow: isDropTarget ? 'inset 0 0 0 1px hsl(158 64% 42% / 0.2)' : 'none',
@@ -551,7 +502,7 @@ export default function LearningPage() {
                 {/* Column header */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                    <span style={{ fontSize: 11, letterSpacing: '0.02em', color: conf.headerColor, fontFamily: 'var(--font-roboto-flex)' }}>
+                    <span style={{ fontSize: 12, letterSpacing: '0.01em', color: conf.headerColor, fontFamily: 'var(--font-roboto-flex)', fontWeight: 600 }}>
                       {conf.label}
                     </span>
                     <span style={{ fontSize: 10, color: conf.countColor, fontFamily: 'var(--font-roboto-flex)' }}>
@@ -587,7 +538,7 @@ export default function LearningPage() {
                 ) : (
                   <AddCard
                     onClick={() => setAddingTo(status)}
-                    label="Add"
+                    label="New"
                     color={conf.addColor}
                   />
                 )}
