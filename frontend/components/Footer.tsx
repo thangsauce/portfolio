@@ -5,6 +5,7 @@ import { useLenis } from 'lenis/react';
 import { usePathname, useRouter } from 'next/navigation';
 
 const SECTION_LINKS = [
+    { label: 'Home', href: '/#banner' },
     { label: 'About Me', href: '/#about-me' },
     { label: 'Projects', href: '/#selected-projects' },
     { label: 'Experience', href: '/#my-experience' },
@@ -222,16 +223,16 @@ const Footer = () => {
                     aria-hidden="true"
                 >
                     <pre
-                        className="font-mono leading-snug select-none whitespace-pre bg-clip-text text-transparent bg-gradient-to-l from-white/20 via-white/45 to-white/80 [[data-theme='light']_&]:from-black/30 [[data-theme='light']_&]:via-black/55 [[data-theme='light']_&]:to-black/82"
+                        className="font-mono leading-snug select-none whitespace-pre bg-clip-text text-transparent bg-gradient-to-l from-white/20 via-white/45 to-white/80 [[data-theme='light']_&]:from-black/60 [[data-theme='light']_&]:via-black/42 [[data-theme='light']_&]:to-black/25"
                         style={{ fontSize: 'clamp(7px, 2.1vw, 24px)' }}
                         itemProp="name"
-                    >{`:::::::::::::: :::    :::    ::::     :::     ::: :::::::    :::        ::::::::::
-     :+:       :+:    :+:   :+: :+:   :+:+:   :+: :+:  :+:   :+:        :+:
-     +:+       +:+    +:+  +:+   +:+  :+:+:+  +:+ +:+        +:+        +:+
-     +#+       +#++:++#++ +#++:++#++: +#+ +:+ +#+ :#:        +#+        +#++:++#
-     +#+       +#+    +#+ +#+     +#+ +#+  +#+#+# +#+ +#+#+  +#+        +#+
-     #+#       #+#    #+# #+#     #+# #+#   #+#+# #+#  #+#   #+#        #+#
-     ###       ###    ### ###     ### ###    #### ########   ########## ##########`}</pre>
+                    >{`:::::::::::::: :::    :::    ::::     :::     ::: :::::::    :::       ::::::::::
+     :+:       :+:    :+:   :+: :+:   :+:+:   :+: :+:  :+:   :+:       :+:
+     +:+       +:+    +:+  +:+   +:+  :+:+:+  +:+ +:+        +:+       +:+
+     +#+       +#++:++#++ +#++:++#++: +#+ +:+ +#+ :#:        +#+       +#++:++#
+     +#+       +#+    +#+ +#+     +#+ +#+  #+#+#+ +#+ +#+#+  +#+       +#+
+     #+#       #+#    #+# #+#     #+# #+#   #+#+# #+#  #+#   #+#       #+#
+     ###       ###    ### ###     ### ###   ##### ########   ######### ##########`}</pre>
                 </div>
 
                 {/* Copyright */}

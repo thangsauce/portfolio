@@ -18,24 +18,33 @@ type LearningItem = {
 // ─── Config ───────────────────────────────────────────────────────────────────
 const STATUSES: LStatus[] = ['to_learn', 'learning', 'learned']
 
-const COL_CONFIG: Record<LStatus, { label: string; headerColor: string; bg: string; countColor: string }> = {
+const COL_CONFIG: Record<
+  LStatus,
+  { label: string; headerColor: string; bg: string; countColor: string; addColor: string; addHoverColor: string }
+> = {
   to_learn: {
-    label:       'To Learn',
-    headerColor: 'hsl(var(--dash-fg-dim))',
-    bg:          'hsl(var(--dash-bg))',
-    countColor:  'hsl(var(--dash-border))',
+    label:       'Lesson',
+    headerColor: 'hsl(35 85% 58%)',
+    bg:          'hsl(35 85% 45% / 0.07)',
+    countColor:  'hsl(35 70% 38%)',
+    addColor:    'hsl(35 85% 58%)',
+    addHoverColor:'hsl(35 95% 68%)',
   },
   learning: {
-    label:       'In Progress',
-    headerColor: 'hsl(158 64% 42%)',
-    bg:          'hsl(158 64% 36% / 0.04)',
-    countColor:  'hsl(158 64% 28%)',
+    label:       'Learning',
+    headerColor: 'hsl(210 88% 62%)',
+    bg:          'hsl(210 88% 52% / 0.08)',
+    countColor:  'hsl(210 70% 42%)',
+    addColor:    'hsl(210 88% 62%)',
+    addHoverColor:'hsl(210 98% 72%)',
   },
   learned: {
     label:       'Learned',
-    headerColor: 'hsl(158 64% 28%)',
-    bg:          'hsl(var(--dash-bg))',
-    countColor:  'hsl(var(--dash-border))',
+    headerColor: 'hsl(152 62% 45%)',
+    bg:          'hsl(152 62% 34% / 0.08)',
+    countColor:  'hsl(152 62% 30%)',
+    addColor:    'hsl(152 62% 45%)',
+    addHoverColor:'hsl(152 70% 56%)',
   },
 }
 
@@ -460,13 +469,13 @@ export default function LearningPage() {
                     onClick={() => setAddingTo(status)}
                     style={{
                       fontSize: 11, letterSpacing: '0.02em',
-                      color: 'hsl(158 64% 36%)', background: 'none', border: 'none',
+                      color: conf.addColor, background: 'none', border: 'none',
                       cursor: 'pointer', padding: 0, transition: 'color 0.12s',
                       fontFamily: 'var(--font-roboto-flex)',
                       borderRadius: 4,
                     }}
-                    onMouseEnter={e => e.currentTarget.style.color = 'hsl(158 64% 58%)'}
-                    onMouseLeave={e => e.currentTarget.style.color = 'hsl(158 64% 36%)'}
+                    onMouseEnter={e => e.currentTarget.style.color = conf.addHoverColor}
+                    onMouseLeave={e => e.currentTarget.style.color = conf.addColor}
                   >
                     + Add
                   </button>

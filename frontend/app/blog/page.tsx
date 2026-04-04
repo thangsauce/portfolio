@@ -341,7 +341,7 @@ function PostRow({
   return (
     <Link
       href={`/blog/${encodeURIComponent(post.slug)}`}
-      className="block text-inherit no-underline"
+      className="block text-inherit no-underline no-click-glow"
     >
       <article className="group rounded-xl border border-border bg-white/[0.04] backdrop-blur-sm px-5 py-5 sm:px-6 sm:py-6 transition-all duration-300 hover:border-white/30 hover:bg-white/[0.07] hover:shadow-[0_0_28px_rgba(255,255,255,0.06)]">
         <div className="flex flex-wrap items-center gap-3 text-[11px] uppercase tracking-[0.2em] text-muted-foreground/70 mb-3">

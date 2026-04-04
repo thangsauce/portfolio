@@ -75,6 +75,7 @@ function PostEditor({
   const excerptRef = useRef(post.excerpt ?? '')
   const contentRef = useRef(post.content)
   const timerRef   = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const changeConfirmedRef = useRef(false)
 
   useEffect(() => {
     setTitle(post.title);   titleRef.current   = post.title
@@ -84,6 +85,7 @@ function PostEditor({
     setExcerpt(post.excerpt ?? ''); excerptRef.current = post.excerpt ?? ''
     setContent(post.content); contentRef.current = post.content
     setSlugManual(false)
+    changeConfirmedRef.current = false
     setStatus('idle')
     if (timerRef.current) clearTimeout(timerRef.current)
   }, [post.id])
@@ -93,6 +95,14 @@ function PostEditor({
     setStatus('saving')
     timerRef.current = setTimeout(async () => {
       try {
+        if (!changeConfirmedRef.current) {
+          const confirmed = window.confirm('Are you sure you want to apply these blog changes?')
+          if (!confirmed) {
+            setStatus('idle')
+            return
+          }
+          changeConfirmedRef.current = true
+        }
         const parsedTags = tagsRef.current.split(',').map(t => t.trim()).filter(Boolean)
         await onSave(post.id, {
           title:   titleRef.current,
