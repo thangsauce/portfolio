@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { apiPrivate } from '@/lib/api'
+import { useDashboardTheme } from '../theme-context'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 type ProjectImages = { thumbnail?: string; long?: string; gallery?: string[] }
@@ -76,6 +77,7 @@ function toTechStackArray(value: Project['tech_stack']): string[] {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function PortfolioPage() {
+  const { isLight } = useDashboardTheme()
   const [tab, setTab]               = useState<Tab>('projects')
   const [panelOpen, setPanelOpen]   = useState(false)
   const [editingId, setEditingId]   = useState<string | null>(null)
@@ -813,7 +815,7 @@ export default function PortfolioPage() {
 
       {/* Page header */}
       <div style={{ marginBottom: 28 }}>
-        <p style={{ fontSize: 10, letterSpacing: '0.35em', textTransform: 'uppercase', color: 'hsl(158 64% 36%)', marginBottom: 8 }}>
+        <p style={{ fontSize: 10, letterSpacing: '0.35em', textTransform: 'uppercase', color: 'hsl(var(--dash-fg-dim))', marginBottom: 8 }}>
           $ portfolio.cms --mode manage
         </p>
         <h1 style={{ fontFamily: 'var(--font-anton)', fontSize: 26, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'hsl(var(--dash-fg))', lineHeight: 1 }}>
@@ -825,10 +827,10 @@ export default function PortfolioPage() {
       {status && (
         <div style={{
           padding: '8px 14px', marginBottom: 20,
-          background: status.ok ? 'hsl(158 50% 7%)' : 'hsl(0 50% 7%)',
-          border: `1px solid ${status.ok ? 'hsl(158 64% 20%)' : 'hsl(0 62% 22%)'}`,
+          background: status.ok ? 'hsl(158 64% 36% / 0.10)' : 'hsl(0 62% 52% / 0.10)',
+          border: `1px solid ${status.ok ? 'hsl(158 64% 36% / 0.35)' : 'hsl(0 62% 52% / 0.35)'}`,
           fontSize: 11, letterSpacing: '0.1em',
-          color: status.ok ? 'hsl(158 64% 52%)' : 'hsl(0 62% 55%)',
+          color: status.ok ? 'hsl(var(--dash-fg))' : 'hsl(var(--dash-fg))',
         }}>
           {status.ok ? '> ok: ' : '> err: '}{status.msg}
         </div>
@@ -844,9 +846,9 @@ export default function PortfolioPage() {
               style={{
                 padding: '10px 18px 9px',
                 fontSize: 10, letterSpacing: '0.25em', textTransform: 'uppercase',
-                color: active ? 'hsl(158 64% 55%)' : 'hsl(var(--dash-fg-dim))',
+                color: active ? 'hsl(var(--dash-fg))' : 'hsl(var(--dash-fg-dim))',
                 background: 'none', border: 'none', outline: 'none',
-                borderBottom: `2px solid ${active ? 'hsl(158 64% 36%)' : 'transparent'}`,
+                borderBottom: `2px solid ${active ? 'hsl(var(--dash-fg-muted))' : 'transparent'}`,
                 marginBottom: -1, cursor: 'pointer', transition: 'color 0.12s',
               }}
               onMouseEnter={e => { if (!active) (e.currentTarget).style.color = 'hsl(var(--dash-fg-muted))' }}
@@ -903,12 +905,20 @@ export default function PortfolioPage() {
             style={{
               display: 'flex', alignItems: 'center', gap: 6,
               fontSize: 11, letterSpacing: '0.15em',
-              color: 'hsl(158 64% 42%)', background: 'none',
-              border: '1px solid hsl(158 64% 18%)',
+              color: 'hsl(var(--dash-fg))', background: 'none',
+              border: '1px solid hsl(var(--dash-border))',
               padding: '5px 11px', cursor: 'pointer', transition: 'all 0.12s',
             }}
-            onMouseEnter={e => { e.currentTarget.style.color = 'hsl(158 64% 60%)'; e.currentTarget.style.borderColor = 'hsl(158 64% 32%)' }}
-            onMouseLeave={e => { e.currentTarget.style.color = 'hsl(158 64% 42%)'; e.currentTarget.style.borderColor = 'hsl(158 64% 18%)' }}
+            onMouseEnter={e => {
+              e.currentTarget.style.color = 'hsl(var(--dash-fg))'
+              e.currentTarget.style.borderColor = 'hsl(var(--dash-fg-dim))'
+              e.currentTarget.style.background = isLight ? 'hsl(0 0% 0% / 0.03)' : 'hsl(0 0% 100% / 0.04)'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.color = 'hsl(var(--dash-fg))'
+              e.currentTarget.style.borderColor = 'hsl(var(--dash-border))'
+              e.currentTarget.style.background = 'none'
+            }}
           >
             <IcPlus /> add_new
           </button>
