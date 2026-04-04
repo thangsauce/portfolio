@@ -280,7 +280,7 @@ const ProjectList = () => {
     return (
         <section className="pb-section -mt-10 md:mt-0" id="selected-projects">
             <div className="container">
-                <div className="flex items-center gap-3 mb-0 md:mb-10">
+                <div className="flex items-center gap-3 mb-1 md:mb-10">
                     <span className="text-primary [[data-theme='light']_&]:text-foreground/80 font-mono text-2xl leading-none select-none">&lt;</span>
                     <h2 className="text-2xl uppercase leading-none tracking-widest">
                         PROJECTS
@@ -371,7 +371,7 @@ const ProjectList = () => {
 
                         {currentProjects.length > 0 ? (
                             <div
-                                className="flex flex-col max-md:-mt-1 max-md:space-y-2.5"
+                                className="flex flex-col max-md:-mt-1 max-md:space-y-1.5"
                                 ref={pagePanelRef}
                                 key={`${activeCategory}-${currentPage}`}
                             >

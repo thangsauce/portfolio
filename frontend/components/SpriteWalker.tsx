@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 const SPRITE_ASSET_VERSION = '2026-04-03-01';
+const INITIAL_SPAWN_X = 140;
 const WALK_SPRITE_SRC = `/sprites/sprite-walking.png?v=${SPRITE_ASSET_VERSION}`;
 const RUN_SPRITE_SRC = `/sprites/sprite-running.png?v=${SPRITE_ASSET_VERSION}`;
 const IDLE_SPRITE_SRC = `/sprites/sprite-idling.png?v=${SPRITE_ASSET_VERSION}`;
@@ -14,7 +15,7 @@ const FALL_SPRITE_SRC = `/sprites/sprite-falling-down.png?v=${SPRITE_ASSET_VERSI
 const SPRITE_FRAMES = 6;
 const DEFAULT_FRAME_W = 84;
 const DEFAULT_FRAME_H = 84;
-const SPRITE_SCALE = 0.52;
+const SPRITE_SCALE = 0.65;
 const FLOOR_OFFSET = 0;
 const WALK_SPEED = 4.2;
 const RUN_SPEED = 6.2;
@@ -326,12 +327,12 @@ const SpriteWalker = () => {
         },
     });
 
-    const xRef = useRef(24);
+    const xRef = useRef(INITIAL_SPAWN_X);
     const yRef = useRef(0);
     const vyRef = useRef(0);
     const facingRef = useRef<1 | -1>(1);
 
-    const [x, setX] = useState(24);
+    const [x, setX] = useState(INITIAL_SPAWN_X);
     const [y, setY] = useState(0);
     const [facing, setFacing] = useState<1 | -1>(1);
     const [frame, setFrame] = useState(0);
@@ -343,6 +344,7 @@ const SpriteWalker = () => {
     const [frameH, setFrameH] = useState(DEFAULT_FRAME_H);
     const [showControlsHint, setShowControlsHint] = useState(true);
     const [viewportW, setViewportW] = useState(1280);
+    const [mobileScrollActive, setMobileScrollActive] = useState(false);
     const obstacleRectsRef = useRef<ObstacleRect[]>([]);
     const lastObstacleScanAtRef = useRef(0);
 
@@ -379,6 +381,24 @@ const SpriteWalker = () => {
         });
         return () => observer.disconnect();
     }, []);
+
+    useEffect(() => {
+        if (viewportW >= 768) {
+            setMobileScrollActive(false);
+            return;
+        }
+        let timer: number | null = null;
+        const onScroll = () => {
+            setMobileScrollActive(true);
+            if (timer) window.clearTimeout(timer);
+            timer = window.setTimeout(() => setMobileScrollActive(false), 160);
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        return () => {
+            window.removeEventListener('scroll', onScroll);
+            if (timer) window.clearTimeout(timer);
+        };
+    }, [viewportW]);
 
     useEffect(() => {
         const loadSprite = (key: SpriteKey, src: string) => {
@@ -587,17 +607,32 @@ const SpriteWalker = () => {
                 : 16;
             lastTickRef.current = t;
             const viewportW = window.innerWidth;
+            const isMobileView = viewportW < 768;
             const maxX = Math.max(0, viewportW - playerW - 8);
 
-            const movingLeft = keysRef.current.left && !keysRef.current.right;
-            const movingRight = keysRef.current.right && !keysRef.current.left;
+            if (isMobileView) {
+                yRef.current = 0;
+                vyRef.current = 0;
+                moveHoldMsRef.current = 0;
+                moveDirRef.current = 0;
+                facingRef.current = 1;
+            }
+
+            const movingLeft =
+                !isMobileView &&
+                keysRef.current.left &&
+                !keysRef.current.right;
+            const movingRight =
+                !isMobileView &&
+                keysRef.current.right &&
+                !keysRef.current.left;
             const requestedDir: 0 | -1 | 1 = movingLeft
                 ? -1
                 : movingRight
                   ? 1
                   : 0;
-            const downPressed = keysRef.current.down;
-            const upPressed = keysRef.current.up;
+            const downPressed = !isMobileView && keysRef.current.down;
+            const upPressed = !isMobileView && keysRef.current.up;
             const currentBottomPxEarly = FLOOR_OFFSET + yRef.current;
             if (
                 dropThroughClearBelowBottomRef.current > 0 &&
@@ -861,6 +896,7 @@ const SpriteWalker = () => {
             const onGround =
                 !flyCombo &&
                 !didDropThroughThisFrame &&
+                !dropThroughActive &&
                 (yRef.current <= 0 || standingOnPlatform || squishedForJump);
             if (!flyCombo && jumpQueuedRef.current && onGround) {
                 vyRef.current = JUMP_VELOCITY;
@@ -1413,12 +1449,19 @@ const SpriteWalker = () => {
         ctx.putImageData(imageData, 0, 0);
     }, [frame, mode, playerW, playerH, isDarkTheme]);
 
+    const isMobileView = viewportW < 768;
+    const blownRenderW =
+        mode === 'blown'
+            ? Math.max(playerW, Math.round(playerW * BLOWN_RENDER_WIDTH_MULT))
+            : playerW;
+    const mobileScale = mobileScrollActive ? 0.72 : 0.82;
+
     return (
         <div
             className="pointer-events-none fixed inset-0 z-[30]"
             aria-hidden="true"
         >
-            {showControlsHint && (
+            {showControlsHint && viewportW >= 768 && (
                 <div
                     className="absolute sprite-controls-hint"
                     style={{
@@ -1426,17 +1469,7 @@ const SpriteWalker = () => {
                             8,
                             Math.min(
                                 viewportW - 126,
-                                x +
-                                    (mode === 'blown'
-                                        ? Math.max(
-                                              playerW,
-                                              Math.round(
-                                                  playerW *
-                                                      BLOWN_RENDER_WIDTH_MULT,
-                                              ),
-                                          )
-                                        : playerW) +
-                                    12,
+                                x - 84,
                             ),
                         )}px`,
                         bottom: `${Math.max(8, FLOOR_OFFSET + y + 2)}px`,
@@ -1456,17 +1489,25 @@ const SpriteWalker = () => {
                 id="sprite-anchor"
                 className="absolute will-change-transform"
                 style={{
-                    left: `${x}px`,
-                    bottom: `${FLOOR_OFFSET + y}px`,
-                    width: `${mode === 'blown' ? Math.max(playerW, Math.round(playerW * BLOWN_RENDER_WIDTH_MULT)) : playerW}px`,
+                    left: isMobileView ? '50%' : `${x}px`,
+                    top: isMobileView ? '8px' : 'auto',
+                    bottom: isMobileView ? 'auto' : `${FLOOR_OFFSET + y}px`,
+                    width: `${blownRenderW}px`,
                     height: `${playerH}px`,
-                    transform: facing === -1 ? 'scaleX(-1)' : 'scaleX(1)',
+                    transform: isMobileView
+                        ? `translateX(-50%) scale(${mobileScale})`
+                        : facing === -1
+                          ? 'scaleX(-1)'
+                          : 'scaleX(1)',
                     transformOrigin: 'center center',
+                    transition: isMobileView
+                        ? 'transform 140ms ease-out'
+                        : undefined,
                 }}
             >
                 <canvas
                     ref={canvasRef}
-                    width={mode === 'blown' ? Math.max(playerW, Math.round(playerW * BLOWN_RENDER_WIDTH_MULT)) : playerW}
+                    width={blownRenderW}
                     height={playerH}
                     className="block h-full w-full"
                     style={{

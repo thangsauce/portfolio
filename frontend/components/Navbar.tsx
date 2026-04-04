@@ -360,7 +360,7 @@ const Navbar = () => {
                             />
                             <span
                                 className={cn(
-                                    'absolute -right-1 -top-1 size-2 rounded-full bg-primary menu-dot-blink transition-opacity duration-300',
+                                    'absolute -right-1 -top-1 size-2 rounded-full bg-primary menu-dot-glow transition-opacity duration-300',
                                     {
                                         'opacity-0': isMenuOpen,
                                         'opacity-100': !isMenuOpen,
@@ -557,8 +557,8 @@ const Navbar = () => {
                 :global([data-theme='light']) .shooting-star-head {
                     animation-name: starTwinkleLight;
                 }
-                .menu-dot-blink {
-                    animation: menuDotBlink 2.4s ease-in-out infinite;
+                .menu-dot-glow {
+                    animation: menuDotGlow 3.2s ease-in-out infinite;
                 }
                 @keyframes starDrift {
                     0% { transform: translate(0px, 0px) rotate(-4deg); opacity: 0.84; }
@@ -593,15 +593,17 @@ const Navbar = () => {
                     80% { transform: translateX(1px) rotate(0.3deg); }
                     100% { transform: translateX(0); }
                 }
-                @keyframes menuDotBlink {
+                @keyframes menuDotGlow {
                     0%,
                     100% {
-                        opacity: 0.35;
-                        transform: scale(0.9);
+                        opacity: 0.6;
+                        transform: scale(0.94);
+                        box-shadow: 0 0 0px rgba(255, 255, 255, 0);
                     }
                     50% {
-                        opacity: 1;
-                        transform: scale(1.15);
+                        opacity: 0.95;
+                        transform: scale(1.08);
+                        box-shadow: 0 0 8px rgba(255, 255, 255, 0.42);
                     }
                 }
             `}</style>
