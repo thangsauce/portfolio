@@ -284,7 +284,7 @@ const ProjectList = () => {
     return (
         <section className="pb-section" id="selected-projects">
             <div className="container">
-                <div className="flex items-center gap-3 mb-3 md:mb-10">
+                <div className="flex items-center gap-3 mb-6 md:mb-10">
                     <span className="text-primary [[data-theme='light']_&]:text-foreground/80 font-mono text-2xl leading-none select-none">&lt;</span>
                     <h2 className="text-2xl uppercase leading-none tracking-widest">
                         PROJECT

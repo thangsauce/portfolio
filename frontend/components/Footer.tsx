@@ -4,28 +4,33 @@ import { useLenis } from 'lenis/react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 
-const FIRE_W = 32;
-const FIRE_H = 20;
-const FIRE_CHARS = '  ....,,;;::==++xxXX##@@';
+const FIRE_W = 24;
+const FIRE_H = 22;
+const FIRE_CHARS = "  ...''::;;--==++**##@@";
+const FIRE_MID = Math.floor(FIRE_W / 2);
+const FIRE_RADIUS = 3;
+
+type Ember = { x: number; y: number; vx: number; age: number; life: number };
 
 function Campfire() {
     const preRef = useRef<HTMLPreElement>(null);
     const bufRef = useRef(new Uint8Array(FIRE_W * FIRE_H));
+    const embersRef = useRef<Ember[]>([]);
     const rafRef = useRef(0);
 
     useEffect(() => {
         const buf = bufRef.current;
 
         const setSource = () => {
-            const mid = Math.floor(FIRE_W / 2);
-            const half = Math.floor(FIRE_W / 5);
             for (let x = 0; x < FIRE_W; x++) {
-                const dist = Math.abs(x - mid);
+                const dist = Math.abs(x - FIRE_MID);
                 const base =
-                    dist <= half ? 255 : Math.max(0, 255 - (dist - half) * 55);
+                    dist <= FIRE_RADIUS
+                        ? 255
+                        : Math.max(0, 255 - (dist - FIRE_RADIUS) * 90);
                 buf[(FIRE_H - 1) * FIRE_W + x] = Math.max(
                     0,
-                    base - Math.floor(Math.random() * 30),
+                    base - Math.floor(Math.random() * 40),
                 );
             }
         };
@@ -37,8 +42,9 @@ function Campfire() {
                     if (src === 0) {
                         buf[(y - 1) * FIRE_W + x] = 0;
                     } else {
-                        const rand = Math.round(Math.random() * 3);
-                        const dst = (x - rand + 1 + FIRE_W) % FIRE_W;
+                        // Wind biased rightward: rand 0-3 → drift +1 on average
+                        const rand = Math.floor(Math.random() * 4);
+                        const dst = (x + rand - 1 + FIRE_W) % FIRE_W;
                         buf[(y - 1) * FIRE_W + dst] = Math.max(
                             0,
                             src - (rand & 1),
@@ -48,20 +54,66 @@ function Campfire() {
             }
         };
 
+        const updateEmbers = () => {
+            // Spawn sparks from the hot core
+            if (Math.random() < 0.28) {
+                embersRef.current.push({
+                    x: FIRE_MID + (Math.random() - 0.5) * FIRE_RADIUS * 2,
+                    y: FIRE_H - 5 - Math.floor(Math.random() * 3),
+                    vx: (Math.random() - 0.25) * 0.5, // slight rightward wind drift
+                    age: 0,
+                    life: 10 + Math.floor(Math.random() * 15),
+                });
+            }
+            embersRef.current = embersRef.current
+                .map((e) => ({
+                    ...e,
+                    x: e.x + e.vx + 0.18,
+                    y: e.y - 1,
+                    age: e.age + 1,
+                }))
+                .filter(
+                    (e) =>
+                        e.age < e.life &&
+                        e.y >= 0 &&
+                        e.x >= 0 &&
+                        e.x < FIRE_W,
+                );
+        };
+
         const render = () => {
+            const grid: string[] = [];
+            for (let i = 0; i < FIRE_W * FIRE_H; i++) {
+                const v = buf[i];
+                grid.push(
+                    FIRE_CHARS[
+                        Math.floor((v * (FIRE_CHARS.length - 1)) / 255)
+                    ],
+                );
+            }
+
+            // Overlay ember sparks on top of fire
+            for (const e of embersRef.current) {
+                const ex = Math.round(e.x);
+                const ey = Math.round(e.y);
+                if (ex >= 0 && ex < FIRE_W && ey >= 0 && ey < FIRE_H) {
+                    const p = e.age / e.life;
+                    grid[ey * FIRE_W + ex] =
+                        p < 0.35 ? '*' : p < 0.65 ? "'" : '.';
+                }
+            }
+
             let out = '';
             for (let y = 0; y < FIRE_H; y++) {
                 for (let x = 0; x < FIRE_W; x++) {
-                    const v = buf[y * FIRE_W + x];
-                    const ci = Math.floor((v * (FIRE_CHARS.length - 1)) / 255);
-                    out += FIRE_CHARS[ci];
+                    out += grid[y * FIRE_W + x];
                 }
                 out += '\n';
             }
-            // Firewood logs — centered to FIRE_W (32)
-            out += '         /\\/\\/\\/\\/\\/\\/\\         \n';
-            out += '        /              \\        \n';
-            out += '       /________________\\       ';
+            // Firewood logs centered for FIRE_W=24
+            out += '      /\\/\\/\\/\\/\\       \n';
+            out += '     /          \\      \n';
+            out += '    /____________\\     ';
             return out;
         };
 
@@ -72,6 +124,7 @@ function Campfire() {
             if (time - last >= INTERVAL) {
                 setSource();
                 spread();
+                updateEmbers();
                 if (preRef.current) preRef.current.textContent = render();
                 last = time;
             }

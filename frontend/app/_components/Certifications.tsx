@@ -70,27 +70,43 @@ const Certifications = () => {
     useGSAP(
         () => {
             if (certs.length === 0) return;
+            gsap.set('.cert-item', {
+                opacity: 1,
+                y: 0,
+                clearProps: 'opacity,transform',
+            });
             const isHorizontalMode = window.innerWidth >= 768 && !!document.querySelector('.horizontal-mode');
             if (isHorizontalMode) {
-                gsap.from('.cert-item', {
-                    opacity: 0,
-                    y: 30,
-                    stagger: 0.15,
-                    ease: 'power2.out',
-                    duration: 0.8,
-                });
+                gsap.fromTo(
+                    '.cert-item',
+                    { opacity: 0, y: 30 },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        stagger: 0.15,
+                        ease: 'power2.out',
+                        duration: 0.8,
+                        clearProps: 'opacity,transform',
+                    },
+                );
                 return;
             }
-            gsap.from('.cert-item', {
-                opacity: 0,
-                y: 30,
-                stagger: 0.15,
-                ease: 'power2.out',
-                scrollTrigger: {
-                    trigger: containerRef.current,
-                    start: 'top 80%',
+            gsap.fromTo(
+                '.cert-item',
+                { opacity: 0, y: 30 },
+                {
+                    opacity: 1,
+                    y: 0,
+                    stagger: 0.15,
+                    ease: 'power2.out',
+                    clearProps: 'opacity,transform',
+                    scrollTrigger: {
+                        trigger: containerRef.current,
+                        start: 'top 80%',
+                        toggleActions: 'play none none none',
+                    },
                 },
-            });
+            );
         },
         { scope: containerRef, dependencies: [certs.length] },
     );
