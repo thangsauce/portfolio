@@ -516,6 +516,7 @@ export default function TodosPage() {
   const [todos, setTodos] = useState<Todo[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [addingStatus, setAddingStatus] = useState<Status | null>(null)
   const [draggingTodoId, setDraggingTodoId] = useState<string | null>(null)
   const [dragOverStatus, setDragOverStatus] = useState<Status | null>(null)
@@ -570,6 +571,7 @@ export default function TodosPage() {
 
   const createTodo = useCallback(async (status: Status, title: string) => {
     try {
+      setErrorMsg(null)
       const todo = await apiPrivate<Todo>('/todos', {
         method: 'POST',
         body: JSON.stringify({
@@ -580,7 +582,7 @@ export default function TodosPage() {
         }),
       })
       setTodos((prev) => [todo, ...prev])
-    } catch {
+    } catch (err) {
       // Fallback for stricter schemas that only allow default creation state.
       try {
         const todo = await apiPrivate<Todo>('/todos', {
@@ -600,7 +602,10 @@ export default function TodosPage() {
           })
           setTodos((prev) => prev.map((t) => (t.id === moved.id ? moved : t)))
         }
-      } catch {}
+      } catch (fallbackErr) {
+        const msg = fallbackErr instanceof Error ? fallbackErr.message : (err instanceof Error ? err.message : 'Unable to add todo')
+        setErrorMsg(msg)
+      }
     }
   }, [])
 
@@ -788,6 +793,21 @@ export default function TodosPage() {
 
   return (
     <div style={{ maxWidth: 1040, margin: '0 auto' }}>
+      {errorMsg && (
+        <div
+          style={{
+            marginBottom: 10,
+            fontSize: 12,
+            color: 'hsl(0 72% 58%)',
+            background: 'hsl(0 72% 58% / 0.08)',
+            border: '1px solid hsl(0 72% 58% / 0.28)',
+            borderRadius: 8,
+            padding: '8px 10px',
+          }}
+        >
+          {errorMsg}
+        </div>
+      )}
       <div style={{ marginBottom: 12 }}>
         <input
           value={search}
