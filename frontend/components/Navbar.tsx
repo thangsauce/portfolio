@@ -322,7 +322,7 @@ const Navbar = () => {
                 <button
                     ref={menuButtonRef}
                     className={cn(
-                        'no-click-glow group absolute top-5 right-5 z-[2] h-14 min-w-14 px-4 rounded-full bg-background/5 backdrop-blur-sm transition-all duration-300 touch-none md:hidden',
+                        'no-click-glow group absolute top-5 right-5 z-[2] h-14 min-w-14 px-4 rounded-full bg-transparent backdrop-blur-none transition-all duration-300 touch-none md:hidden',
                     )}
                     style={{ transform: `translate(${menuBtnOffset.x}px, ${menuBtnOffset.y}px)` }}
                     onPointerDown={handleMenuPointerDown}
