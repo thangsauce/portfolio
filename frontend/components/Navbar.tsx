@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react';
 import { useLenis } from 'lenis/react';
 import gsap from 'gsap';
 import { useRouter, usePathname } from 'next/navigation';
-import Link from 'next/link';
 import { SOCIAL_LINKS } from '@/lib/data';
 
 const MENU_LINKS = [
@@ -272,12 +271,13 @@ const Navbar = () => {
         <>
             <div className="sticky top-0 z-[4]">
                 {!isProjectPage && (
-                    <Link
-                        href="/#banner"
+                    <button
+                        type="button"
                         aria-label="Go to homepage"
                         className="group-top-star absolute top-2 left-5 md:top-1 md:left-6 z-[2] h-20 w-28 md:h-24 md:w-36 flex items-center justify-center text-primary/85 [[data-theme='light']_&]:text-zinc-900"
                         onMouseEnter={() => setTopStarHovered(true)}
                         onMouseLeave={() => setTopStarHovered(false)}
+                        onClick={() => navigateTo('/')}
                     >
                         <svg
                             viewBox="0 0 120 72"
@@ -315,14 +315,14 @@ const Navbar = () => {
                                 <circle cx="88" cy="45" r="2.6" fill="hsl(var(--background))" opacity="0.7" />
                             </g>
                         </svg>
-                    </Link>
+                    </button>
                 )}
 
 
                 <button
                     ref={menuButtonRef}
                     className={cn(
-                        'group absolute top-5 right-5 z-[2] h-14 min-w-14 px-4 rounded-full bg-background/5 backdrop-blur-sm transition-all duration-300 touch-none md:hidden',
+                        'no-click-glow group absolute top-5 right-5 z-[2] h-14 min-w-14 px-4 rounded-full bg-background/5 backdrop-blur-sm transition-all duration-300 touch-none md:hidden',
                     )}
                     style={{ transform: `translate(${menuBtnOffset.x}px, ${menuBtnOffset.y}px)` }}
                     onPointerDown={handleMenuPointerDown}
@@ -354,7 +354,7 @@ const Navbar = () => {
                             />
                             <span
                                 className={cn(
-                                    'absolute -right-1 -top-1 size-2 rounded-full bg-primary menu-dot-glow transition-opacity duration-300',
+                                    'absolute -right-1 -top-1 size-2 rounded-full bg-primary transition-opacity duration-300',
                                     {
                                         'opacity-0': isMenuOpen,
                                         'opacity-100': !isMenuOpen,
@@ -447,7 +447,7 @@ const Navbar = () => {
                     },
                 )}
             >
-                <div className="absolute inset-0 bg-background/85 backdrop-blur-md z-[-1]" />
+                <div className="absolute inset-0 bg-background/35 md:bg-background/85 backdrop-blur-md z-[-1]" />
                 <div className="grow flex w-auto px-4 md:px-4 lg:px-5">
                     <div className="flex gap-6 flex-col md:flex-row md:items-center md:gap-4 w-auto">
                         <div className="order-2">

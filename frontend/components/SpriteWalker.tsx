@@ -1542,6 +1542,8 @@ const SpriteWalker = () => {
                     align-items: center;
                     justify-content: center;
                     border-radius: 5px;
+                    border: 1px solid rgba(255, 255, 255, 0.42);
+                    background: rgba(255, 255, 255, 0.08);
                     font-size: 11px;
                     font-weight: 700;
                     font-family: var(--font-roboto-flex);
@@ -1563,6 +1565,8 @@ const SpriteWalker = () => {
                 :global([data-theme='light']) .sprite-controls-hint {
                 }
                 :global([data-theme='light']) .keycap {
+                    border-color: rgba(24, 24, 27, 0.42);
+                    background: rgba(24, 24, 27, 0.06);
                     color: rgba(24, 24, 27, 0.95);
                 }
                 @keyframes hintFadeIn {

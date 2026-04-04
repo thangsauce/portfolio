@@ -374,7 +374,7 @@ const Footer = () => {
                     </div>
 
                     {/* Fireplace */}
-                    <div className="order-4 col-span-2 absolute right-0 bottom-0 z-0 pointer-events-none flex justify-end">
+                    <div className="order-4 col-span-2 absolute right-0 bottom-0 md:right-14 md:-bottom-6 z-0 pointer-events-none flex justify-end">
                         <div className="block scale-90 md:scale-100 origin-right opacity-30 md:opacity-60">
                             <Campfire />
                         </div>

@@ -78,9 +78,9 @@ export function ContactSection() {
             <div className="container">
                 <div className="max-w-2xl">
                     <div className="flex items-center gap-3 mb-10">
-                        <span className="text-primary font-mono text-2xl leading-none select-none">&lt;</span>
+                        <span className="font-mono text-3xl md:text-2xl leading-none select-none text-foreground/95 md:text-primary [[data-theme='light']_&]:text-zinc-900">&lt;</span>
                         <h2 className="text-2xl uppercase leading-none tracking-widest">Let&apos;s Connect</h2>
-                        <span className="text-primary font-mono text-2xl leading-none select-none">&gt;</span>
+                        <span className="font-mono text-3xl md:text-2xl leading-none select-none text-foreground/95 md:text-primary [[data-theme='light']_&]:text-zinc-900">&gt;</span>
                     </div>
                     <div className="flex flex-col gap-4">
                         <form
