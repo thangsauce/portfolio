@@ -2,10 +2,22 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { apiPrivate } from '@/lib/api'
+import { apiFetch, apiPrivate } from '@/lib/api'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 type Stats = { notes: number; pending: number; learning: number; docs: number }
+type HealthState = 'operational' | 'degraded' | 'down'
+type HealthService = { key: string; val: string; status: HealthState; error?: string | null }
+type HealthPayload = {
+  ok: boolean
+  timestamp: string
+  services: {
+    api: HealthService
+    auth: HealthService
+    db: HealthService
+    deploy: HealthService
+  }
+}
 
 // ── Config ───────────────────────────────────────────────────────────────────
 const SYSTEM = [
@@ -84,6 +96,7 @@ export default function DashboardPage() {
   const [greeting, setGreeting] = useState('')
   const [mounted,  setMounted]  = useState(false)
   const [stats,    setStats]    = useState<Stats | null>(null)
+  const [health,   setHealth]   = useState<HealthPayload | null>(null)
   const [hovered,  setHovered]  = useState<string | null>(null)
 
   useEffect(() => {
@@ -113,8 +126,44 @@ export default function DashboardPage() {
       })
     })
 
+    apiFetch<HealthPayload>('/health')
+      .then((res) => setHealth(res))
+      .catch(() => setHealth(null))
+
     return () => clearInterval(id)
   }, [])
+
+  const systemRows = health
+    ? [health.services.api, health.services.auth, health.services.db, health.services.deploy]
+    : SYSTEM.map((s) => ({ ...s, status: 'degraded' as HealthState }))
+
+  const statusTheme = (status: HealthState) => {
+    if (status === 'operational') {
+      return {
+        dot: 'hsl(158 64% 42%)',
+        dotShadow: '0 0 5px hsl(158 64% 42% / 0.5)',
+        pillColor: 'hsl(158 58% 46%)',
+        pillBg: 'hsl(158 64% 42% / 0.1)',
+        label: 'Operational',
+      }
+    }
+    if (status === 'degraded') {
+      return {
+        dot: 'hsl(40 90% 55%)',
+        dotShadow: '0 0 5px hsl(40 90% 55% / 0.45)',
+        pillColor: 'hsl(40 90% 56%)',
+        pillBg: 'hsl(40 90% 56% / 0.12)',
+        label: 'Degraded',
+      }
+    }
+    return {
+      dot: 'hsl(0 62% 52%)',
+      dotShadow: '0 0 5px hsl(0 62% 52% / 0.45)',
+      pillColor: 'hsl(0 62% 55%)',
+      pillBg: 'hsl(0 62% 55% / 0.12)',
+      label: 'Down',
+    }
+  }
 
   return (
     <div
@@ -206,7 +255,9 @@ export default function DashboardPage() {
           }}>
             System Status
           </h3>
-          {SYSTEM.map(({ key, val }) => (
+          {systemRows.map(({ key, val, status }) => {
+            const tone = statusTheme(status)
+            return (
             <div key={key} style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               padding: '8px 0',
@@ -215,8 +266,8 @@ export default function DashboardPage() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <div style={{
                   width: 6, height: 6, borderRadius: '50%', flexShrink: 0,
-                  background: 'hsl(158 64% 42%)',
-                  boxShadow: '0 0 5px hsl(158 64% 42% / 0.5)',
+                  background: tone.dot,
+                  boxShadow: tone.dotShadow,
                 }} />
                 <span style={{
                   fontSize: 13, color: 'hsl(var(--dash-fg-muted))', letterSpacing: '-0.01em',
@@ -232,14 +283,14 @@ export default function DashboardPage() {
               </div>
               <span style={{
                 fontSize: 11, fontWeight: 500,
-                color: 'hsl(158 58% 46%)',
-                background: 'hsl(158 64% 42% / 0.1)',
+                color: tone.pillColor,
+                background: tone.pillBg,
                 padding: '2px 8px', borderRadius: 4,
               }}>
-                Operational
+                {tone.label}
               </span>
             </div>
-          ))}
+          )})}
         </div>
 
         {/* Quick access */}

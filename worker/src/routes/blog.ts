@@ -12,7 +12,7 @@ blog.get('/', async (c) => {
     .eq('published', true)
     .lte('published_at', new Date().toISOString())
     .order('published_at', { ascending: false })
-  if (error) return c.json({ error: error.message }, 500)
+  if (error) return c.json({ error: 'Failed to fetch posts' }, 500)
   return c.json(data)
 })
 
