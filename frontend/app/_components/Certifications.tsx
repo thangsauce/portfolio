@@ -29,14 +29,42 @@ const Certifications = () => {
     const [loadError, setLoadError] = useState(false);
 
     useEffect(() => {
-        apiFetch<Cert[]>('/api/portfolio/certifications')
-            .then((data) => {
-                setCerts(data);
-                setLoadError(false);
-            })
-            .catch(() => {
+        let alive = true;
+        const load = async () => {
+            const endpoints = [
+                '/api/portfolio/certifications',
+                '/api/portfolio/certification',
+            ];
+
+            for (const endpoint of endpoints) {
+                try {
+                    const data = await apiFetch<Cert[]>(endpoint);
+                    if (!alive) return;
+                    if (Array.isArray(data)) {
+                        setCerts(
+                            [...data].sort(
+                                (a, b) => ((a as Cert & { order_index?: number }).order_index ?? 0) -
+                                    ((b as Cert & { order_index?: number }).order_index ?? 0),
+                            ),
+                        );
+                        setLoadError(false);
+                        return;
+                    }
+                } catch {
+                    // Try the next endpoint for compatibility across deployments.
+                }
+            }
+
+            if (alive) {
+                setCerts([]);
                 setLoadError(true);
-            });
+            }
+        };
+
+        void load();
+        return () => {
+            alive = false;
+        };
     }, []);
 
     useGSAP(
@@ -82,7 +110,7 @@ const Certifications = () => {
                     {certs.length === 0 && (
                         <div className="cert-item px-0 py-1">
                             <p className="text-sm text-muted-foreground [[data-theme='light']_&]:text-zinc-700">
-                                {loadError ? 'Unable to load certifications right now.' : 'No certifications yet.'}
+                                {loadError ? 'Unable to load certifications right now.' : 'No currently certifications items yet.'}
                             </p>
                         </div>
                     )}

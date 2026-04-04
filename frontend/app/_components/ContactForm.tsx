@@ -88,7 +88,7 @@ export function ContactSection() {
                             className="order-2 relative flex flex-col gap-3 px-4 py-4 rounded-xl border border-border [[data-theme='light']_&]:border-foreground/30 bg-background-light"
                         >
                             <p className="text-xs text-muted-foreground/60 uppercase tracking-widest text-center">
-                                Questions or connect
+                                Questions or contact
                             </p>
 
                             <label htmlFor="contact-name" className="sr-only">

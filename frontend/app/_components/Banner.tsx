@@ -145,7 +145,7 @@ const Banner = () => {
 
     return (
         <section className="relative overflow-hidden" id="banner">
-            <ArrowAnimation mobileClassName="top-[54%] left-[86%] -translate-x-1/2 bottom-auto" />
+            <ArrowAnimation mobileClassName="top-[74%] left-1/2 -translate-x-1/2 bottom-auto" />
             <div
                 className="container min-h-[100svh] md:h-[100svh] pt-24 sm:pt-0 pb-10 flex flex-col justify-center relative"
                 ref={containerRef}

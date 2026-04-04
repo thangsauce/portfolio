@@ -158,8 +158,8 @@ const Project = ({
                     _{(index + 1).toString().padStart(2, '0')}.
                 </div>
                 <div className="">
-                    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-1 md:gap-4">
-                        <TransitionLink href={`/projects?slug=${encodeURIComponent(project.slug)}`} className="min-w-0 no-click-glow">
+                    <div className="flex items-start justify-between gap-2 md:gap-4">
+                        <TransitionLink href={`/projects?slug=${encodeURIComponent(project.slug)}`} className="min-w-0 flex-1 no-click-glow">
                             <h4 className="project-title-soft-glow text-3xl xs:text-4xl md:text-6xl flex gap-3 md:gap-4 font-anton transition-all duration-700 bg-gradient-to-r from-primary to-foreground from-[50%] to-[50%] bg-[length:200%] bg-right bg-clip-text text-transparent group-hover:bg-left [[data-theme='light']_&]:from-zinc-900 [[data-theme='light']_&]:to-zinc-700">
                                 {project.title}
                                 <span className="text-foreground opacity-0 group-hover:opacity-100 transition-all">
@@ -186,7 +186,7 @@ const Project = ({
                             </h4>
                         </TransitionLink>
                         {(project.sourceCode || project.liveUrl) && (
-                            <div className="inline-flex items-center justify-end md:justify-center gap-4 md:pt-2 md:shrink-0">
+                            <div className="inline-flex items-center justify-end gap-3 sm:gap-4 pt-1 md:pt-2 shrink-0">
                                 {project.sourceCode && (
                                     <a
                                         href={project.sourceCode}

@@ -90,9 +90,14 @@ type SpriteMeta = {
 type ObstacleRect = { left: number; top: number; right: number; bottom: number };
 
 function collectObstacleRects(): ObstacleRect[] {
-    const root = document.querySelector('main');
-    if (!root) return [];
-    const elements = Array.from(root.querySelectorAll<HTMLElement>('*'));
+    const roots = Array.from(
+        document.querySelectorAll<HTMLElement>('main, footer'),
+    );
+    if (roots.length === 0) return [];
+    const elements = roots.flatMap((root) => [
+        root,
+        ...Array.from(root.querySelectorAll<HTMLElement>('*')),
+    ]);
     const rects: ObstacleRect[] = [];
 
     for (const el of elements) {
@@ -115,11 +120,9 @@ function collectObstacleRects(): ObstacleRect[] {
             Number.parseFloat(style.borderRightWidth) > 0 ||
             Number.parseFloat(style.borderBottomWidth) > 0 ||
             Number.parseFloat(style.borderLeftWidth) > 0;
-        const visualTag = /^(img|video|canvas|svg|iframe)$/i.test(
-            el.tagName,
-        );
+        const visualTag = /^(img|video|canvas|svg|iframe)$/i.test(el.tagName);
         const isVisual = hasBorder || visualTag;
-        if (!isVisual) continue;
+        if (!forceObstacle && !isVisual) continue;
 
         rects.push({
             left: rect.left,
