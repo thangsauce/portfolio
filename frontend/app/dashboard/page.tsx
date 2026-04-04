@@ -28,11 +28,11 @@ const SYSTEM = [
 ]
 
 const QUICK = [
-  { label: 'Portfolio CMS', sub: 'Manage projects',   href: '/dashboard/portfolio' },
-  { label: 'Notes',         sub: 'Open editor',       href: '/dashboard/notes'     },
-  { label: 'Task Board',    sub: 'View todos',        href: '/dashboard/todos'     },
-  { label: 'Write Post',    sub: 'Blog editor',       href: '/dashboard/blog'      },
-]
+  { label: 'Portfolio CMS', sub: 'Manage projects',   href: '/dashboard/portfolio', icon: 'portfolio' },
+  { label: 'Notes',         sub: 'Open editor',       href: '/dashboard/notes',     icon: 'notes'     },
+  { label: 'Task Board',    sub: 'View todos',        href: '/dashboard/todos',     icon: 'todos'     },
+  { label: 'Write Post',    sub: 'Blog editor',       href: '/dashboard/blog',      icon: 'blog'      },
+] as const
 
 const STAT_COLORS = [
   'hsl(158 64% 42%)',
@@ -40,6 +40,63 @@ const STAT_COLORS = [
   'hsl(193 80% 50%)',
   'hsl(280 60% 62%)',
 ]
+
+const ip = {
+  width: 15,
+  height: 15,
+  viewBox: '0 0 16 16',
+  fill: 'none',
+  stroke: 'currentColor',
+  strokeWidth: '1.5',
+  strokeLinecap: 'round' as const,
+  strokeLinejoin: 'round' as const,
+  style: { flexShrink: 0 as const },
+}
+
+function IconPortfolio() {
+  return (
+    <svg {...ip}>
+      <rect x="1" y="5" width="14" height="10" rx="1.5" />
+      <path d="M5 5V4a2 2 0 012-2h2a2 2 0 012 2v1" />
+      <line x1="1" y1="9.5" x2="15" y2="9.5" />
+    </svg>
+  )
+}
+
+function IconNotes() {
+  return (
+    <svg {...ip}>
+      <path d="M3 2h10v10l-3 3H3z" strokeLinejoin="round" />
+      <line x1="5.5" y1="6" x2="10.5" y2="6" />
+      <line x1="5.5" y1="9" x2="8" y2="9" />
+    </svg>
+  )
+}
+
+function IconTodos() {
+  return (
+    <svg {...ip}>
+      <rect x="1" y="1" width="14" height="14" rx="2" />
+      <polyline points="4.5,8 6.5,10 11,5.5" />
+    </svg>
+  )
+}
+
+function IconBlog() {
+  return (
+    <svg {...ip}>
+      <path d="M11.5 2.5L13.5 4.5l-7.5 7.5H4v-2l7.5-7.5z" />
+      <line x1="2" y1="14.5" x2="14" y2="14.5" />
+    </svg>
+  )
+}
+
+function QuickIcon({ name }: { name: 'portfolio' | 'notes' | 'todos' | 'blog' }) {
+  if (name === 'portfolio') return <IconPortfolio />
+  if (name === 'notes') return <IconNotes />
+  if (name === 'todos') return <IconTodos />
+  return <IconBlog />
+}
 
 // ── Stat card ────────────────────────────────────────────────────────────────
 function StatCard({ label, value, sub, color, loaded }: {
@@ -320,7 +377,7 @@ export default function DashboardPage() {
             Quick Access
           </h3>
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 8 }}>
-            {QUICK.map(({ label, sub, href }) => (
+            {QUICK.map(({ label, sub, href, icon }) => (
               <Link
                 key={href}
                 href={href}
@@ -339,13 +396,23 @@ export default function DashboardPage() {
                 onMouseEnter={() => setHovered(href)}
                 onMouseLeave={() => setHovered(null)}
               >
-                <div style={{
-                  fontSize: 13, fontWeight: 500, letterSpacing: '-0.01em',
-                  color: hovered === href ? 'hsl(158 58% 60%)' : 'hsl(var(--dash-fg))',
-                  marginBottom: 4,
-                  transition: 'color 0.15s',
-                }}>
-                  {label}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                  <span
+                    style={{
+                      color: hovered === href ? 'hsl(158 58% 60%)' : 'hsl(var(--dash-fg-dim))',
+                      display: 'inline-flex',
+                      transition: 'color 0.15s',
+                    }}
+                  >
+                    <QuickIcon name={icon} />
+                  </span>
+                  <div style={{
+                    fontSize: 13, fontWeight: 500, letterSpacing: '-0.01em',
+                    color: hovered === href ? 'hsl(158 58% 60%)' : 'hsl(var(--dash-fg))',
+                    transition: 'color 0.15s',
+                  }}>
+                    {label}
+                  </div>
                 </div>
                 <div style={{
                   fontSize: 11, color: 'hsl(var(--dash-fg-dim))', letterSpacing: '-0.01em',
