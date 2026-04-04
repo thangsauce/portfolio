@@ -313,8 +313,7 @@ export function ContactSection() {
 
                         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
                             <address className="not-italic" itemProp="address">
-                                <span className="text-muted-foreground [[data-theme='light']_&]:text-zinc-600">Based in </span>
-                                <span className="text-foreground/85 [[data-theme='light']_&]:text-zinc-900">Orlando, FL</span>
+                                <span className="text-[13px] text-foreground/85 [[data-theme='light']_&]:text-zinc-900">Orlando, FL</span>
                             </address>
                             <a
                                 href={`mailto:${GENERAL_INFO.email}`}

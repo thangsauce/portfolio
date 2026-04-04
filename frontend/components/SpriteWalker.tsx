@@ -190,7 +190,7 @@ function computeGridFrameAlphaBounds(
     const canvas = document.createElement('canvas');
     canvas.width = w;
     canvas.height = h;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
     if (!ctx) return undefined;
     ctx.clearRect(0, 0, w, h);
     ctx.drawImage(img, 0, 0);
@@ -1120,7 +1120,7 @@ const SpriteWalker = () => {
 
         const canvas = canvasRef.current;
         if (!canvas) return;
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
         if (!ctx) return;
 
         const renderW =

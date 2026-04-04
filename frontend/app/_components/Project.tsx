@@ -5,7 +5,7 @@ import { IProject } from '@/types';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { Github } from 'lucide-react';
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 
 interface Props {
     index: number;
@@ -33,43 +33,57 @@ gsap.registerPlugin(useGSAP);
 
 const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
     const externalLinkSVGRef = useRef<SVGSVGElement>(null);
+    const linkTlRef = useRef<gsap.core.Timeline | null>(null);
     const fallbackThumbnail = '/projects/thumbnail/portfolio-thumbnail.jpg';
 
-    const { context, contextSafe } = useGSAP(() => {}, {
-        scope: externalLinkSVGRef,
-        revertOnUpdate: true,
-    });
+    useEffect(() => {
+        return () => {
+            if (linkTlRef.current) {
+                linkTlRef.current.kill();
+                linkTlRef.current = null;
+            }
+        };
+    }, []);
 
-    const handleMouseEnter = contextSafe?.(() => {
+    const handleMouseEnter = () => {
         onMouseEnter(project.slug);
+        const svg = externalLinkSVGRef.current;
+        if (!svg) return;
 
-        const arrowLine = externalLinkSVGRef.current?.querySelector(
+        const arrowLine = svg.querySelector(
             '#arrow-line',
-        ) as SVGPathElement;
-        const arrowCurb = externalLinkSVGRef.current?.querySelector(
+        ) as SVGPathElement | null;
+        const arrowCurb = svg.querySelector(
             '#arrow-curb',
-        ) as SVGPathElement;
-        const box = externalLinkSVGRef.current?.querySelector(
+        ) as SVGPathElement | null;
+        const box = svg.querySelector(
             '#box',
-        ) as SVGPathElement;
+        ) as SVGPathElement | null;
+        if (!arrowLine || !arrowCurb || !box) return;
+
+        if (linkTlRef.current) {
+            linkTlRef.current.kill();
+            linkTlRef.current = null;
+        }
 
         gsap.set(box, {
             opacity: 0,
-            strokeDasharray: box?.getTotalLength(),
-            strokeDashoffset: box?.getTotalLength(),
+            strokeDasharray: box.getTotalLength(),
+            strokeDashoffset: box.getTotalLength(),
         });
         gsap.set(arrowLine, {
             opacity: 0,
-            strokeDasharray: arrowLine?.getTotalLength(),
-            strokeDashoffset: arrowLine?.getTotalLength(),
+            strokeDasharray: arrowLine.getTotalLength(),
+            strokeDashoffset: arrowLine.getTotalLength(),
         });
         gsap.set(arrowCurb, {
             opacity: 0,
-            strokeDasharray: arrowCurb?.getTotalLength(),
-            strokeDashoffset: arrowCurb?.getTotalLength(),
+            strokeDasharray: arrowCurb.getTotalLength(),
+            strokeDashoffset: arrowCurb.getTotalLength(),
         });
 
         const tl = gsap.timeline({ repeat: -1, repeatDelay: 1 });
+        linkTlRef.current = tl;
         tl.to(externalLinkSVGRef.current, {
             autoAlpha: 1,
         })
@@ -96,11 +110,14 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
                 },
                 '+=1',
             );
-    });
+    };
 
-    const handleMouseLeave = contextSafe?.(() => {
-        context.kill();
-    });
+    const handleMouseLeave = () => {
+        if (linkTlRef.current) {
+            linkTlRef.current.kill();
+            linkTlRef.current = null;
+        }
+    };
 
     return (
         <>

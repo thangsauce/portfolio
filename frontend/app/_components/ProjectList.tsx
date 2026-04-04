@@ -137,51 +137,54 @@ const ProjectList = () => {
 
     // update imageRef.current href based on the cursor hover position
     // also update image position
-    useGSAP(
-        (context, contextSafe) => {
-            if (projects.length === 0) return;
+    useEffect(() => {
+        if (projects.length === 0) return;
 
-            // show image on hover
+        if (window.innerWidth < 768) {
+            setSelectedProject(null);
+            return;
+        }
+
+        const handleMouseMove = (e: globalThis.MouseEvent) => {
+            if (!containerRef.current) return;
+            if (!imageContainer.current) return;
+
             if (window.innerWidth < 768) {
                 setSelectedProject(null);
                 return;
             }
 
-            const handleMouseMove = contextSafe?.((e: MouseEvent) => {
-                if (!containerRef.current) return;
-                if (!imageContainer.current) return;
+            const containerRect = containerRef.current.getBoundingClientRect();
+            const imageRect = imageContainer.current.getBoundingClientRect();
+            const offsetTop = e.clientY - containerRect.y;
 
-                if (window.innerWidth < 768) {
-                    setSelectedProject(null);
-                    return;
-                }
-
-                const containerRect = containerRef.current?.getBoundingClientRect();
-                const imageRect     = imageContainer.current.getBoundingClientRect();
-                const offsetTop     = e.clientY - containerRect.y;
-
-                // if cursor is outside the container, hide the image
-                if (
-                    containerRect.y > e.clientY ||
-                    containerRect.bottom < e.clientY ||
-                    containerRect.x > e.clientX ||
-                    containerRect.right < e.clientX
-                ) {
-                    return gsap.to(imageContainer.current, { duration: 0.3, opacity: 0 });
-                }
-
+            if (
+                containerRect.y > e.clientY ||
+                containerRect.bottom < e.clientY ||
+                containerRect.x > e.clientX ||
+                containerRect.right < e.clientX
+            ) {
                 gsap.to(imageContainer.current, {
-                    y: offsetTop - imageRect.height / 2,
-                    duration: 1,
-                    opacity: 1,
+                    duration: 0.3,
+                    opacity: 0,
+                    overwrite: 'auto',
                 });
-            }) as any;
+                return;
+            }
 
-            window.addEventListener('mousemove', handleMouseMove);
-            return () => { window.removeEventListener('mousemove', handleMouseMove); };
-        },
-        { scope: containerRef, dependencies: [projects.length, containerRef.current] },
-    );
+            gsap.to(imageContainer.current, {
+                y: offsetTop - imageRect.height / 2,
+                duration: 1,
+                opacity: 1,
+                overwrite: 'auto',
+            });
+        };
+
+        window.addEventListener('mousemove', handleMouseMove);
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+        };
+    }, [projects.length]);
 
     useGSAP(
         () => {
@@ -280,7 +283,7 @@ const ProjectList = () => {
     return (
         <section className="pb-section -mt-10 md:mt-0" id="selected-projects">
             <div className="container">
-                <div className="flex items-center gap-3 mb-1 md:mb-10">
+                <div className="flex items-center gap-3 mb-5 md:mb-10">
                     <span className="text-primary [[data-theme='light']_&]:text-foreground/80 font-mono text-2xl leading-none select-none">&lt;</span>
                     <h2 className="text-2xl uppercase leading-none tracking-widest">
                         PROJECTS
