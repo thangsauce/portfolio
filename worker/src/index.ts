@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { authMiddleware } from './middleware/auth'
+import { rateLimit } from './middleware/rateLimit'
 import { getSupabase } from './lib/supabase'
 import portfolio from './routes/portfolio'
 import privatePortfolio from './routes/private/portfolio'
@@ -121,11 +122,15 @@ app.get('/health', async (c) => {
   })
 })
 
+// Public routes — 80 requests/min per IP
+app.use('/api/portfolio/*', rateLimit(80))
+app.use('/api/blog/*',      rateLimit(80))
 app.route('/api/portfolio', portfolio)
 app.route('/api/blog', blog)
 
-// All /api/private/* routes require a valid Supabase JWT
+// Private routes — auth required + tighter write limit
 app.use('/api/private/*', authMiddleware)
+app.use('/api/private/*', rateLimit(30))
 app.route('/api/private/portfolio', privatePortfolio)
 app.route('/api/private/notes', privateNotes)
 app.route('/api/private/todos', privateTodos)
