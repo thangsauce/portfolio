@@ -367,7 +367,10 @@ function PostRow({
         {post.tags.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {post.tags.map(tag => (
-              <span key={tag} className="text-[10px] uppercase tracking-[0.2em] text-primary border border-primary/25 px-2.5 py-1">
+              <span
+                key={tag}
+                className="text-[10px] uppercase tracking-[0.2em] px-2.5 py-1 border border-white/18 [[data-theme='light']_&]:border-black/18 bg-gradient-to-r from-white/16 via-white/8 to-transparent [[data-theme='light']_&]:from-black/12 [[data-theme='light']_&]:via-black/6 [[data-theme='light']_&]:to-transparent text-foreground/85 [[data-theme='light']_&]:text-foreground/75"
+              >
                 {tag}
               </span>
             ))}

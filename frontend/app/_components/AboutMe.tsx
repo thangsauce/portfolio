@@ -206,10 +206,10 @@ const AboutMe = () => {
                     <div className="md:col-span-5">
                         <div className="text-lg text-muted-foreground max-w-[520px] space-y-6">
                             <p className="slide-up-and-fade text-lg md:text-2xl font-light leading-relaxed text-foreground/95">
-                                With projects like web platforms and security
-                                monitoring tools, I&apos;m constantly picking up new
-                                technologies and sharpening my problem-solving
-                                skills.
+                                I am an IT student in UCF working on projects like
+                                web platforms and security monitoring tools, I&apos;m
+                                constantly picking up new technologies and
+                                sharpening my problem-solving skills.
                             </p>
                             <div>
                             <p className="slide-up-and-fade text-sm uppercase tracking-widest text-muted-foreground/60">
@@ -245,7 +245,14 @@ const AboutMe = () => {
 
                         <div data-sprite-obstacle="true" className="absolute left-4 top-4 rounded-full border border-primary/45 [[data-theme='light']_&]:border-zinc-500/70 bg-background/70 px-4 py-1.5 text-sm sm:text-base tracking-wide shadow-[0_0_14px_rgba(255,255,255,0.25)]">
                             <span className="text-muted-foreground [[data-theme='light']_&]:text-zinc-600">Based in </span>
-                            <span className="text-primary [[data-theme='light']_&]:text-zinc-900">Orlando, FL</span>
+                            <a
+                                href="https://www.google.com/search?q=Orlando%2C+FL&sourceid=chrome&ie=UTF-8"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="no-click-glow text-primary [[data-theme='light']_&]:text-zinc-900 hover-shake"
+                            >
+                                Orlando, FL
+                            </a>
                         </div>
 
                         <div
@@ -269,6 +276,19 @@ const AboutMe = () => {
                     </div>
                 </div>
             </div>
+            <style jsx>{`
+                .hover-shake:hover {
+                    animation: aboutShake 0.34s ease-in-out;
+                }
+                @keyframes aboutShake {
+                    0% { transform: translateX(0); }
+                    20% { transform: translateX(-1.5px) rotate(-0.6deg); }
+                    40% { transform: translateX(1.5px) rotate(0.6deg); }
+                    60% { transform: translateX(-1px) rotate(-0.3deg); }
+                    80% { transform: translateX(1px) rotate(0.3deg); }
+                    100% { transform: translateX(0); }
+                }
+            `}</style>
         </section>
     );
 };

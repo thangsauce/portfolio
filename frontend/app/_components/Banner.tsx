@@ -255,7 +255,7 @@ const Banner = () => {
                     </div>
                 </div>
 
-                <div className="md:absolute md:bottom-20 left-0 right-0 flex gap-8 md:gap-0 md:justify-between pt-6 mt-40 sm:mt-44 md:mt-0">
+                <div className="md:absolute md:bottom-20 left-0 right-0 flex gap-8 md:gap-0 md:justify-between pt-6 mt-20 sm:mt-24 md:mt-0">
                     <div className="slide-up-and-fade">
                         <h5 className="text-2xl sm:text-3xl font-anton text-primary mb-1 [[data-theme='light']_&]:text-black">
                             University of Central Florida

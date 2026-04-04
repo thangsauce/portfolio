@@ -1525,9 +1525,6 @@ const SpriteWalker = () => {
                     gap: 4px;
                     padding: 6px;
                     border-radius: 10px;
-                    border: 1px solid rgba(255, 255, 255, 0.18);
-                    background: rgba(20, 20, 20, 0.35);
-                    backdrop-filter: blur(2px);
                     animation: hintFadeIn 0.35s ease-out both;
                 }
                 .key-row {
@@ -1546,9 +1543,6 @@ const SpriteWalker = () => {
                     font-weight: 700;
                     font-family: var(--font-roboto-flex);
                     color: rgba(255, 255, 255, 0.92);
-                    border: 1px solid rgba(255, 255, 255, 0.42);
-                    background: rgba(255, 255, 255, 0.08);
-                    box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.2);
                     transform-origin: center center;
                 }
                 .keycap-w {
@@ -1564,14 +1558,9 @@ const SpriteWalker = () => {
                     animation: keyPressD 2.0s ease-in-out infinite;
                 }
                 :global([data-theme='light']) .sprite-controls-hint {
-                    border-color: rgba(24, 24, 27, 0.28);
-                    background: rgba(255, 255, 255, 0.78);
                 }
                 :global([data-theme='light']) .keycap {
                     color: rgba(24, 24, 27, 0.95);
-                    border-color: rgba(24, 24, 27, 0.34);
-                    background: rgba(24, 24, 27, 0.06);
-                    box-shadow: inset 0 -1px 0 rgba(24, 24, 27, 0.12);
                 }
                 @keyframes hintFadeIn {
                     from {

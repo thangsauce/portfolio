@@ -49,7 +49,7 @@ const SOCIAL_MENU_LINKS = [
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [scrolled, setScrolled] = useState(false);
+    const [topStarHovered, setTopStarHovered] = useState(false);
     const [theme, setTheme] = useState<'light' | 'dark'>('dark');
     const [showThemeToggle, setShowThemeToggle] = useState(true);
     const router = useRouter();
@@ -158,14 +158,6 @@ const Navbar = () => {
         const timer = window.setTimeout(run, 220);
         return () => window.clearTimeout(timer);
     }, [pathname, lenis]);
-
-    useEffect(() => {
-        function handleScroll() {
-            setScrolled(window.scrollY > 50);
-        }
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
 
     useEffect(() => {
         const onResize = () => {
@@ -283,11 +275,13 @@ const Navbar = () => {
                     <Link
                         href="/#banner"
                         aria-label="Go to homepage"
-                        className="absolute top-2 left-5 md:top-1 md:left-6 z-[2] h-20 w-28 md:h-24 md:w-36 flex items-center justify-center text-primary/85 [[data-theme='light']_&]:text-zinc-900"
+                        className="group-top-star absolute top-2 left-5 md:top-1 md:left-6 z-[2] h-20 w-28 md:h-24 md:w-36 flex items-center justify-center text-primary/85 [[data-theme='light']_&]:text-zinc-900"
+                        onMouseEnter={() => setTopStarHovered(true)}
+                        onMouseLeave={() => setTopStarHovered(false)}
                     >
                         <svg
                             viewBox="0 0 120 72"
-                            className="h-16 w-24 md:h-20 md:w-32 shooting-star"
+                            className={`h-16 w-24 md:h-20 md:w-32 shooting-star${topStarHovered ? ' hovered' : ''}`}
                             fill="none"
                             xmlns="http://www.w3.org/2000/svg"
                             aria-hidden="true"
@@ -551,6 +545,23 @@ const Navbar = () => {
                     transform-origin: 94px 38px;
                     animation: starTwinkle 2.8s ease-in-out infinite;
                 }
+                .shooting-star.hovered {
+                    filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.55))
+                        drop-shadow(0 0 20px rgba(250, 204, 21, 0.28));
+                }
+                .shooting-star.hovered .shooting-star-head {
+                    color: #facc15;
+                    filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.75))
+                        drop-shadow(0 0 22px rgba(250, 204, 21, 0.42));
+                    animation: starTwinkle 2.8s ease-in-out infinite;
+                }
+                .shooting-star.hovered .shooting-star-tail {
+                    stroke: #fbbf24;
+                    opacity: 0.9;
+                    filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.45));
+                    animation: tailPulse 2.8s ease-in-out infinite,
+                        tailRainbow 3s linear infinite;
+                }
                 :global([data-theme='light']) .shooting-star-tail {
                     animation-name: tailPulseLight;
                 }
@@ -581,6 +592,14 @@ const Navbar = () => {
                 @keyframes starTwinkleLight {
                     0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(24, 24, 27, 0)); }
                     50% { transform: scale(1.08); filter: drop-shadow(0 0 7px rgba(24, 24, 27, 0.36)); }
+                }
+                @keyframes tailRainbow {
+                    0% { stroke: #fbbf24; }
+                    20% { stroke: #fb7185; }
+                    40% { stroke: #c084fc; }
+                    60% { stroke: #60a5fa; }
+                    80% { stroke: #34d399; }
+                    100% { stroke: #fbbf24; }
                 }
                 .nav-shake:hover {
                     animation: navShake 0.34s ease-in-out;

@@ -3,6 +3,100 @@ import { GENERAL_INFO } from '@/lib/data';
 import TransitionLink from '@/components/TransitionLink';
 import { useLenis } from 'lenis/react';
 import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useRef } from 'react';
+
+const FIRE_W = 32;
+const FIRE_H = 20;
+const FIRE_CHARS = '  ....,,;;::==++xxXX##@@';
+
+function Campfire() {
+    const preRef = useRef<HTMLPreElement>(null);
+    const bufRef = useRef(new Uint8Array(FIRE_W * FIRE_H));
+    const rafRef = useRef(0);
+
+    useEffect(() => {
+        const buf = bufRef.current;
+
+        const setSource = () => {
+            const mid = Math.floor(FIRE_W / 2);
+            const half = Math.floor(FIRE_W / 5);
+            for (let x = 0; x < FIRE_W; x++) {
+                const dist = Math.abs(x - mid);
+                const base = dist <= half ? 255 : Math.max(0, 255 - (dist - half) * 55);
+                buf[(FIRE_H - 1) * FIRE_W + x] = Math.max(0, base - Math.floor(Math.random() * 30));
+            }
+        };
+
+        const spread = () => {
+            for (let x = 0; x < FIRE_W; x++) {
+                for (let y = 1; y < FIRE_H; y++) {
+                    const src = buf[y * FIRE_W + x];
+                    if (src === 0) {
+                        buf[(y - 1) * FIRE_W + x] = 0;
+                    } else {
+                        const rand = Math.round(Math.random() * 3);
+                        const dst = (x - rand + 1 + FIRE_W) % FIRE_W;
+                        buf[(y - 1) * FIRE_W + dst] = Math.max(0, src - (rand & 1));
+                    }
+                }
+            }
+        };
+
+        const render = () => {
+            let out = '';
+            for (let y = 0; y < FIRE_H; y++) {
+                for (let x = 0; x < FIRE_W; x++) {
+                    const v = buf[y * FIRE_W + x];
+                    const ci = Math.floor(v * (FIRE_CHARS.length - 1) / 255);
+                    out += FIRE_CHARS[ci];
+                }
+                out += '\n';
+            }
+            // Firewood logs — centered to FIRE_W (32)
+            out += '         /\\/\\/\\/\\/\\/\\/\\         \n';
+            out += '        /              \\        \n';
+            out += '       /________________\\       ';
+            return out;
+        };
+
+        let last = 0;
+        const INTERVAL = 1000 / 30;
+
+        const tick = (time: number) => {
+            if (time - last >= INTERVAL) {
+                setSource();
+                spread();
+                if (preRef.current) preRef.current.textContent = render();
+                last = time;
+            }
+            rafRef.current = requestAnimationFrame(tick);
+        };
+
+        const observer = new IntersectionObserver(([e]) => {
+            if (e.isIntersecting) {
+                rafRef.current = requestAnimationFrame(tick);
+            } else {
+                cancelAnimationFrame(rafRef.current);
+            }
+        }, { threshold: 0 });
+
+        if (preRef.current) observer.observe(preRef.current);
+
+        return () => {
+            cancelAnimationFrame(rafRef.current);
+            observer.disconnect();
+        };
+    }, []);
+
+    return (
+        <pre
+            ref={preRef}
+            className="font-mono text-[11px] leading-[1.15] select-none text-muted-foreground/55 [[data-theme='light']_&]:text-foreground/40 whitespace-pre"
+            aria-hidden="true"
+            style={{ minWidth: `${FIRE_W}ch` }}
+        />
+    );
+}
 
 const SECTION_LINKS = [
     { label: 'Home', href: '/#banner' },
@@ -114,7 +208,7 @@ const Footer = () => {
         >
             <div className="container pt-12 pb-6">
                 {/* Link columns */}
-                <div className="grid grid-cols-2 gap-x-8 gap-y-10 mb-16 sm:mb-20 md:flex md:gap-16">
+                <div className="grid grid-cols-2 gap-x-8 gap-y-10 mb-16 sm:mb-20 md:flex md:gap-16 md:items-start md:justify-between">
                     <div>
                         <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50 [[data-theme='light']_&]:text-foreground/65 mb-5">
                             Pages
@@ -193,46 +287,57 @@ const Footer = () => {
                                     className="not-italic"
                                     itemProp="address"
                                 >
-                                    <span className="inline-flex items-center gap-1.5 text-muted-foreground/50 [[data-theme='light']_&]:text-foreground/70">
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            width="11"
-                                            height="11"
-                                            viewBox="0 0 24 24"
-                                            fill="currentColor"
-                                            aria-hidden="true"
-                                        >
-                                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-                                        </svg>
-                                        <span className="text-[10px] uppercase tracking-[0.18em]">
-                                            Location
+                                    <div className="flex flex-col items-start">
+                                        <span className="inline-flex items-center gap-1.5 text-muted-foreground/50 [[data-theme='light']_&]:text-foreground/70">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="11"
+                                                height="11"
+                                                viewBox="0 0 24 24"
+                                                fill="currentColor"
+                                                aria-hidden="true"
+                                            >
+                                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                                            </svg>
+                                            <span className="text-[10px] uppercase tracking-[0.18em]">
+                                                Location
+                                            </span>
                                         </span>
-                                    </span>
-                                    <p className="font-space-grotesk font-bold text-2xl text-foreground mt-0.5 leading-none">
-                                        Orlando, FL
-                                    </p>
+                                        <a
+                                            href="https://www.google.com/search?q=Orlando%2C+FL&sourceid=chrome&ie=UTF-8"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="no-click-glow inline-block mt-2 font-space-grotesk font-bold text-2xl text-foreground leading-none hover:text-primary [[data-theme='light']_&]:hover:text-zinc-900 transition-colors"
+                                        >
+                                            Orlando, FL
+                                        </a>
+                                    </div>
                                 </address>
                             </li>
                         </ul>
+                    </div>
+
+                    {/* Campfire */}
+                    <div className="hidden md:block md:self-start">
+                        <Campfire />
                     </div>
                 </div>
 
                 {/* ASCII name */}
                 <div
                     className="overflow-x-auto -mx-4 sm:-mx-6 px-4 sm:px-6 mb-2"
-                    aria-hidden="true"
                 >
                     <pre
-                        className="font-mono leading-snug select-none whitespace-pre bg-clip-text text-transparent bg-gradient-to-l from-white/20 via-white/45 to-white/80 [[data-theme='light']_&]:from-black/60 [[data-theme='light']_&]:via-black/42 [[data-theme='light']_&]:to-black/25"
+                        className="font-mono leading-snug whitespace-pre bg-clip-text text-transparent bg-gradient-to-l from-white/20 via-white/45 to-white/80 [[data-theme='light']_&]:from-black/60 [[data-theme='light']_&]:via-black/42 [[data-theme='light']_&]:to-black/25"
                         style={{ fontSize: 'clamp(7px, 2.1vw, 24px)' }}
                         itemProp="name"
-                    >{`:::::::::::::: :::    :::    ::::     :::     ::: :::::::    :::       ::::::::::
-     :+:       :+:    :+:   :+: :+:   :+:+:   :+: :+:  :+:   :+:       :+:
-     +:+       +:+    +:+  +:+   +:+  :+:+:+  +:+ +:+        +:+       +:+
-     +#+       +#++:++#++ +#++:++#++: +#+ +:+ +#+ :#:        +#+       +#++:++#
-     +#+       +#+    +#+ +#+     +#+ +#+  #+#+#+ +#+ +#+#+  +#+       +#+
-     #+#       #+#    #+# #+#     #+# #+#   #+#+# #+#  #+#   #+#       #+#
-     ###       ###    ### ###     ### ###   ##### ########   ######### ##########`}</pre>
+                    >{`:::::::::::::: :::    :::    ::::     :::     ::: :::::::   :::       ::::::::::
+     :+:       :+:    :+:   :+: :+:   :+:+:   :+: :+:  :+:  :+:       :+:
+     +:+       +:+    +:+  +:+   +:+  :+:+:+  +:+ +:+       +:+       +:+
+     +#+       +#++:++#++ +#++:++#++: +#+ +:+ +#+ :#:       +#+       +#++:++#
+     +#+       +#+    +#+ +#+     +#+ +#+  #+#+#+ +#+ +#+#+ +#+       +#+
+     #+#       #+#    #+# #+#     #+# #+#   #+#+# #+#  #+#  #+#       #+#
+     ###       ###    ### ###     ### ###   ##### ########  ######### ##########`}</pre>
                 </div>
 
                 {/* Copyright */}
