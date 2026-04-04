@@ -515,6 +515,7 @@ function TodoCard({
 export default function TodosPage() {
   const [todos, setTodos] = useState<Todo[]>([])
   const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
   const [addingStatus, setAddingStatus] = useState<Status | null>(null)
   const [draggingTodoId, setDraggingTodoId] = useState<string | null>(null)
   const [dragOverStatus, setDragOverStatus] = useState<Status | null>(null)
@@ -642,7 +643,16 @@ export default function TodosPage() {
 
   function renderColumn(status: Status) {
     const config = COL_CONFIG[status]
-    const items = todos.filter((t) => t.status === status)
+    const q = search.trim().toLowerCase()
+    const items = todos.filter((t) => {
+      if (t.status !== status) return false
+      if (!q) return true
+      return (
+        t.title.toLowerCase().includes(q) ||
+        t.priority.toLowerCase().includes(q) ||
+        (t.due_date ?? '').toLowerCase().includes(q)
+      )
+    })
     const isActive = activeStatus === status
     const hasActive = activeStatus !== null
 
@@ -712,24 +722,44 @@ export default function TodosPage() {
           </span>
         </div>
 
-        {items.map((todo) => {
-          const idx = STATUSES.indexOf(todo.status)
-          return (
-            <TodoCard
-              key={todo.id}
-              todo={todo}
-              onUpdate={updateTodo}
-              onDelete={deleteTodo}
-              canMoveLeft={idx > 0}
-              canMoveRight={idx < STATUSES.length - 1}
-              onDragStart={(id) => setDraggingTodoId(id)}
-              onDragEnd={() => {
-                setDraggingTodoId(null)
-                setDragOverStatus(null)
+        <div
+          style={{
+            maxHeight: 360,
+            overflowY: 'auto',
+            paddingRight: 2,
+            marginBottom: 8,
+          }}
+        >
+          {items.map((todo) => {
+            const idx = STATUSES.indexOf(todo.status)
+            return (
+              <TodoCard
+                key={todo.id}
+                todo={todo}
+                onUpdate={updateTodo}
+                onDelete={deleteTodo}
+                canMoveLeft={idx > 0}
+                canMoveRight={idx < STATUSES.length - 1}
+                onDragStart={(id) => setDraggingTodoId(id)}
+                onDragEnd={() => {
+                  setDraggingTodoId(null)
+                  setDragOverStatus(null)
+                }}
+              />
+            )
+          })}
+          {items.length === 0 && (
+            <div
+              style={{
+                fontSize: 12,
+                color: 'hsl(var(--dash-fg-dim))',
+                padding: '6px 4px 10px',
               }}
-            />
-          )
-        })}
+            >
+              No matching tasks
+            </div>
+          )}
+        </div>
 
         {addingStatus === status ? (
           <InlineAdd
@@ -758,6 +788,25 @@ export default function TodosPage() {
 
   return (
     <div style={{ maxWidth: 1040, margin: '0 auto' }}>
+      <div style={{ marginBottom: 12 }}>
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search todos..."
+          style={{
+            width: '100%',
+            boxSizing: 'border-box',
+            padding: '9px 11px',
+            background: 'hsl(var(--dash-input))',
+            border: '1px solid hsl(var(--dash-border))',
+            color: 'hsl(var(--dash-fg))',
+            fontSize: 13,
+            outline: 'none',
+            fontFamily: 'var(--font-roboto-flex)',
+            borderRadius: 8,
+          }}
+        />
+      </div>
       {isDesktop ? (
         <div ref={containerRef} style={{ display: 'flex', alignItems: 'stretch' }} onMouseLeave={() => setActiveStatus(null)}>
           {STATUSES.map((status, idx) => (

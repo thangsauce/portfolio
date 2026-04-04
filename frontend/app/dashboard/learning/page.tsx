@@ -440,6 +440,7 @@ function LearningCard({
 export default function LearningPage() {
   const [items,    setItems]    = useState<LearningItem[]>([])
   const [loading,  setLoading]  = useState(true)
+  const [search,   setSearch]   = useState('')
   const [addingTo, setAddingTo] = useState<LStatus | null>(null)
   const [draggingItem, setDraggingItem] = useState<LearningItem | null>(null)
   const [dragOverStatus, setDragOverStatus] = useState<LStatus | null>(null)
@@ -542,6 +543,25 @@ export default function LearningPage() {
         </div>
       ) : (
         <>
+          <div style={{ marginBottom: 12, position: 'relative', zIndex: 1 }}>
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search learning..."
+              style={{
+                width: '100%',
+                boxSizing: 'border-box',
+                padding: '9px 11px',
+                background: 'hsl(var(--dash-input))',
+                border: '1px solid hsl(var(--dash-border))',
+                color: 'hsl(var(--dash-fg))',
+                fontSize: 13,
+                outline: 'none',
+                fontFamily: 'var(--font-roboto-flex)',
+                borderRadius: 8,
+              }}
+            />
+          </div>
           {isDesktop ? (
             <div
               ref={containerRef}
@@ -595,7 +615,16 @@ export default function LearningPage() {
 
   function renderColumn(status: LStatus, colIdx: number) {
     const conf = COL_CONFIG[status]
-    const colItems = items.filter(i => i.status === status)
+    const q = search.trim().toLowerCase()
+    const colItems = items.filter(i => {
+      if (i.status !== status) return false
+      if (!q) return true
+      return (
+        i.title.toLowerCase().includes(q) ||
+        (i.category ?? '').toLowerCase().includes(q) ||
+        (i.notes ?? '').toLowerCase().includes(q)
+      )
+    })
     const isDropTarget = dragOverStatus === status && draggingItem !== null
     const isActive = activeStatus === status
     const hasActive = activeStatus !== null
@@ -647,21 +676,41 @@ export default function LearningPage() {
         </div>
 
         {/* Cards */}
-        {colItems.map(item => (
-          <LearningCard
-            key={item.id}
-            item={item}
-            onUpdate={updateItem}
-            onDelete={deleteItem}
-            canMoveLeft={colIdx > 0}
-            canMoveRight={colIdx < STATUSES.length - 1}
-            onDragStart={(dragItem) => setDraggingItem(dragItem)}
-            onDragEnd={() => {
-              setDraggingItem(null)
-              setDragOverStatus(null)
-            }}
-          />
-        ))}
+        <div
+          style={{
+            maxHeight: 360,
+            overflowY: 'auto',
+            paddingRight: 2,
+            marginBottom: 8,
+          }}
+        >
+          {colItems.map(item => (
+            <LearningCard
+              key={item.id}
+              item={item}
+              onUpdate={updateItem}
+              onDelete={deleteItem}
+              canMoveLeft={colIdx > 0}
+              canMoveRight={colIdx < STATUSES.length - 1}
+              onDragStart={(dragItem) => setDraggingItem(dragItem)}
+              onDragEnd={() => {
+                setDraggingItem(null)
+                setDragOverStatus(null)
+              }}
+            />
+          ))}
+          {colItems.length === 0 && (
+            <div
+              style={{
+                fontSize: 12,
+                color: 'hsl(var(--dash-fg-dim))',
+                padding: '6px 4px 10px',
+              }}
+            >
+              No matching items
+            </div>
+          )}
+        </div>
 
         {/* Inline add at bottom of each column */}
         {addingTo === status ? (
