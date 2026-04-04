@@ -96,7 +96,7 @@ function InlineAdd({
         style={{
           width: '100%', background: 'none', border: 'none', outline: 'none',
           fontFamily: 'var(--font-roboto-flex)',
-          fontSize: 12, letterSpacing: '0.03em',
+          fontSize: 14, letterSpacing: '0.03em',
           color: 'hsl(var(--dash-fg))',
           caretColor: 'hsl(158 64% 36%)',
         }}
@@ -124,7 +124,7 @@ function AddCard({
         padding: '10px 12px',
         marginTop: 4,
         fontFamily: 'var(--font-roboto-flex)',
-        fontSize: 11,
+        fontSize: 13,
         letterSpacing: '0.02em',
         color: 'hsl(var(--dash-fg-muted))',
         cursor: 'pointer',
@@ -218,7 +218,7 @@ function LearningCard({
         background: 'hsl(var(--dash-card))',
         border: `1px solid ${hovered ? 'hsl(var(--dash-fg-dim) / 0.3)' : 'hsl(var(--dash-border))'}`,
         borderRadius: 10,
-        padding: '11px 12px', marginBottom: 8,
+        padding: '13px 14px', marginBottom: 8,
         transition: 'border-color 0.12s, box-shadow 0.12s',
         boxShadow: hovered ? '0 6px 16px hsl(0 0% 0% / 0.12)' : 'none',
         cursor: 'grab',
@@ -235,7 +235,7 @@ function LearningCard({
           style={{
             width: '100%', background: 'none', border: 'none', outline: 'none',
             fontFamily: 'var(--font-roboto-flex)',
-            fontSize: 12, letterSpacing: '0.03em',
+            fontSize: 14, letterSpacing: '0.03em',
             color: 'hsl(var(--dash-fg))',
             caretColor: 'hsl(158 64% 36%)', marginBottom: 6,
           }}
@@ -244,7 +244,7 @@ function LearningCard({
         <div
           onClick={() => setEditTitle(true)}
           style={{
-            fontSize: 12, letterSpacing: '0.03em',
+            fontSize: 14, letterSpacing: '0.03em',
             color: 'hsl(var(--dash-fg-muted))',
             cursor: 'text', marginBottom: 6,
             overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
@@ -266,7 +266,7 @@ function LearningCard({
           style={{
             background: 'none', border: 'none', outline: 'none',
             fontFamily: 'var(--font-roboto-flex)',
-            fontSize: 9, letterSpacing: '0.04em',
+            fontSize: 11, letterSpacing: '0.03em',
             color: 'hsl(158 64% 36%)',
             caretColor: 'hsl(158 64% 36%)', marginBottom: 6, width: '100%',
           }}
@@ -275,7 +275,7 @@ function LearningCard({
         <div
           onClick={() => setEditCat(true)}
           style={{
-            fontSize: 9, letterSpacing: '0.04em',
+            fontSize: 11, letterSpacing: '0.03em',
             color: item.category ? 'hsl(var(--dash-fg-muted))' : 'hsl(var(--dash-border))',
             cursor: 'text', marginBottom: 6,
           }}
@@ -301,7 +301,7 @@ function LearningCard({
             borderRadius: 8,
             outline: 'none', resize: 'none',
             fontFamily: 'var(--font-roboto-flex)',
-            fontSize: 10, letterSpacing: '0.03em',
+            fontSize: 12, letterSpacing: '0.03em',
             color: 'hsl(var(--dash-fg-muted))',
             caretColor: 'hsl(158 64% 36%)', padding: '5px 7px',
             marginBottom: 8,
@@ -311,7 +311,7 @@ function LearningCard({
         <div
           onClick={() => setEditNotes(true)}
           style={{
-            fontSize: 10, letterSpacing: '0.03em',
+            fontSize: 12, letterSpacing: '0.03em',
             color: 'hsl(var(--dash-fg-dim))',
             cursor: 'text', marginBottom: 8, lineHeight: 1.5,
             display: '-webkit-box', WebkitLineClamp: 2,
@@ -324,7 +324,7 @@ function LearningCard({
         <div
           onClick={() => setEditNotes(true)}
           style={{
-            fontSize: 9, letterSpacing: '0.04em',
+            fontSize: 11, letterSpacing: '0.03em',
             color: 'hsl(var(--dash-border))',
             cursor: 'text', marginBottom: 8,
           }}
@@ -340,7 +340,7 @@ function LearningCard({
             <button
               onClick={moveLeft}
               style={{
-                fontSize: 11,
+                fontSize: 13,
                 color: 'hsl(var(--dash-fg-dim))', background: 'none', border: 'none',
                 cursor: 'pointer', padding: '0 4px', transition: 'color 0.1s',
                 borderRadius: 4,
@@ -355,7 +355,7 @@ function LearningCard({
             <button
               onClick={moveRight}
               style={{
-                fontSize: 11,
+                fontSize: 13,
                 color: 'hsl(var(--dash-fg-dim))', background: 'none', border: 'none',
                 cursor: 'pointer', padding: '0 4px', transition: 'color 0.1s',
                 borderRadius: 4,
@@ -375,7 +375,7 @@ function LearningCard({
                 onClick={() => onDelete(item.id)}
                 style={{
                   color: 'hsl(0 62% 52%)', background: 'none', border: 'none',
-                  cursor: 'pointer', fontSize: 11, letterSpacing: '0.03em',
+                  cursor: 'pointer', fontSize: 12, letterSpacing: '0.03em',
                   padding: 0, fontFamily: 'var(--font-roboto-flex)', borderRadius: 4,
                 }}
               >
@@ -385,7 +385,7 @@ function LearningCard({
                 onClick={() => setConfirmDel(false)}
                 style={{
                   color: 'hsl(var(--dash-fg-dim))', background: 'none', border: 'none',
-                  cursor: 'pointer', fontSize: 11, letterSpacing: '0.03em',
+                  cursor: 'pointer', fontSize: 12, letterSpacing: '0.03em',
                   padding: 0, fontFamily: 'var(--font-roboto-flex)', borderRadius: 4,
                 }}
               >
@@ -421,6 +421,7 @@ export default function LearningPage() {
   const [addingTo, setAddingTo] = useState<LStatus | null>(null)
   const [draggingItem, setDraggingItem] = useState<LearningItem | null>(null)
   const [dragOverStatus, setDragOverStatus] = useState<LStatus | null>(null)
+  const [activeStatus, setActiveStatus] = useState<LStatus | null>(null)
 
   useEffect(() => {
     apiPrivate<LearningItem[]>('/learning')
@@ -465,18 +466,32 @@ export default function LearningPage() {
   return (
     <div style={{ position: 'relative', isolation: 'isolate', maxWidth: 1120, margin: '0 auto' }}>
       {loading ? (
-        <div style={{ fontSize: 12, color: 'hsl(var(--dash-fg-dim))', position: 'relative', zIndex: 1 }}>
+        <div style={{ fontSize: 13, color: 'hsl(var(--dash-fg-dim))', position: 'relative', zIndex: 1 }}>
           Loading...
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14, alignItems: 'start', position: 'relative', zIndex: 1 }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: 14,
+            alignItems: 'start',
+            position: 'relative',
+            zIndex: 1,
+          }}
+          onMouseLeave={() => setActiveStatus(null)}
+        >
           {STATUSES.map((status, colIdx) => {
             const conf = COL_CONFIG[status]
             const colItems = items.filter(i => i.status === status)
             const isDropTarget = dragOverStatus === status && draggingItem !== null
+            const isActive = activeStatus === status
+            const hasActive = activeStatus !== null
             return (
               <div
                 key={status}
+                onMouseEnter={() => setActiveStatus(status)}
+                onClick={() => setActiveStatus(status)}
                 onDragOver={(e) => {
                   if (!draggingItem) return
                   e.preventDefault()
@@ -498,17 +513,21 @@ export default function LearningPage() {
                   padding: 12,
                   outline: isDropTarget ? `1px dashed ${conf.dropColor}` : 'none',
                   boxShadow: isDropTarget ? `inset 0 0 0 1px ${conf.dropColor}` : 'none',
-                  transition: 'outline-color 0.12s, box-shadow 0.12s',
+                  transform: hasActive ? (isActive ? 'scale(1.03)' : 'scale(0.965)') : 'scale(1)',
+                  opacity: hasActive ? (isActive ? 1 : 0.58) : 1,
+                  filter: hasActive ? (isActive ? 'none' : 'saturate(0.75)') : 'none',
+                  transition: 'outline-color 0.12s, box-shadow 0.12s, transform 220ms ease, opacity 220ms ease, filter 220ms ease',
+                  zIndex: isActive ? 2 : 1,
                 }}
               >
 
                 {/* Column header */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                    <span style={{ fontSize: 12, letterSpacing: '0.01em', color: conf.headerColor, fontFamily: 'var(--font-roboto-flex)', fontWeight: 600 }}>
+                    <span style={{ fontSize: 14, letterSpacing: '0.01em', color: conf.headerColor, fontFamily: 'var(--font-roboto-flex)', fontWeight: 600 }}>
                       {conf.label}
                     </span>
-                    <span style={{ fontSize: 10, color: conf.countColor, fontFamily: 'var(--font-roboto-flex)' }}>
+                    <span style={{ fontSize: 12, color: conf.countColor, fontFamily: 'var(--font-roboto-flex)' }}>
                       {colItems.length}
                     </span>
                   </div>

@@ -145,7 +145,7 @@ function InlineAdd({
           border: 'none',
           outline: 'none',
           fontFamily: 'var(--font-roboto-flex)',
-          fontSize: 12,
+          fontSize: 14,
           letterSpacing: '0.03em',
           color: 'hsl(var(--dash-fg))',
           caretColor: 'hsl(158 64% 36%)',
@@ -176,7 +176,7 @@ function AddCard({
         padding: '10px 12px',
         marginTop: 4,
         fontFamily: 'var(--font-roboto-flex)',
-        fontSize: 11,
+        fontSize: 13,
         letterSpacing: '0.02em',
         color,
         cursor: 'pointer',
@@ -277,7 +277,7 @@ function TodoCard({
         background: 'hsl(var(--dash-card))',
         border: `1px solid ${hovered ? 'hsl(var(--dash-fg-dim) / 0.3)' : 'hsl(var(--dash-border))'}`,
         borderRadius: 10,
-        padding: '11px 12px',
+        padding: '13px 14px',
         marginBottom: 8,
         transition: 'border-color 0.12s, box-shadow 0.12s',
         boxShadow: hovered ? '0 6px 16px hsl(0 0% 0% / 0.12)' : 'none',
@@ -304,7 +304,7 @@ function TodoCard({
             border: 'none',
             outline: 'none',
             fontFamily: 'var(--font-roboto-flex)',
-            fontSize: 12,
+            fontSize: 14,
             letterSpacing: '0.03em',
             color: 'hsl(var(--dash-fg))',
             caretColor: 'hsl(158 64% 36%)',
@@ -315,7 +315,7 @@ function TodoCard({
         <div
           onClick={() => setEditTitle(true)}
           style={{
-            fontSize: 12,
+            fontSize: 14,
             letterSpacing: '0.03em',
             color: 'hsl(var(--dash-fg-muted))',
             textDecoration: done ? 'line-through' : 'none',
@@ -339,7 +339,7 @@ function TodoCard({
               border: 'none',
               color: 'hsl(var(--dash-fg-dim))',
               cursor: 'pointer',
-              fontSize: 11,
+              fontSize: 13,
               padding: '0 2px',
             }}
             title="Move left"
@@ -347,7 +347,7 @@ function TodoCard({
             ←
           </button>
         ) : (
-          <span style={{ opacity: 0.25, fontSize: 11, color: 'hsl(var(--dash-border))', padding: '0 2px' }}>←</span>
+          <span style={{ opacity: 0.25, fontSize: 13, color: 'hsl(var(--dash-border))', padding: '0 2px' }}>←</span>
         )}
 
         {canMoveRight ? (
@@ -358,7 +358,7 @@ function TodoCard({
               border: 'none',
               color: 'hsl(var(--dash-fg-dim))',
               cursor: 'pointer',
-              fontSize: 11,
+              fontSize: 13,
               padding: '0 2px',
             }}
             title="Move right"
@@ -366,20 +366,20 @@ function TodoCard({
             →
           </button>
         ) : (
-          <span style={{ opacity: 0.25, fontSize: 11, color: 'hsl(var(--dash-border))', padding: '0 2px' }}>→</span>
+          <span style={{ opacity: 0.25, fontSize: 13, color: 'hsl(var(--dash-border))', padding: '0 2px' }}>→</span>
         )}
 
         <button
           onClick={() => void onUpdate(todo.id, { priority: nextPriority(todo.priority) })}
           title="cycle priority"
           style={{
-            fontSize: 10,
+            fontSize: 12,
             letterSpacing: '0.03em',
             color: PRIORITY_COLOR[todo.priority],
             background: 'none',
             border: `1px solid ${PRIORITY_COLOR[todo.priority]}28`,
             borderRadius: 6,
-            padding: '2px 7px',
+            padding: '3px 9px',
             cursor: 'pointer',
             fontFamily: 'var(--font-roboto-flex)',
           }}
@@ -404,7 +404,7 @@ function TodoCard({
               border: '1px solid hsl(var(--dash-border))',
               borderRadius: 6,
               color: 'hsl(var(--dash-fg-muted))',
-              fontSize: 10,
+              fontSize: 12,
               padding: '2px 5px',
               outline: 'none',
               fontFamily: 'var(--font-roboto-flex)',
@@ -419,7 +419,7 @@ function TodoCard({
               background: 'none',
               border: 'none',
               padding: 0,
-              fontSize: 10,
+              fontSize: 12,
               letterSpacing: '0.02em',
               color: overdue
                 ? 'hsl(0 62% 52%)'
@@ -442,7 +442,7 @@ function TodoCard({
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
-                fontSize: 10,
+                fontSize: 11,
                 padding: 0,
               }}
             >
@@ -455,7 +455,7 @@ function TodoCard({
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
-                fontSize: 10,
+                fontSize: 11,
                 padding: 0,
               }}
             >
@@ -491,6 +491,7 @@ export default function TodosPage() {
   const [addingStatus, setAddingStatus] = useState<Status | null>(null)
   const [draggingTodoId, setDraggingTodoId] = useState<string | null>(null)
   const [dragOverStatus, setDragOverStatus] = useState<Status | null>(null)
+  const [activeStatus, setActiveStatus] = useState<Status | null>(null)
 
   useEffect(() => {
     apiPrivate<Todo[]>('/todos')
@@ -539,7 +540,7 @@ export default function TodosPage() {
 
   if (loading) {
     return (
-      <div style={{ maxWidth: 1040, margin: '0 auto', fontSize: 12, color: 'hsl(var(--dash-fg-dim))' }}>
+      <div style={{ maxWidth: 1040, margin: '0 auto', fontSize: 13, color: 'hsl(var(--dash-fg-dim))' }}>
         Loading...
       </div>
     )
@@ -550,18 +551,23 @@ export default function TodosPage() {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
           gap: 14,
           alignItems: 'start',
         }}
+        onMouseLeave={() => setActiveStatus(null)}
       >
         {STATUSES.map((status) => {
           const config = COL_CONFIG[status]
           const items = todos.filter((t) => t.status === status)
+          const isActive = activeStatus === status
+          const hasActive = activeStatus !== null
 
           return (
             <section
               key={status}
+              onMouseEnter={() => setActiveStatus(status)}
+              onClick={() => setActiveStatus(status)}
               onDragOver={(e) => {
                 e.preventDefault()
                 if (dragOverStatus !== status) setDragOverStatus(status)
@@ -588,8 +594,13 @@ export default function TodosPage() {
                     ? `1px solid ${config.dropBorderColor}`
                     : `1px solid ${config.borderColor}`,
                 borderRadius: 10,
-                padding: '12px 10px 10px',
+                padding: '14px 12px 12px',
                 minHeight: 220,
+                transform: hasActive ? (isActive ? 'scale(1.03)' : 'scale(0.965)') : 'scale(1)',
+                opacity: hasActive ? (isActive ? 1 : 0.58) : 1,
+                filter: hasActive ? (isActive ? 'none' : 'saturate(0.75)') : 'none',
+                transition: 'transform 220ms ease, opacity 220ms ease, filter 220ms ease, border-color 160ms ease',
+                zIndex: isActive ? 2 : 1,
               }}
             >
               <div
@@ -603,7 +614,7 @@ export default function TodosPage() {
               >
                 <span
                   style={{
-                    fontSize: 12,
+                    fontSize: 14,
                     letterSpacing: '0.02em',
                     color: config.headerColor,
                   }}
@@ -612,7 +623,7 @@ export default function TodosPage() {
                 </span>
                 <span
                   style={{
-                    fontSize: 11,
+                    fontSize: 12,
                     letterSpacing: '0.02em',
                     color: 'hsl(var(--dash-fg-dim))',
                   }}
