@@ -1,0 +1,10 @@
+{
+  "lsp": {
+    "tailwindcss-language-server": {
+      "binary": {
+        "path": "/Users/thangle/Library/Application Support/Zed/languages/tailwindcss-language-server/node_modules/.bin/tailwindcss-language-server",
+        "arguments": ["--stdio"]
+      }
+    }
+  }
+}
