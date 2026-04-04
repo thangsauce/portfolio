@@ -110,7 +110,7 @@ function InlineAdd({
     ref.current?.focus()
   }, [])
 
-  async function handleBlur() {
+  async function submit() {
     const t = value.trim()
     if (t) await onSubmit(t)
     else onCancel()
@@ -130,9 +130,12 @@ function InlineAdd({
         ref={ref}
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        onBlur={handleBlur}
+        onBlur={submit}
         onKeyDown={(e) => {
-          if (e.key === 'Enter') ref.current?.blur()
+          if (e.key === 'Enter') {
+            e.preventDefault()
+            void submit()
+          }
           if (e.key === 'Escape') onCancel()
         }}
         placeholder="new task..."
@@ -520,9 +523,17 @@ export default function TodosPage() {
     try {
       const todo = await apiPrivate<Todo>('/todos', {
         method: 'POST',
-        body: JSON.stringify({ title, status, priority: 'medium' }),
+        // Some backends only accept create in default "todo" state.
+        body: JSON.stringify({ title, priority: 'medium' }),
       })
       setTodos((prev) => [todo, ...prev])
+      if (status !== 'todo') {
+        const moved = await apiPrivate<Todo>(`/todos/${todo.id}`, {
+          method: 'PUT',
+          body: JSON.stringify({ status }),
+        })
+        setTodos((prev) => prev.map((t) => (t.id === moved.id ? moved : t)))
+      }
     } catch {}
   }, [])
 
