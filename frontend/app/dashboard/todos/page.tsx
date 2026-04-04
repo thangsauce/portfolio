@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import { apiPrivate } from '@/lib/api'
 
 type Status = 'todo' | 'in_progress' | 'done'
@@ -519,12 +519,32 @@ export default function TodosPage() {
   const [draggingTodoId, setDraggingTodoId] = useState<string | null>(null)
   const [dragOverStatus, setDragOverStatus] = useState<Status | null>(null)
   const [activeStatus, setActiveStatus] = useState<Status | null>(null)
+  const [isDesktop, setIsDesktop] = useState(false)
+  const [colWidths, setColWidths] = useState<[number, number, number]>([1, 1, 1])
+  const containerRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     apiPrivate<Todo[]>('/todos')
       .then(setTodos)
       .catch(() => {})
       .finally(() => setLoading(false))
+  }, [])
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)')
+    setIsDesktop(mq.matches)
+    const saved = window.localStorage.getItem('dashboard-todos-col-widths')
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved) as number[]
+        if (parsed.length === 3 && parsed.every((n) => Number.isFinite(n) && n > 0.2)) {
+          setColWidths([parsed[0], parsed[1], parsed[2]])
+        }
+      } catch {}
+    }
+    const onChange = (e: MediaQueryListEvent) => setIsDesktop(e.matches)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
   }, [])
 
   const updateTodo = useCallback(
@@ -551,19 +571,66 @@ export default function TodosPage() {
     try {
       const todo = await apiPrivate<Todo>('/todos', {
         method: 'POST',
-        // Some backends only accept create in default "todo" state.
-        body: JSON.stringify({ title, priority: 'medium' }),
+        body: JSON.stringify({
+          title,
+          status,
+          priority: 'medium',
+          due_date: null,
+        }),
       })
       setTodos((prev) => [todo, ...prev])
-      if (status !== 'todo') {
-        const moved = await apiPrivate<Todo>(`/todos/${todo.id}`, {
-          method: 'PUT',
-          body: JSON.stringify({ status }),
+    } catch {
+      // Fallback for stricter schemas that only allow default creation state.
+      try {
+        const todo = await apiPrivate<Todo>('/todos', {
+          method: 'POST',
+          body: JSON.stringify({
+            title,
+            status: 'todo',
+            priority: 'medium',
+            due_date: null,
+          }),
         })
-        setTodos((prev) => prev.map((t) => (t.id === moved.id ? moved : t)))
-      }
-    } catch {}
+        setTodos((prev) => [todo, ...prev])
+        if (status !== 'todo') {
+          const moved = await apiPrivate<Todo>(`/todos/${todo.id}`, {
+            method: 'PUT',
+            body: JSON.stringify({ status }),
+          })
+          setTodos((prev) => prev.map((t) => (t.id === moved.id ? moved : t)))
+        }
+      } catch {}
+    }
   }, [])
+
+  function beginResize(handleIndex: number, e: React.MouseEvent<HTMLDivElement>) {
+    if (!isDesktop) return
+    e.preventDefault()
+    const startX = e.clientX
+    const start = [...colWidths] as [number, number, number]
+    const pairTotal = start[handleIndex] + start[handleIndex + 1]
+    const containerWidth = containerRef.current?.getBoundingClientRect().width ?? 1
+    const minWidth = 0.6
+
+    const onMove = (ev: MouseEvent) => {
+      const deltaFr = ((ev.clientX - startX) / containerWidth) * 3
+      const left = Math.max(minWidth, Math.min(pairTotal - minWidth, start[handleIndex] + deltaFr))
+      const right = pairTotal - left
+      setColWidths((prev) => {
+        const next = [...prev] as [number, number, number]
+        next[handleIndex] = left
+        next[handleIndex + 1] = right
+        return next
+      })
+    }
+    const onUp = () => {
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+      window.localStorage.setItem('dashboard-todos-col-widths', JSON.stringify(colWidths))
+    }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+  }
 
   if (loading) {
     return (
@@ -573,136 +640,164 @@ export default function TodosPage() {
     )
   }
 
-  return (
-    <div style={{ maxWidth: 1040, margin: '0 auto' }}>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: 14,
-          alignItems: 'start',
-        }}
-        onMouseLeave={() => setActiveStatus(null)}
-      >
-        {STATUSES.map((status) => {
-          const config = COL_CONFIG[status]
-          const items = todos.filter((t) => t.status === status)
-          const isActive = activeStatus === status
-          const hasActive = activeStatus !== null
+  function renderColumn(status: Status) {
+    const config = COL_CONFIG[status]
+    const items = todos.filter((t) => t.status === status)
+    const isActive = activeStatus === status
+    const hasActive = activeStatus !== null
 
+    return (
+      <section
+        key={status}
+        onMouseEnter={() => setActiveStatus(status)}
+        onClick={() => setActiveStatus(status)}
+        onDragOver={(e) => {
+          e.preventDefault()
+          if (dragOverStatus !== status) setDragOverStatus(status)
+        }}
+        onDragLeave={() => {
+          if (dragOverStatus === status) setDragOverStatus(null)
+        }}
+        onDrop={() => {
+          if (!draggingTodoId) return
+          const dragged = todos.find((t) => t.id === draggingTodoId)
+          if (dragged && dragged.status !== status) {
+            void updateTodo(dragged.id, { status })
+          }
+          setDraggingTodoId(null)
+          setDragOverStatus(null)
+        }}
+        style={{
+          background: `linear-gradient(180deg, ${config.panelTint}, hsl(var(--dash-panel)))`,
+          border:
+            dragOverStatus === status
+              ? `1px solid ${config.dropBorderColor}`
+              : `1px solid ${config.borderColor}`,
+          borderRadius: 10,
+          padding: '14px 12px 12px',
+          minHeight: 220,
+          transform: hasActive ? (isActive ? 'scale(1.03)' : 'scale(0.965)') : 'scale(1)',
+          opacity: hasActive ? (isActive ? 1 : 0.58) : 1,
+          filter: hasActive ? (isActive ? 'none' : 'saturate(0.75)') : 'none',
+          transition: 'transform 220ms ease, opacity 220ms ease, filter 220ms ease, border-color 160ms ease',
+          zIndex: isActive ? 2 : 1,
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: 10,
+            padding: '0 2px',
+          }}
+        >
+          <span
+            style={{
+              fontSize: 14,
+              letterSpacing: '0.02em',
+              color: config.headerColor,
+            }}
+          >
+            {config.label}
+          </span>
+          <span
+            style={{
+              fontSize: 12,
+              letterSpacing: '0.02em',
+              color: 'hsl(var(--dash-fg-dim))',
+            }}
+          >
+            {items.length}
+          </span>
+        </div>
+
+        {items.map((todo) => {
+          const idx = STATUSES.indexOf(todo.status)
           return (
-            <section
-              key={status}
-              onMouseEnter={() => setActiveStatus(status)}
-              onClick={() => setActiveStatus(status)}
-              onDragOver={(e) => {
-                e.preventDefault()
-                if (dragOverStatus !== status) setDragOverStatus(status)
-              }}
-              onDragLeave={() => {
-                if (dragOverStatus === status) setDragOverStatus(null)
-              }}
-              onDrop={() => {
-                if (!draggingTodoId) return
-                const dragged = todos.find((t) => t.id === draggingTodoId)
-                if (dragged && dragged.status !== status) {
-                  void updateTodo(dragged.id, { status })
-                }
+            <TodoCard
+              key={todo.id}
+              todo={todo}
+              onUpdate={updateTodo}
+              onDelete={deleteTodo}
+              canMoveLeft={idx > 0}
+              canMoveRight={idx < STATUSES.length - 1}
+              onDragStart={(id) => setDraggingTodoId(id)}
+              onDragEnd={() => {
                 setDraggingTodoId(null)
                 setDragOverStatus(null)
               }}
-              style={{
-                background:
-                  dragOverStatus === status
-                    ? `linear-gradient(180deg, ${config.panelTint}, hsl(var(--dash-panel)))`
-                    : `linear-gradient(180deg, ${config.panelTint}, hsl(var(--dash-panel)))`,
-                border:
-                  dragOverStatus === status
-                    ? `1px solid ${config.dropBorderColor}`
-                    : `1px solid ${config.borderColor}`,
-                borderRadius: 10,
-                padding: '14px 12px 12px',
-                minHeight: 220,
-                transform: hasActive ? (isActive ? 'scale(1.03)' : 'scale(0.965)') : 'scale(1)',
-                opacity: hasActive ? (isActive ? 1 : 0.58) : 1,
-                filter: hasActive ? (isActive ? 'none' : 'saturate(0.75)') : 'none',
-                transition: 'transform 220ms ease, opacity 220ms ease, filter 220ms ease, border-color 160ms ease',
-                zIndex: isActive ? 2 : 1,
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  marginBottom: 10,
-                  padding: '0 2px',
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: 14,
-                    letterSpacing: '0.02em',
-                    color: config.headerColor,
-                  }}
-                >
-                  {config.label}
-                </span>
-                <span
-                  style={{
-                    fontSize: 12,
-                    letterSpacing: '0.02em',
-                    color: 'hsl(var(--dash-fg-dim))',
-                  }}
-                >
-                  {items.length}
-                </span>
-              </div>
-
-              {items.map((todo) => {
-                const idx = STATUSES.indexOf(todo.status)
-                return (
-                  <TodoCard
-                    key={todo.id}
-                    todo={todo}
-                    onUpdate={updateTodo}
-                    onDelete={deleteTodo}
-                    canMoveLeft={idx > 0}
-                    canMoveRight={idx < STATUSES.length - 1}
-                    onDragStart={(id) => setDraggingTodoId(id)}
-                    onDragEnd={() => {
-                      setDraggingTodoId(null)
-                      setDragOverStatus(null)
-                    }}
-                  />
-                )
-              })}
-
-              {addingStatus === status ? (
-                <InlineAdd
-                  onSubmit={async (title) => {
-                    await createTodo(status, title)
-                    setAddingStatus(null)
-                  }}
-                  onCancel={() => setAddingStatus(null)}
-                />
-              ) : (
-                <AddCard
-                  onClick={() => setAddingStatus(status)}
-                  label="New"
-                  color={config.addColor}
-                />
-              )}
-
-              <style jsx>{`
-                section button:hover {
-                  color: ${config.addHoverColor};
-                }
-              `}</style>
-            </section>
+            />
           )
         })}
-      </div>
+
+        {addingStatus === status ? (
+          <InlineAdd
+            onSubmit={async (title) => {
+              await createTodo(status, title)
+              setAddingStatus(null)
+            }}
+            onCancel={() => setAddingStatus(null)}
+          />
+        ) : (
+          <AddCard
+            onClick={() => setAddingStatus(status)}
+            label="New"
+            color={config.addColor}
+          />
+        )}
+
+        <style jsx>{`
+          section button:hover {
+            color: ${config.addHoverColor};
+          }
+        `}</style>
+      </section>
+    )
+  }
+
+  return (
+    <div style={{ maxWidth: 1040, margin: '0 auto' }}>
+      {isDesktop ? (
+        <div ref={containerRef} style={{ display: 'flex', alignItems: 'stretch' }} onMouseLeave={() => setActiveStatus(null)}>
+          {STATUSES.map((status, idx) => (
+            <Fragment key={status}>
+              <div style={{ flex: `${colWidths[idx]} 1 0`, minWidth: 260, paddingRight: idx < STATUSES.length - 1 ? 8 : 0 }}>
+                {renderColumn(status)}
+              </div>
+              {idx < STATUSES.length - 1 && (
+                <div
+                  onMouseDown={(e) => beginResize(idx, e)}
+                  style={{
+                    width: 12,
+                    cursor: 'col-resize',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    userSelect: 'none',
+                  }}
+                >
+                  <div style={{ width: 2, height: '38%', borderRadius: 999, background: 'hsl(var(--dash-border))' }} />
+                </div>
+              )}
+            </Fragment>
+          ))}
+        </div>
+      ) : (
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: 14,
+            alignItems: 'start',
+          }}
+          onMouseLeave={() => setActiveStatus(null)}
+        >
+          {STATUSES.map((status) => (
+            <div key={status}>{renderColumn(status)}</div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

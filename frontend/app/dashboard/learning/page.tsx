@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { Fragment, useState, useEffect, useRef, useCallback } from 'react'
 import { apiPrivate } from '@/lib/api'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -444,12 +444,32 @@ export default function LearningPage() {
   const [draggingItem, setDraggingItem] = useState<LearningItem | null>(null)
   const [dragOverStatus, setDragOverStatus] = useState<LStatus | null>(null)
   const [activeStatus, setActiveStatus] = useState<LStatus | null>(null)
+  const [isDesktop, setIsDesktop] = useState(false)
+  const [colWidths, setColWidths] = useState<[number, number, number]>([1, 1, 1])
+  const containerRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     apiPrivate<LearningItem[]>('/learning')
       .then(setItems)
       .catch(() => {})
       .finally(() => setLoading(false))
+  }, [])
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)')
+    setIsDesktop(mq.matches)
+    const saved = window.localStorage.getItem('dashboard-learning-col-widths')
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved) as number[]
+        if (parsed.length === 3 && parsed.every((n) => Number.isFinite(n) && n > 0.2)) {
+          setColWidths([parsed[0], parsed[1], parsed[2]])
+        }
+      } catch {}
+    }
+    const onChange = (e: MediaQueryListEvent) => setIsDesktop(e.matches)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
   }, [])
 
   async function createItem(status: LStatus, title: string) {
@@ -485,6 +505,35 @@ export default function LearningPage() {
     await updateItem(item.id, { status })
   }
 
+  function beginResize(handleIndex: number, e: React.MouseEvent<HTMLDivElement>) {
+    if (!isDesktop) return
+    e.preventDefault()
+    const startX = e.clientX
+    const start = [...colWidths] as [number, number, number]
+    const pairTotal = start[handleIndex] + start[handleIndex + 1]
+    const containerWidth = containerRef.current?.getBoundingClientRect().width ?? 1
+    const minWidth = 0.6
+
+    const onMove = (ev: MouseEvent) => {
+      const deltaFr = ((ev.clientX - startX) / containerWidth) * 3
+      const left = Math.max(minWidth, Math.min(pairTotal - minWidth, start[handleIndex] + deltaFr))
+      const right = pairTotal - left
+      setColWidths((prev) => {
+        const next = [...prev] as [number, number, number]
+        next[handleIndex] = left
+        next[handleIndex + 1] = right
+        return next
+      })
+    }
+    const onUp = () => {
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+      window.localStorage.setItem('dashboard-learning-col-widths', JSON.stringify(colWidths))
+    }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+  }
+
   return (
     <div style={{ position: 'relative', isolation: 'isolate', maxWidth: 1120, margin: '0 auto' }}>
       {loading ? (
@@ -492,105 +541,143 @@ export default function LearningPage() {
           Loading...
         </div>
       ) : (
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: 14,
-            alignItems: 'start',
-            position: 'relative',
-            zIndex: 1,
-          }}
-          onMouseLeave={() => setActiveStatus(null)}
-        >
-          {STATUSES.map((status, colIdx) => {
-            const conf = COL_CONFIG[status]
-            const colItems = items.filter(i => i.status === status)
-            const isDropTarget = dragOverStatus === status && draggingItem !== null
-            const isActive = activeStatus === status
-            const hasActive = activeStatus !== null
-            return (
-              <div
-                key={status}
-                onMouseEnter={() => setActiveStatus(status)}
-                onClick={() => setActiveStatus(status)}
-                onDragOver={(e) => {
-                  if (!draggingItem) return
-                  e.preventDefault()
-                  setDragOverStatus(status)
-                }}
-                onDragLeave={() => {
-                  if (dragOverStatus === status) setDragOverStatus(null)
-                }}
-                onDrop={async (e) => {
-                  e.preventDefault()
-                  if (draggingItem) await moveItemToStatus(draggingItem, status)
-                  setDragOverStatus(null)
-                  setDraggingItem(null)
-                }}
-                style={{
-                  background: conf.bg,
-                  border: '1px solid hsl(var(--dash-border))',
-                  borderRadius: 12,
-                  padding: 12,
-                  outline: isDropTarget ? `1px dashed ${conf.dropColor}` : 'none',
-                  boxShadow: isDropTarget ? `inset 0 0 0 1px ${conf.dropColor}` : 'none',
-                  transform: hasActive ? (isActive ? 'scale(1.03)' : 'scale(0.965)') : 'scale(1)',
-                  opacity: hasActive ? (isActive ? 1 : 0.58) : 1,
-                  filter: hasActive ? (isActive ? 'none' : 'saturate(0.75)') : 'none',
-                  transition: 'outline-color 0.12s, box-shadow 0.12s, transform 220ms ease, opacity 220ms ease, filter 220ms ease',
-                  zIndex: isActive ? 2 : 1,
-                }}
-              >
-
-                {/* Column header */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                    <span style={{ fontSize: 14, letterSpacing: '0.01em', color: conf.headerColor, fontFamily: 'var(--font-roboto-flex)', fontWeight: 600 }}>
-                      {conf.label}
-                    </span>
-                    <span style={{ fontSize: 12, color: conf.countColor, fontFamily: 'var(--font-roboto-flex)' }}>
-                      {colItems.length}
-                    </span>
+        <>
+          {isDesktop ? (
+            <div
+              ref={containerRef}
+              style={{ display: 'flex', alignItems: 'stretch', position: 'relative', zIndex: 1 }}
+              onMouseLeave={() => setActiveStatus(null)}
+            >
+              {STATUSES.map((status, colIdx) => (
+                <Fragment key={status}>
+                  <div style={{ flex: `${colWidths[colIdx]} 1 0`, minWidth: 260, paddingRight: colIdx < STATUSES.length - 1 ? 8 : 0 }}>
+                    {renderColumn(status, colIdx)}
                   </div>
-                </div>
-
-                {/* Cards */}
-                {colItems.map(item => (
-                  <LearningCard
-                    key={item.id}
-                    item={item}
-                    onUpdate={updateItem}
-                    onDelete={deleteItem}
-                    canMoveLeft={colIdx > 0}
-                    canMoveRight={colIdx < STATUSES.length - 1}
-                    onDragStart={(dragItem) => setDraggingItem(dragItem)}
-                    onDragEnd={() => {
-                      setDraggingItem(null)
-                      setDragOverStatus(null)
-                    }}
-                  />
-                ))}
-
-                {/* Inline add at bottom of each column */}
-                {addingTo === status ? (
-                  <InlineAdd
-                    onSubmit={title => createItem(status, title)}
-                    onCancel={() => setAddingTo(null)}
-                    accentColor={conf.addColor}
-                  />
-                ) : (
-                  <AddCard
-                    onClick={() => setAddingTo(status)}
-                    label="New"
-                    color={conf.addColor}
-                  />
-                )}
-              </div>
-            )
-          })}
-        </div>
+                  {colIdx < STATUSES.length - 1 && (
+                    <div
+                      onMouseDown={(e) => beginResize(colIdx, e)}
+                      style={{
+                        width: 12,
+                        cursor: 'col-resize',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        userSelect: 'none',
+                      }}
+                    >
+                      <div style={{ width: 2, height: '38%', borderRadius: 999, background: 'hsl(var(--dash-border))' }} />
+                    </div>
+                  )}
+                </Fragment>
+              ))}
+            </div>
+          ) : (
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                gap: 14,
+                alignItems: 'start',
+                position: 'relative',
+                zIndex: 1,
+              }}
+              onMouseLeave={() => setActiveStatus(null)}
+            >
+              {STATUSES.map((status, colIdx) => (
+                <div key={status}>{renderColumn(status, colIdx)}</div>
+              ))}
+            </div>
+          )}
+        </>
       )}
     </div>
   )
+
+  function renderColumn(status: LStatus, colIdx: number) {
+    const conf = COL_CONFIG[status]
+    const colItems = items.filter(i => i.status === status)
+    const isDropTarget = dragOverStatus === status && draggingItem !== null
+    const isActive = activeStatus === status
+    const hasActive = activeStatus !== null
+
+    return (
+      <div
+        key={status}
+        onMouseEnter={() => setActiveStatus(status)}
+        onClick={() => setActiveStatus(status)}
+        onDragOver={(e) => {
+          if (!draggingItem) return
+          e.preventDefault()
+          setDragOverStatus(status)
+        }}
+        onDragLeave={() => {
+          if (dragOverStatus === status) setDragOverStatus(null)
+        }}
+        onDrop={async (e) => {
+          e.preventDefault()
+          if (draggingItem) await moveItemToStatus(draggingItem, status)
+          setDragOverStatus(null)
+          setDraggingItem(null)
+        }}
+        style={{
+          background: conf.bg,
+          border: '1px solid hsl(var(--dash-border))',
+          borderRadius: 12,
+          padding: 12,
+          outline: isDropTarget ? `1px dashed ${conf.dropColor}` : 'none',
+          boxShadow: isDropTarget ? `inset 0 0 0 1px ${conf.dropColor}` : 'none',
+          transform: hasActive ? (isActive ? 'scale(1.03)' : 'scale(0.965)') : 'scale(1)',
+          opacity: hasActive ? (isActive ? 1 : 0.58) : 1,
+          filter: hasActive ? (isActive ? 'none' : 'saturate(0.75)') : 'none',
+          transition: 'outline-color 0.12s, box-shadow 0.12s, transform 220ms ease, opacity 220ms ease, filter 220ms ease',
+          zIndex: isActive ? 2 : 1,
+        }}
+      >
+
+        {/* Column header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+            <span style={{ fontSize: 14, letterSpacing: '0.01em', color: conf.headerColor, fontFamily: 'var(--font-roboto-flex)', fontWeight: 600 }}>
+              {conf.label}
+            </span>
+            <span style={{ fontSize: 12, color: conf.countColor, fontFamily: 'var(--font-roboto-flex)' }}>
+              {colItems.length}
+            </span>
+          </div>
+        </div>
+
+        {/* Cards */}
+        {colItems.map(item => (
+          <LearningCard
+            key={item.id}
+            item={item}
+            onUpdate={updateItem}
+            onDelete={deleteItem}
+            canMoveLeft={colIdx > 0}
+            canMoveRight={colIdx < STATUSES.length - 1}
+            onDragStart={(dragItem) => setDraggingItem(dragItem)}
+            onDragEnd={() => {
+              setDraggingItem(null)
+              setDragOverStatus(null)
+            }}
+          />
+        ))}
+
+        {/* Inline add at bottom of each column */}
+        {addingTo === status ? (
+          <InlineAdd
+            onSubmit={title => createItem(status, title)}
+            onCancel={() => setAddingTo(null)}
+            accentColor={conf.addColor}
+          />
+        ) : (
+          <AddCard
+            onClick={() => setAddingTo(status)}
+            label="New"
+            color={conf.addColor}
+          />
+        )}
+      </div>
+    )
+  }
 }
