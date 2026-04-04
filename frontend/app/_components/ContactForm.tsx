@@ -288,8 +288,8 @@ export function ContactSection() {
                     <div className="flex flex-col gap-4 rounded-2xl border border-border/70 bg-background/55 px-4 py-4 backdrop-blur-sm sm:px-6">
                         <div className="flex flex-wrap items-center gap-3">
                             <span className="relative inline-flex h-2.5 w-2.5">
-                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary/80 opacity-70" />
-                                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-primary" />
+                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary/80 opacity-70 [[data-theme='light']_&]:bg-zinc-700/75" />
+                                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-primary [[data-theme='light']_&]:bg-zinc-800" />
                             </span>
                             <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground" itemProp="name">
                                 © {new Date().getFullYear()} Thang Le

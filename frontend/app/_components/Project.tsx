@@ -12,6 +12,7 @@ interface Props {
     project: IProject;
     selectedProject: string | null;
     onMouseEnter: (_slug: string) => void;
+    showLiveCursor?: boolean;
 }
 
 /*
@@ -31,7 +32,13 @@ interface Props {
 
 gsap.registerPlugin(useGSAP);
 
-const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
+const Project = ({
+    index,
+    project,
+    selectedProject,
+    onMouseEnter,
+    showLiveCursor = false,
+}: Props) => {
     const externalLinkSVGRef = useRef<SVGSVGElement>(null);
     const linkTlRef = useRef<gsap.core.Timeline | null>(null);
     const fallbackThumbnail = '/projects/thumbnail/portfolio-thumbnail.jpg';
@@ -122,7 +129,7 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
     return (
         <>
             <div
-                className="project-item group leading-none max-md:py-1.5 py-1.5 md:py-5 first:!pt-0 last:pb-0 md:group-hover/projects:opacity-30 md:hover:!opacity-100 transition-all"
+                className="project-item group leading-none max-md:py-1 py-1.5 md:py-5 first:!pt-0 last:pb-0 md:group-hover/projects:opacity-30 md:hover:!opacity-100 transition-all"
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
             >
@@ -153,7 +160,7 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
                 <div className="">
                     <div className="flex items-start justify-between gap-4">
                         <TransitionLink href={`/projects?slug=${encodeURIComponent(project.slug)}`} className="min-w-0 no-click-glow">
-                            <h4 className="project-title-soft-glow text-4xl xs:text-6xl flex gap-4 font-anton transition-all duration-700 bg-gradient-to-r from-primary to-foreground from-[50%] to-[50%] bg-[length:200%] bg-right bg-clip-text text-transparent group-hover:bg-left">
+                            <h4 className="project-title-soft-glow text-4xl xs:text-6xl flex gap-4 font-anton transition-all duration-700 bg-gradient-to-r from-primary to-foreground from-[50%] to-[50%] bg-[length:200%] bg-right bg-clip-text text-transparent group-hover:bg-left [[data-theme='light']_&]:from-zinc-900 [[data-theme='light']_&]:to-zinc-700">
                                 {project.title}
                                 <span className="text-foreground opacity-0 group-hover:opacity-100 transition-all">
                                     <svg
@@ -185,7 +192,7 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
                                         href={project.sourceCode}
                                         target="_blank"
                                         rel="noreferrer noopener"
-                                        className="inline-flex items-center justify-center text-muted-foreground hover:text-primary transition-colors"
+                                        className="inline-flex items-center justify-center text-muted-foreground hover:text-primary [[data-theme='light']_&]:hover:text-zinc-900 transition-colors"
                                         aria-label={`${project.title} GitHub`}
                                         onClick={(e) => e.stopPropagation()}
                                     >
@@ -197,24 +204,26 @@ const Project = ({ index, project, selectedProject, onMouseEnter }: Props) => {
                                         href={project.liveUrl}
                                         target="_blank"
                                         rel="noreferrer noopener"
-                                        className="inline-flex items-center gap-2 text-[11px] sm:text-xs uppercase tracking-[0.14em] text-muted-foreground hover:text-primary transition-colors live-demo-link"
+                                        className="inline-flex items-center gap-2 text-[11px] sm:text-xs uppercase tracking-[0.14em] text-muted-foreground hover:text-primary [[data-theme='light']_&]:hover:text-zinc-900 transition-colors live-demo-link"
                                         aria-label={`${project.title} website`}
                                         onClick={(e) => e.stopPropagation()}
                                     >
                                         <span className="live-demo-dot inline-block size-2 rounded-full bg-red-500" />
                                         <span className="live-demo-target relative inline-flex items-center justify-center min-w-[36px]">
                                             <span>LIVE</span>
-                                            <span className="live-demo-cursor-orbit absolute" aria-hidden="true">
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    width="20"
-                                                    height="20"
-                                                    viewBox="0 0 24 24"
-                                                    fill="currentColor"
-                                                >
-                                                    <path d="M3 3l7.4 17 2.3-5.4 5.3-2.2L3 3z" />
-                                                </svg>
-                                            </span>
+                                            {showLiveCursor && (
+                                                <span className="live-demo-cursor-orbit absolute" aria-hidden="true">
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        width="20"
+                                                        height="20"
+                                                        viewBox="0 0 24 24"
+                                                        fill="currentColor"
+                                                    >
+                                                        <path d="M3 3l7.4 17 2.3-5.4 5.3-2.2L3 3z" />
+                                                    </svg>
+                                                </span>
+                                            )}
                                         </span>
                                     </a>
                                 )}

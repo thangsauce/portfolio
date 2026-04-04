@@ -283,7 +283,7 @@ const ProjectList = () => {
     return (
         <section className="pb-section -mt-10 md:mt-0" id="selected-projects">
             <div className="container">
-                <div className="flex items-center gap-3 mb-5 md:mb-10">
+                <div className="flex items-center gap-3 mb-2 md:mb-10">
                     <span className="text-primary [[data-theme='light']_&]:text-foreground/80 font-mono text-2xl leading-none select-none">&lt;</span>
                     <h2 className="text-2xl uppercase leading-none tracking-widest">
                         PROJECTS
@@ -291,7 +291,7 @@ const ProjectList = () => {
                     <span className="text-primary [[data-theme='light']_&]:text-foreground/80 font-mono text-2xl leading-none select-none">&gt;</span>
                 </div>
 
-                <div className="group/projects relative max-md:-mt-1" ref={containerRef}>
+                <div className="group/projects relative max-md:-mt-2" ref={containerRef}>
                     {selectedProject !== null && projects.some((p) => p.thumbnail || p.longThumbnail) && (
                         <div
                             className="max-md:hidden absolute -right-20 xl:-right-28 top-0 z-[1] pointer-events-none w-[200px] xl:w-[350px] aspect-[3/4] overflow-hidden opacity-100"
@@ -337,8 +337,8 @@ const ProjectList = () => {
                                     className={cn(
                                         'rounded-full border px-3 py-1 text-xs sm:text-sm uppercase tracking-[0.16em] transition-all',
                                         activeCategory === category.key
-                                            ? 'border-primary/55 text-primary'
-                                            : 'border-border text-muted-foreground hover:border-primary/35 hover:text-foreground',
+                                            ? 'border-primary/55 text-primary [[data-theme=\'light\']_&]:border-zinc-500 [[data-theme=\'light\']_&]:text-zinc-900'
+                                            : 'border-border text-muted-foreground hover:border-primary/35 hover:text-foreground [[data-theme=\'light\']_&]:hover:border-zinc-500 [[data-theme=\'light\']_&]:hover:text-zinc-900',
                                     )}
                                 >
                                     {category.title}
@@ -374,7 +374,7 @@ const ProjectList = () => {
 
                         {currentProjects.length > 0 ? (
                             <div
-                                className="flex flex-col max-md:-mt-1 max-md:space-y-1.5"
+                                className="flex flex-col max-md:-mt-2 max-md:space-y-1"
                                 ref={pagePanelRef}
                                 key={`${activeCategory}-${currentPage}`}
                             >
@@ -384,6 +384,7 @@ const ProjectList = () => {
                                         project={project}
                                         selectedProject={selectedProject}
                                         onMouseEnter={handleMouseEnter}
+                                        showLiveCursor={i === 0}
                                         key={`${activeCategory}-${project.slug}`}
                                     />
                                 ))}

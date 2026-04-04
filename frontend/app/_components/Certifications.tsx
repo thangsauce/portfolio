@@ -24,11 +24,17 @@ function formatDate(dateStr: string | null): string | null {
 const Certifications = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [certs, setCerts] = useState<Cert[]>([]);
+    const [loadError, setLoadError] = useState(false);
 
     useEffect(() => {
         apiFetch<Cert[]>('/api/portfolio/certifications')
-            .then(setCerts)
-            .catch(() => {});
+            .then((data) => {
+                setCerts(data);
+                setLoadError(false);
+            })
+            .catch(() => {
+                setLoadError(true);
+            });
     }, []);
 
     useGSAP(
@@ -59,8 +65,6 @@ const Certifications = () => {
         { scope: containerRef, dependencies: [certs.length] },
     );
 
-    if (certs.length === 0) return null;
-
     return (
         <section className="pt-20 md:pt-0 pb-section" id="certifications" ref={containerRef}>
             <div className="container">
@@ -73,6 +77,14 @@ const Certifications = () => {
                 </div>
 
                 <div className="space-y-4 max-w-2xl">
+                    {certs.length === 0 && (
+                        <div className="cert-item border border-border rounded px-5 py-4 bg-white/[0.03] backdrop-blur-sm [[data-theme='light']_&]:bg-black/[0.03]">
+                            <p className="text-sm text-muted-foreground [[data-theme='light']_&]:text-zinc-700">
+                                {loadError ? 'Unable to load certifications right now.' : 'No certifications yet.'}
+                            </p>
+                        </div>
+                    )}
+
                     {certs.map((cert) =>
                         cert.url ? (
                             <a
@@ -80,31 +92,31 @@ const Certifications = () => {
                                 href={cert.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="cert-item flex items-center justify-between border border-border rounded px-5 py-4 bg-white/[0.03] backdrop-blur-sm hover:border-white/30 hover:bg-white/[0.07] hover:shadow-[0_0_20px_rgba(255,255,255,0.06)] transition-all group"
+                                className="cert-item flex items-center justify-between border border-border rounded px-5 py-4 bg-white/[0.03] backdrop-blur-sm hover:border-white/30 hover:bg-white/[0.07] hover:shadow-[0_0_20px_rgba(255,255,255,0.06)] transition-all group [[data-theme='light']_&]:bg-black/[0.03] [[data-theme='light']_&]:hover:border-zinc-500 [[data-theme='light']_&]:hover:bg-black/[0.06]"
                             >
                                 <div>
-                                    <p className="text-lg font-medium group-hover:text-primary transition-colors">{cert.name}</p>
-                                    <p className="text-sm text-muted-foreground">
+                                    <p className="text-lg font-medium text-foreground transition-colors [[data-theme='light']_&]:text-zinc-900">{cert.name}</p>
+                                    <p className="text-sm text-muted-foreground [[data-theme='light']_&]:text-zinc-700">
                                         {cert.issuer}{cert.credential_id ? ` · ID: ${cert.credential_id}` : ''}
                                     </p>
                                 </div>
                                 {cert.issue_date && (
-                                    <span className="text-primary font-mono text-sm shrink-0 ml-4">{formatDate(cert.issue_date)}</span>
+                                    <span className="text-foreground/85 font-mono text-sm shrink-0 ml-4 [[data-theme='light']_&]:text-zinc-900">{formatDate(cert.issue_date)}</span>
                                 )}
                             </a>
                         ) : (
                             <div
                                 key={cert.id}
-                                className="cert-item flex items-center justify-between border border-border rounded px-5 py-4 bg-white/[0.03] backdrop-blur-sm"
+                                className="cert-item flex items-center justify-between border border-border rounded px-5 py-4 bg-white/[0.03] backdrop-blur-sm [[data-theme='light']_&]:bg-black/[0.03]"
                             >
                                 <div>
-                                    <p className="text-lg font-medium">{cert.name}</p>
-                                    <p className="text-sm text-muted-foreground">
+                                    <p className="text-lg font-medium [[data-theme='light']_&]:text-zinc-900">{cert.name}</p>
+                                    <p className="text-sm text-muted-foreground [[data-theme='light']_&]:text-zinc-700">
                                         {cert.issuer}{cert.credential_id ? ` · ID: ${cert.credential_id}` : ''}
                                     </p>
                                 </div>
                                 {cert.issue_date && (
-                                    <span className="text-primary font-mono text-sm shrink-0 ml-4">{formatDate(cert.issue_date)}</span>
+                                    <span className="text-foreground/85 font-mono text-sm shrink-0 ml-4 [[data-theme='light']_&]:text-zinc-900">{formatDate(cert.issue_date)}</span>
                                 )}
                             </div>
                         )
