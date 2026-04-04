@@ -1,6 +1,7 @@
 import { createClient } from './supabase/client'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL!
+const supabase = createClient()
 
 async function parseApiError(res: Response): Promise<string> {
   try {
@@ -12,10 +13,29 @@ async function parseApiError(res: Response): Promise<string> {
 }
 
 async function authHeaders(): Promise<HeadersInit> {
-  const { data: { session } } = await createClient().auth.getSession()
-  return session?.access_token
-    ? { Authorization: `Bearer ${session.access_token}` }
-    : {}
+  const buildAuth = (token?: string): HeadersInit => {
+    if (!token) return {}
+    return { Authorization: `Bearer ${token}` }
+  }
+
+  const first = await supabase.auth.getSession()
+  const firstToken = first.data.session?.access_token
+  if (firstToken) return buildAuth(firstToken)
+
+  // Brief retry for race on initial hydration/navigation.
+  await new Promise((resolve) => setTimeout(resolve, 120))
+  const second = await supabase.auth.getSession()
+  const secondToken = second.data.session?.access_token
+  if (secondToken) return buildAuth(secondToken)
+
+  // Final recovery attempt if token exists but is stale.
+  try {
+    await supabase.auth.refreshSession()
+    const third = await supabase.auth.getSession()
+    return buildAuth(third.data.session?.access_token)
+  } catch {
+    return {}
+  }
 }
 
 /** Fetch from a public API endpoint (no auth required) */
