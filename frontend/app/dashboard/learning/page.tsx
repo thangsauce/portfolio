@@ -20,31 +20,34 @@ const STATUSES: LStatus[] = ['to_learn', 'learning', 'learned']
 
 const COL_CONFIG: Record<
   LStatus,
-  { label: string; headerColor: string; bg: string; countColor: string; addColor: string; addHoverColor: string }
+  { label: string; headerColor: string; bg: string; countColor: string; addColor: string; addHoverColor: string; dropColor: string }
 > = {
   to_learn: {
     label:       'Lesson',
-    headerColor: 'hsl(var(--dash-fg))',
-    bg:          'hsl(var(--dash-panel))',
-    countColor:  'hsl(var(--dash-fg-dim))',
-    addColor:    'hsl(var(--dash-fg-muted))',
-    addHoverColor:'hsl(var(--dash-fg))',
+    headerColor: 'hsl(0 72% 58%)',
+    bg:          'hsl(0 72% 58% / 0.06)',
+    countColor:  'hsl(0 72% 58% / 0.9)',
+    addColor:    'hsl(0 72% 58% / 0.85)',
+    addHoverColor:'hsl(0 80% 62%)',
+    dropColor:   'hsl(0 72% 58% / 0.7)',
   },
   learning: {
     label:       'Learning',
-    headerColor: 'hsl(var(--dash-fg))',
-    bg:          'hsl(var(--dash-panel))',
-    countColor:  'hsl(var(--dash-fg-dim))',
-    addColor:    'hsl(var(--dash-fg-muted))',
-    addHoverColor:'hsl(var(--dash-fg))',
+    headerColor: 'hsl(212 90% 58%)',
+    bg:          'hsl(212 90% 58% / 0.06)',
+    countColor:  'hsl(212 90% 58% / 0.9)',
+    addColor:    'hsl(212 90% 58% / 0.85)',
+    addHoverColor:'hsl(212 96% 64%)',
+    dropColor:   'hsl(212 90% 58% / 0.7)',
   },
   learned: {
     label:       'Learned',
-    headerColor: 'hsl(var(--dash-fg))',
-    bg:          'hsl(var(--dash-panel))',
-    countColor:  'hsl(var(--dash-fg-dim))',
-    addColor:    'hsl(var(--dash-fg-muted))',
-    addHoverColor:'hsl(var(--dash-fg))',
+    headerColor: 'hsl(145 68% 42%)',
+    bg:          'hsl(145 68% 42% / 0.06)',
+    countColor:  'hsl(145 68% 42% / 0.9)',
+    addColor:    'hsl(145 68% 42% / 0.85)',
+    addHoverColor:'hsl(145 74% 48%)',
+    dropColor:   'hsl(145 68% 42% / 0.7)',
   },
 }
 
@@ -493,8 +496,8 @@ export default function LearningPage() {
                   border: '1px solid hsl(var(--dash-border))',
                   borderRadius: 12,
                   padding: 12,
-                  outline: isDropTarget ? '1px dashed hsl(158 64% 42% / 0.7)' : 'none',
-                  boxShadow: isDropTarget ? 'inset 0 0 0 1px hsl(158 64% 42% / 0.2)' : 'none',
+                  outline: isDropTarget ? `1px dashed ${conf.dropColor}` : 'none',
+                  boxShadow: isDropTarget ? `inset 0 0 0 1px ${conf.dropColor}` : 'none',
                   transition: 'outline-color 0.12s, box-shadow 0.12s',
                 }}
               >
