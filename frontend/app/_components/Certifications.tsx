@@ -18,7 +18,9 @@ type Cert = {
 
 function formatDate(dateStr: string | null): string | null {
     if (!dateStr) return null;
-    return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    const date = new Date(dateStr);
+    if (Number.isNaN(date.getTime())) return null;
+    return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 }
 
 const Certifications = () => {

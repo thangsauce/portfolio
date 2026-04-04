@@ -59,10 +59,11 @@ function IcTrash() { return <svg {...sv}><polyline points="2,5 14,5"/><path d="M
 
 // ─── Inline Add ───────────────────────────────────────────────────────────────
 function InlineAdd({
-  onSubmit, onCancel,
+  onSubmit, onCancel, accentColor,
 }: {
   onSubmit: (t: string) => Promise<void>
   onCancel: () => void
+  accentColor?: string
 }) {
   const [value, setValue] = useState('')
   const ref = useRef<HTMLInputElement>(null)
@@ -78,7 +79,7 @@ function InlineAdd({
   return (
     <div style={{
       background: 'hsl(var(--dash-card))',
-      border: '1px solid hsl(158 64% 36% / 0.35)',
+      border: `1px solid ${accentColor ?? 'hsl(158 64% 36% / 0.35)'}`,
       borderRadius: 8,
       padding: '10px 12px', marginBottom: 6,
     }}>
@@ -97,6 +98,97 @@ function InlineAdd({
           caretColor: 'hsl(158 64% 36%)',
         }}
       />
+    </div>
+  )
+}
+
+function AddCard({
+  onClick, label, color,
+}: {
+  onClick: () => void
+  label: string
+  color: string
+}) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        width: '100%',
+        textAlign: 'left',
+        background: 'hsl(var(--dash-card))',
+        border: `1px dashed ${color}`,
+        borderRadius: 8,
+        padding: '10px 12px',
+        marginTop: 4,
+        fontFamily: 'var(--font-roboto-flex)',
+        fontSize: 11,
+        letterSpacing: '0.02em',
+        color,
+        cursor: 'pointer',
+        transition: 'filter 0.12s, transform 0.12s',
+      }}
+      onMouseEnter={e => {
+        e.currentTarget.style.filter = 'brightness(1.08)'
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.style.filter = 'brightness(1)'
+      }}
+    >
+      + {label}
+    </button>
+  )
+}
+
+function AsciiFireflies() {
+  const flies = [
+    { id: 1, ch: '.',  x: '8%',  y: '14%', s: 11, d: 0.0, t: 4.2 },
+    { id: 2, ch: '*',  x: '22%', y: '68%', s: 12, d: 0.7, t: 5.1 },
+    { id: 3, ch: '+',  x: '38%', y: '26%', s: 10, d: 1.1, t: 4.8 },
+    { id: 4, ch: '.',  x: '57%', y: '74%', s: 11, d: 0.4, t: 5.7 },
+    { id: 5, ch: '*',  x: '72%', y: '18%', s: 12, d: 1.5, t: 4.9 },
+    { id: 6, ch: '.',  x: '86%', y: '58%', s: 10, d: 0.2, t: 5.4 },
+    { id: 7, ch: '+',  x: '64%', y: '42%', s: 11, d: 1.0, t: 4.4 },
+  ]
+
+  return (
+    <div
+      aria-hidden="true"
+      style={{
+        position: 'absolute',
+        inset: 0,
+        pointerEvents: 'none',
+        overflow: 'hidden',
+        zIndex: 0,
+      }}
+    >
+      {flies.map(f => (
+        <span
+          key={f.id}
+          style={{
+            position: 'absolute',
+            left: f.x,
+            top: f.y,
+            fontFamily: 'var(--font-roboto-flex)',
+            fontSize: f.s,
+            color: 'hsl(var(--dash-fg-dim) / 0.42)',
+            textShadow: '0 0 8px hsl(var(--dash-fg-dim) / 0.18)',
+            animation: `fireflyFloat ${f.t}s ease-in-out ${f.d}s infinite alternate, fireflyBlink 2.6s ease-in-out ${f.d}s infinite`,
+          }}
+        >
+          {f.ch}
+        </span>
+      ))}
+
+      <style>{`
+        @keyframes fireflyFloat {
+          0% { transform: translate3d(0, 0, 0); }
+          100% { transform: translate3d(0, -9px, 0); }
+        }
+        @keyframes fireflyBlink {
+          0%, 100% { opacity: 0.22; }
+          50% { opacity: 0.75; }
+        }
+      `}</style>
     </div>
   )
 }
@@ -389,7 +481,7 @@ export default function LearningPage() {
         method: 'POST',
         body: JSON.stringify({ title, status }),
       })
-      setItems(prev => [item, ...prev])
+      setItems(prev => [...prev, item])
     } catch {}
     setAddingTo(null)
   }
@@ -417,13 +509,14 @@ export default function LearningPage() {
   }
 
   return (
-    <div>
+    <div style={{ position: 'relative', isolation: 'isolate' }}>
+      <AsciiFireflies />
       {loading ? (
-        <div style={{ fontSize: 12, color: 'hsl(var(--dash-fg-dim))' }}>
+        <div style={{ fontSize: 12, color: 'hsl(var(--dash-fg-dim))', position: 'relative', zIndex: 1 }}>
           Loading...
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, alignItems: 'start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, alignItems: 'start', position: 'relative', zIndex: 1 }}>
           {STATUSES.map((status, colIdx) => {
             const conf = COL_CONFIG[status]
             const colItems = items.filter(i => i.status === status)
@@ -465,29 +558,7 @@ export default function LearningPage() {
                       {colItems.length}
                     </span>
                   </div>
-                  <button
-                    onClick={() => setAddingTo(status)}
-                    style={{
-                      fontSize: 11, letterSpacing: '0.02em',
-                      color: conf.addColor, background: 'none', border: 'none',
-                      cursor: 'pointer', padding: 0, transition: 'color 0.12s',
-                      fontFamily: 'var(--font-roboto-flex)',
-                      borderRadius: 4,
-                    }}
-                    onMouseEnter={e => e.currentTarget.style.color = conf.addHoverColor}
-                    onMouseLeave={e => e.currentTarget.style.color = conf.addColor}
-                  >
-                    + Add
-                  </button>
                 </div>
-
-                {/* Inline add */}
-                {addingTo === status && (
-                  <InlineAdd
-                    onSubmit={title => createItem(status, title)}
-                    onCancel={() => setAddingTo(null)}
-                  />
-                )}
 
                 {/* Cards */}
                 {colItems.map(item => (
@@ -505,6 +576,21 @@ export default function LearningPage() {
                     }}
                   />
                 ))}
+
+                {/* Inline add at bottom of each column */}
+                {addingTo === status ? (
+                  <InlineAdd
+                    onSubmit={title => createItem(status, title)}
+                    onCancel={() => setAddingTo(null)}
+                    accentColor={conf.addColor}
+                  />
+                ) : (
+                  <AddCard
+                    onClick={() => setAddingTo(status)}
+                    label="Add"
+                    color={conf.addColor}
+                  />
+                )}
               </div>
             )
           })}

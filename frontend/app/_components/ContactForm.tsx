@@ -161,7 +161,7 @@ export function ContactSection() {
                             )}
                         </form>
 
-                        <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+                        <div className="flex flex-row items-center justify-center gap-6 sm:gap-8">
                         <a
                             href={GENERAL_INFO.githubProfile}
                             target="_blank"

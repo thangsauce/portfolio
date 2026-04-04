@@ -8,10 +8,12 @@ import CurrentlyUsing from './_components/CurrentlyUsing';
 import Skills from './_components/Skills';
 import ProjectList from './_components/ProjectList';
 import SpriteGate from '@/components/SpriteGate';
+import PortfolioDataWarmup from '@/components/PortfolioDataWarmup';
 
 export default function Home() {
     return (
         <>
+            <PortfolioDataWarmup />
             <HorizontalScrollLayout>
                 <div className="page-">
                     <Banner />

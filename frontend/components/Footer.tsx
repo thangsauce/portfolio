@@ -1,6 +1,5 @@
 'use client';
 import { GENERAL_INFO } from '@/lib/data';
-import TransitionLink from '@/components/TransitionLink';
 import { useLenis } from 'lenis/react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
@@ -22,8 +21,12 @@ function Campfire() {
             const half = Math.floor(FIRE_W / 5);
             for (let x = 0; x < FIRE_W; x++) {
                 const dist = Math.abs(x - mid);
-                const base = dist <= half ? 255 : Math.max(0, 255 - (dist - half) * 55);
-                buf[(FIRE_H - 1) * FIRE_W + x] = Math.max(0, base - Math.floor(Math.random() * 30));
+                const base =
+                    dist <= half ? 255 : Math.max(0, 255 - (dist - half) * 55);
+                buf[(FIRE_H - 1) * FIRE_W + x] = Math.max(
+                    0,
+                    base - Math.floor(Math.random() * 30),
+                );
             }
         };
 
@@ -36,7 +39,10 @@ function Campfire() {
                     } else {
                         const rand = Math.round(Math.random() * 3);
                         const dst = (x - rand + 1 + FIRE_W) % FIRE_W;
-                        buf[(y - 1) * FIRE_W + dst] = Math.max(0, src - (rand & 1));
+                        buf[(y - 1) * FIRE_W + dst] = Math.max(
+                            0,
+                            src - (rand & 1),
+                        );
                     }
                 }
             }
@@ -47,7 +53,7 @@ function Campfire() {
             for (let y = 0; y < FIRE_H; y++) {
                 for (let x = 0; x < FIRE_W; x++) {
                     const v = buf[y * FIRE_W + x];
-                    const ci = Math.floor(v * (FIRE_CHARS.length - 1) / 255);
+                    const ci = Math.floor((v * (FIRE_CHARS.length - 1)) / 255);
                     out += FIRE_CHARS[ci];
                 }
                 out += '\n';
@@ -72,13 +78,16 @@ function Campfire() {
             rafRef.current = requestAnimationFrame(tick);
         };
 
-        const observer = new IntersectionObserver(([e]) => {
-            if (e.isIntersecting) {
-                rafRef.current = requestAnimationFrame(tick);
-            } else {
-                cancelAnimationFrame(rafRef.current);
-            }
-        }, { threshold: 0 });
+        const observer = new IntersectionObserver(
+            ([e]) => {
+                if (e.isIntersecting) {
+                    rafRef.current = requestAnimationFrame(tick);
+                } else {
+                    cancelAnimationFrame(rafRef.current);
+                }
+            },
+            { threshold: 0 },
+        );
 
         if (preRef.current) observer.observe(preRef.current);
 
@@ -98,26 +107,19 @@ function Campfire() {
     );
 }
 
-const SECTION_LINKS = [
+const PAGES_ALL_LINKS = [
     { label: 'Home', href: '/#banner' },
     { label: 'About Me', href: '/#about-me' },
-    { label: 'Projects', href: '/#selected-projects' },
+    { label: 'Projects', href: '/projects' },
     { label: 'Experience', href: '/#my-experience' },
     { label: 'Stack', href: '/#my-stack' },
     { label: 'Certifications', href: '/#certifications' },
     { label: 'Contact', href: '/#contact' },
 ];
 
-const PAGE_LINKS = [
-    { label: 'Home', href: '/' },
-    { label: 'Projects', href: '/projects' },
-    { label: 'Blog', href: '/blog' },
-];
-
 const PENDING_HASH_KEY = 'pending-home-hash';
 
 const Footer = () => {
-    const year = new Date().getFullYear();
     const lenis = useLenis();
     const router = useRouter();
     const pathname = usePathname();
@@ -200,6 +202,14 @@ const Footer = () => {
         scrollToHash(hash);
     };
 
+    useEffect(() => {
+        if (pathname !== '/') return;
+        const pendingHash = window.sessionStorage.getItem(PENDING_HASH_KEY);
+        if (!pendingHash) return;
+        window.sessionStorage.removeItem(PENDING_HASH_KEY);
+        setTimeout(() => scrollToHash(pendingHash), 220);
+    }, [pathname]);
+
     return (
         <footer
             className="border-t border-border bg-background"
@@ -208,36 +218,18 @@ const Footer = () => {
         >
             <div className="container pt-12 pb-6">
                 {/* Link columns */}
-                <div className="grid grid-cols-2 gap-x-8 gap-y-10 mb-16 sm:mb-20 md:flex md:gap-16 md:items-start md:justify-between">
-                    <div>
+                <div className="grid grid-cols-2 gap-x-8 gap-y-4 sm:gap-y-6 mb-16 sm:mb-20 md:flex md:gap-12 md:items-start md:justify-start">
+                    <div className="order-1">
                         <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50 [[data-theme='light']_&]:text-foreground/65 mb-5">
                             Pages
                         </p>
                         <ul className="space-y-3.5">
-                            {PAGE_LINKS.map((link) => (
-                                <li key={link.href}>
-                                    <TransitionLink
-                                        href={link.href}
-                                        className="no-click-glow text-sm text-muted-foreground [[data-theme='light']_&]:text-foreground/75 hover:text-foreground transition-colors tracking-wide"
-                                    >
-                                        {link.label}
-                                    </TransitionLink>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    <div>
-                        <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50 [[data-theme='light']_&]:text-foreground/65 mb-5">
-                            Sections
-                        </p>
-                        <ul className="space-y-3.5">
-                            {SECTION_LINKS.map((link) => (
-                                <li key={link.href}>
+                            {PAGES_ALL_LINKS.map((link) => (
+                                <li key={`${link.label}-${link.href}`}>
                                     <button
                                         type="button"
                                         onClick={() => navigateTo(link.href)}
-                                        className="no-click-glow text-sm text-muted-foreground [[data-theme='light']_&]:text-foreground/75 hover:text-foreground transition-colors tracking-wide text-left"
+                                        className="no-click-glow text-sm text-muted-foreground [[data-theme='light']_&]:text-foreground/75 hover:text-foreground transition-colors tracking-wide"
                                     >
                                         {link.label}
                                     </button>
@@ -246,7 +238,7 @@ const Footer = () => {
                         </ul>
                     </div>
 
-                    <div>
+                    <div className="order-2">
                         <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50 [[data-theme='light']_&]:text-foreground/65 mb-5">
                             Connect
                         </p>
@@ -282,55 +274,59 @@ const Footer = () => {
                                     Email
                                 </a>
                             </li>
-                            <li className="pt-1">
-                                <address
-                                    className="not-italic"
-                                    itemProp="address"
+                            <li>
+                                <button
+                                    type="button"
+                                    onClick={() => navigateTo('/blog')}
+                                    className="no-click-glow text-sm text-muted-foreground [[data-theme='light']_&]:text-foreground/75 hover:text-foreground transition-colors tracking-wide"
                                 >
-                                    <div className="flex flex-col items-start">
-                                        <span className="inline-flex items-center gap-1.5 text-muted-foreground/50 [[data-theme='light']_&]:text-foreground/70">
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                width="11"
-                                                height="11"
-                                                viewBox="0 0 24 24"
-                                                fill="currentColor"
-                                                aria-hidden="true"
-                                            >
-                                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-                                            </svg>
-                                            <span className="text-[10px] uppercase tracking-[0.18em]">
-                                                Location
-                                            </span>
-                                        </span>
-                                        <a
-                                            href="https://www.google.com/search?q=Orlando%2C+FL&sourceid=chrome&ie=UTF-8"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="no-click-glow inline-block mt-2 font-space-grotesk font-bold text-2xl text-foreground leading-none hover:text-primary [[data-theme='light']_&]:hover:text-zinc-900 transition-colors"
-                                        >
-                                            Orlando, FL
-                                        </a>
-                                    </div>
-                                </address>
+                                    Blog
+                                </button>
                             </li>
                         </ul>
                     </div>
 
-                    {/* Campfire */}
-                    <div className="hidden md:block md:self-start">
-                        <Campfire />
+                    <div className="order-3 col-span-1 col-start-2 sm:col-span-1 sm:col-start-auto text-right sm:text-left">
+                        <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50 [[data-theme='light']_&]:text-foreground/65 mb-5">
+                            Location
+                        </p>
+                        <address className="not-italic" itemProp="address">
+                            <a
+                                href="https://www.google.com/search?q=Orlando%2C+FL&sourceid=chrome&ie=UTF-8"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="no-click-glow inline-block font-space-grotesk font-bold text-2xl text-foreground leading-none hover:text-primary [[data-theme='light']_&]:hover:text-zinc-900 transition-colors"
+                            >
+                                Orlando, FL
+                            </a>
+                        </address>
+                    </div>
+
+                    {/* Fireplace */}
+                    <div className="order-4 col-span-2 md:col-span-1 flex justify-end md:justify-start md:-ml-6 md:mt-6">
+                        <div className="hidden md:block">
+                            <Campfire />
+                        </div>
                     </div>
                 </div>
 
                 {/* ASCII name */}
-                <div
-                    className="overflow-x-auto -mx-4 sm:-mx-6 px-4 sm:px-6 mb-2"
-                >
+                <div className="-mx-4 sm:-mx-6 px-4 sm:px-6 mb-2 overflow-hidden">
+                    <pre
+                        className="font-mono leading-snug whitespace-pre bg-clip-text text-transparent bg-gradient-to-l from-white/20 via-white/45 to-white/80 [[data-theme='light']_&]:from-black/60 [[data-theme='light']_&]:via-black/42 [[data-theme='light']_&]:to-black/25 mb-2"
+                        style={{ fontSize: 'clamp(4.3px, 1.18vw, 16px)' }}
+                        aria-label="@ 2026 ascii"
+                    >{`   :::::::::::        ::::::::   :::::::   ::::::::   ::::::::
+ :+: :+:+:+:+:+:            :+: :+:   :+:        :+: :+:    :+:
++:+ +:+   +:+ +:+          +:+  +:+  :+:+       +:+  +:+
++#+ +#+   +#+ +#+        +#+    +#+ + +#+     +#+    +#++:++#+
++#+ +#+   +#+ +#+      +#+      +#+#  +#+   +#+      +#+    +#+
+ #+# #+#+#+#+#+       #+#       #+#   #+#  #+#       #+#    #+#
+  #####              ##########  #######  ##########  ######## `}</pre>
                     <pre
                         className="font-mono leading-snug whitespace-pre bg-clip-text text-transparent bg-gradient-to-l from-white/20 via-white/45 to-white/80 [[data-theme='light']_&]:from-black/60 [[data-theme='light']_&]:via-black/42 [[data-theme='light']_&]:to-black/25"
-                        style={{ fontSize: 'clamp(7px, 2.1vw, 24px)' }}
-                        itemProp="name"
+                        style={{ fontSize: 'clamp(5.9px, 1.78vw, 24px)' }}
+                        itemProp="name ascii"
                     >{`:::::::::::::: :::    :::    ::::     :::     ::: :::::::   :::       ::::::::::
      :+:       :+:    :+:   :+: :+:   :+:+:   :+: :+:  :+:  :+:       :+:
      +:+       +:+    +:+  +:+   +:+  :+:+:+  +:+ +:+       +:+       +:+
@@ -341,12 +337,10 @@ const Footer = () => {
                 </div>
 
                 {/* Copyright */}
-                <div className="border-t border-border/40 mt-4 pt-4 flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-2.5">
-                        <p className="text-[11px] text-muted-foreground/55 [[data-theme='light']_&]:text-foreground/65 tracking-wide">
-                            © {year} Thang Le. All Rights Reserved.
-                        </p>
-                    </div>
+                <div className="border-t border-border/40 mt-4 pt-4 flex items-center justify-end">
+                    <p className="text-[11px] text-muted-foreground/55 [[data-theme='light']_&]:text-foreground/65 tracking-wide text-right">
+                        All Rights Reserved.
+                    </p>
                 </div>
             </div>
         </footer>

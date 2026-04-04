@@ -4,7 +4,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
 import Image from 'next/image';
 import React, { useRef, useEffect, useState } from 'react';
-import { apiFetch } from '@/lib/api';
+import { getStacks } from '@/lib/portfolioPrefetch';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -38,16 +38,21 @@ const Skills = () => {
     const [skills, setSkills] = useState<Skill[]>([]);
 
     useEffect(() => {
-        apiFetch<Skill[]>('/api/portfolio/stacks')
-            .then((data) =>
+        let alive = true;
+        getStacks()
+            .then((data) => {
+                if (!alive) return;
                 setSkills(
                     data.map((item) => ({
                         ...item,
                         category: normalizeSkillCategory(item.category),
                     })),
-                ),
-            )
+                );
+            })
             .catch(() => {});
+        return () => {
+            alive = false;
+        };
     }, []);
 
     useGSAP(

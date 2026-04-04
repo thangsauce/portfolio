@@ -4,7 +4,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
 import Image from 'next/image';
 import React, { useRef, useEffect, useState } from 'react';
-import { apiFetch } from '@/lib/api';
+import { getCurrentlyUsing } from '@/lib/portfolioPrefetch';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -22,24 +22,8 @@ const CurrentlyUsing = () => {
     useEffect(() => {
         let alive = true;
         const load = async () => {
-            const endpoints = [
-                '/api/portfolio/currently_using',
-                '/api/portfolio/currently-using',
-                '/api/portfolio/skills',
-            ];
-            for (const endpoint of endpoints) {
-                try {
-                    const data = await apiFetch<Skill[]>(endpoint);
-                    if (!alive) return;
-                    if (Array.isArray(data)) {
-                        setSkills(data);
-                        return;
-                    }
-                } catch {
-                    // Try next endpoint for compatibility across deployments.
-                }
-            }
-            if (alive) setSkills([]);
+            const data = await getCurrentlyUsing();
+            if (alive) setSkills(data);
         };
         void load();
         return () => {
