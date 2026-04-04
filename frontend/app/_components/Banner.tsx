@@ -238,10 +238,10 @@ const Banner = () => {
                         </div>
                     </div>
 
-                    <div className="w-full lg:w-auto flex justify-center lg:justify-end self-center lg:self-end mt-8 sm:mt-10 md:mt-0">
+                    <div className="w-full lg:w-auto flex justify-center lg:justify-end self-center lg:self-end mt-8 sm:mt-10 md:mt-0 ml-4 sm:ml-6 md:ml-8">
                         <div className="relative slide-up-and-fade">
-                            <span className="pointer-events-none absolute -inset-6 sm:-inset-7 lg:-inset-8 rounded-full hero-orbit-ring" />
-                            <div className="relative h-[250px] w-[250px] sm:h-[300px] sm:w-[300px] lg:h-[360px] lg:w-[360px] rounded-full border border-white/35 [[data-theme='light']_&]:border-black/35 overflow-hidden shadow-[0_0_0_1px_rgba(255,255,255,0.1),0_20px_60px_rgba(0,0,0,0.35)] [[data-theme='light']_&]:shadow-[0_0_0_1px_rgba(0,0,0,0.12),0_20px_60px_rgba(0,0,0,0.18)]">
+                            <span className="pointer-events-none absolute -inset-4 sm:-inset-5 lg:-inset-6 rounded-full hero-orbit-ring" />
+                            <div className="relative h-[180px] w-[180px] sm:h-[220px] sm:w-[220px] lg:h-[270px] lg:w-[270px] rounded-full border border-white/35 [[data-theme='light']_&]:border-black/35 overflow-hidden shadow-[0_0_0_1px_rgba(255,255,255,0.1),0_20px_60px_rgba(0,0,0,0.35)] [[data-theme='light']_&]:shadow-[0_0_0_1px_rgba(0,0,0,0.12),0_20px_60px_rgba(0,0,0,0.18)]">
                                 <Image
                                     src="/CartoonMe.png"
                                     alt="Cartoon portrait of Thang Le"

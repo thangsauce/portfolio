@@ -39,8 +39,8 @@ const tdSt: React.CSSProperties = { padding: '9px 14px', fontSize: 11, letterSpa
 function Fld({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div style={{ marginBottom: 16 }}>
-      <div style={{ fontSize: 9, letterSpacing: '0.3em', color: 'hsl(158 64% 36%)', textTransform: 'uppercase', marginBottom: 5 }}>
-        &gt; {label}
+      <div style={{ fontSize: 9, letterSpacing: '0.28em', color: 'hsl(var(--dash-fg-dim))', textTransform: 'uppercase', marginBottom: 5 }}>
+        {label}
       </div>
       {children}
     </div>

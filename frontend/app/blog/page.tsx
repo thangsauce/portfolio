@@ -150,6 +150,10 @@ export default function BlogPage() {
   )
 
   const handleCalendarPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement | null
+    if (target?.closest('button, input, textarea, select, a, [data-no-calendar-drag="true"]')) {
+      return
+    }
     dragState.active = true
     dragState.startX = e.clientX
     dragState.startY = e.clientY
