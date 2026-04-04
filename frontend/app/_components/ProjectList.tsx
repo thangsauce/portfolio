@@ -283,7 +283,7 @@ const ProjectList = () => {
     return (
         <section className="pb-section -mt-10 md:mt-0" id="selected-projects">
             <div className="container">
-                <div className="flex items-center gap-3 mb-2 md:mb-10">
+                <div className="flex items-center gap-3 mb-3 md:mb-10">
                     <span className="text-primary [[data-theme='light']_&]:text-foreground/80 font-mono text-2xl leading-none select-none">&lt;</span>
                     <h2 className="text-2xl uppercase leading-none tracking-widest">
                         PROJECTS
@@ -291,7 +291,7 @@ const ProjectList = () => {
                     <span className="text-primary [[data-theme='light']_&]:text-foreground/80 font-mono text-2xl leading-none select-none">&gt;</span>
                 </div>
 
-                <div className="group/projects relative max-md:-mt-2" ref={containerRef}>
+                <div className="group/projects relative max-md:-mt-3" ref={containerRef}>
                     {selectedProject !== null && projects.some((p) => p.thumbnail || p.longThumbnail) && (
                         <div
                             className="max-md:hidden absolute -right-20 xl:-right-28 top-0 z-[1] pointer-events-none w-[200px] xl:w-[350px] aspect-[3/4] overflow-hidden opacity-100"
