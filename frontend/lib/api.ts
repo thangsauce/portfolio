@@ -1,7 +1,6 @@
 import { createClient } from './supabase/client'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL!
-const supabase = createClient()
 
 async function parseApiError(res: Response): Promise<string> {
   try {
@@ -13,26 +12,25 @@ async function parseApiError(res: Response): Promise<string> {
 }
 
 async function authHeaders(): Promise<HeadersInit> {
+  const supabase = createClient()
   const buildAuth = (token?: string): HeadersInit => {
     if (!token) return {}
     return { Authorization: `Bearer ${token}` }
   }
 
-  const first = await supabase.auth.getSession()
-  const firstToken = first.data.session?.access_token
-  if (firstToken) return buildAuth(firstToken)
-
-  // Brief retry for race on initial hydration/navigation.
-  await new Promise((resolve) => setTimeout(resolve, 120))
-  const second = await supabase.auth.getSession()
-  const secondToken = second.data.session?.access_token
-  if (secondToken) return buildAuth(secondToken)
+  // Wait briefly for auth hydration after navigation/login redirects.
+  for (let i = 0; i < 10; i += 1) {
+    const { data } = await supabase.auth.getSession()
+    const token = data.session?.access_token
+    if (token) return buildAuth(token)
+    await new Promise((resolve) => setTimeout(resolve, 180))
+  }
 
   // Final recovery attempt if token exists but is stale.
   try {
     await supabase.auth.refreshSession()
-    const third = await supabase.auth.getSession()
-    return buildAuth(third.data.session?.access_token)
+    const { data } = await supabase.auth.getSession()
+    return buildAuth(data.session?.access_token)
   } catch {
     return {}
   }

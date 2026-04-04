@@ -26,13 +26,17 @@ todos.get('/', async (c) => {
 // Create todo
 todos.post('/', zValidator('json', todoBody), async (c) => {
   const body = c.req.valid('json')
+  const userId = c.get('userId')
   const supabase = getSupabase(c.env)
 
   // Be tolerant across schema drift in production by falling back
   // to progressively smaller insert payloads.
   const candidates: Array<Record<string, unknown>> = [
+    { ...body, user_id: userId },
     body,
+    { title: body.title, status: body.status, user_id: userId },
     { title: body.title, status: body.status },
+    { title: body.title, user_id: userId },
     { title: body.title },
   ]
 

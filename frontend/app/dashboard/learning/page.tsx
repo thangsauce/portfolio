@@ -279,7 +279,7 @@ function LearningCard({
             background: 'none', border: 'none', outline: 'none',
             fontFamily: 'var(--font-roboto-flex)',
             fontSize: 11, letterSpacing: '0.03em',
-            color: 'hsl(158 64% 36%)',
+            color: 'hsl(var(--dash-fg))',
             caretColor: 'hsl(158 64% 36%)', marginBottom: 6, width: '100%',
           }}
         />
@@ -288,7 +288,7 @@ function LearningCard({
           onClick={() => setEditCat(true)}
           style={{
             fontSize: 11, letterSpacing: '0.03em',
-            color: item.category ? 'hsl(var(--dash-fg-muted))' : 'hsl(var(--dash-border))',
+            color: item.category ? 'hsl(var(--dash-fg))' : 'hsl(var(--dash-fg-muted))',
             cursor: 'text', marginBottom: 6,
           }}
         >
@@ -314,7 +314,7 @@ function LearningCard({
             outline: 'none', resize: 'none',
             fontFamily: 'var(--font-roboto-flex)',
             fontSize: 12, letterSpacing: '0.03em',
-            color: 'hsl(var(--dash-fg-muted))',
+            color: 'hsl(var(--dash-fg))',
             caretColor: 'hsl(158 64% 36%)', padding: '5px 7px',
             marginBottom: 8,
           }}
@@ -324,7 +324,7 @@ function LearningCard({
           onClick={() => setEditNotes(true)}
           style={{
             fontSize: 12, letterSpacing: '0.03em',
-            color: 'hsl(var(--dash-fg-dim))',
+            color: 'hsl(var(--dash-fg-muted))',
             cursor: 'text', marginBottom: 8, lineHeight: 1.5,
             display: '-webkit-box', WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical', overflow: 'hidden',
@@ -337,7 +337,7 @@ function LearningCard({
           onClick={() => setEditNotes(true)}
           style={{
             fontSize: 11, letterSpacing: '0.03em',
-            color: 'hsl(var(--dash-border))',
+            color: 'hsl(var(--dash-fg-muted))',
             cursor: 'text', marginBottom: 8,
           }}
         >
