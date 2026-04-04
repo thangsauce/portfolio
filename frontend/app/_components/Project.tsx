@@ -129,7 +129,7 @@ const Project = ({
     return (
         <>
             <div
-                className="project-item group leading-none max-md:py-1 py-1.5 md:py-5 first:!pt-0 last:pb-0 md:group-hover/projects:opacity-30 md:hover:!opacity-100 transition-all"
+                className="project-item group leading-none py-5 first:!pt-0 last:pb-0 md:group-hover/projects:opacity-30 md:hover:!opacity-100 transition-all"
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
             >
@@ -138,7 +138,7 @@ const Project = ({
                     src={project.thumbnail}
                     alt="Project"
                     className={cn(
-                        'w-full object-cover mb-1 md:mb-6 aspect-[16/7] md:aspect-[3/2] object-top',
+                        'w-full object-cover mb-4 md:mb-6 aspect-[16/7] md:aspect-[3/2] object-top',
                     )}
                     key={project.slug}
                     loading="lazy"
@@ -246,7 +246,7 @@ const Project = ({
                             ))}
                     </div>
                     {project.description && (
-                        <p className="max-w-3xl text-sm md:text-base text-muted-foreground leading-relaxed overflow-hidden transition-all duration-500 ease-out max-md:mt-2 max-md:max-h-16 max-md:opacity-100 md:mt-0 md:max-h-0 md:opacity-0 md:group-hover:mt-3 md:group-hover:max-h-40 md:group-hover:opacity-100">
+                        <p className="max-md:hidden max-w-3xl text-sm md:text-base text-muted-foreground leading-relaxed overflow-hidden transition-all duration-500 ease-out md:mt-0 md:max-h-0 md:opacity-0 md:group-hover:mt-3 md:group-hover:max-h-40 md:group-hover:opacity-100">
                             {project.description}
                         </p>
                     )}

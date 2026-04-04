@@ -7,7 +7,7 @@ import { IProject } from '@/types';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
-import React, { useRef, useState, useEffect, MouseEvent } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import Project from './Project';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -189,23 +189,25 @@ const ProjectList = () => {
     useGSAP(
         () => {
             if (projects.length === 0) return;
+            const containerEl = containerRef.current;
+            if (!containerEl) return;
             const isHorizontalMode = window.innerWidth >= 768 && !!document.querySelector('.horizontal-mode');
             if (isHorizontalMode) {
-                gsap.from(containerRef.current, { y: 80, opacity: 0, duration: 0.9, ease: 'power2.out' });
+                gsap.from(containerEl, { y: 80, opacity: 0, duration: 0.9, ease: 'power2.out' });
                 return;
             }
             const tl = gsap.timeline({
                 scrollTrigger: {
-                    trigger: containerRef.current,
+                    trigger: containerEl,
                     start: 'top bottom',
                     end: 'top 80%',
                     toggleActions: 'restart none none reverse',
                     scrub: 1,
                 },
             });
-            tl.from(containerRef.current, { y: 150, opacity: 0 });
+            tl.from(containerEl, { y: 150, opacity: 0 });
         },
-        { scope: containerRef, dependencies: [projects.length] },
+        { dependencies: [projects.length] },
     );
 
     const handleMouseEnter = (slug: string) => {
@@ -264,7 +266,6 @@ const ProjectList = () => {
             );
         },
         {
-            scope: containerRef,
             dependencies: [activeCategory, currentPage, currentProjects.length, flipDirection],
         },
     );
@@ -281,7 +282,7 @@ const ProjectList = () => {
     if (projects.length === 0) return null;
 
     return (
-        <section className="pb-section -mt-10 md:mt-0" id="selected-projects">
+        <section className="pb-section" id="selected-projects">
             <div className="container">
                 <div className="flex items-center gap-3 mb-3 md:mb-10">
                     <span className="text-primary [[data-theme='light']_&]:text-foreground/80 font-mono text-2xl leading-none select-none">&lt;</span>
@@ -291,7 +292,7 @@ const ProjectList = () => {
                     <span className="text-primary [[data-theme='light']_&]:text-foreground/80 font-mono text-2xl leading-none select-none">&gt;</span>
                 </div>
 
-                <div className="group/projects relative max-md:-mt-3" ref={containerRef}>
+                <div className="group/projects relative" ref={containerRef}>
                     {selectedProject !== null && projects.some((p) => p.thumbnail || p.longThumbnail) && (
                         <div
                             className="max-md:hidden absolute -right-20 xl:-right-28 top-0 z-[1] pointer-events-none w-[200px] xl:w-[350px] aspect-[3/4] overflow-hidden opacity-100"
@@ -323,8 +324,8 @@ const ProjectList = () => {
                         </div>
                     )}
 
-                    <div className="flex flex-col max-md:gap-0 md:pr-[230px] xl:pr-[390px]" ref={projectListRef}>
-                        <div className="mb-0 max-md:pb-0 md:mb-6 flex flex-wrap items-center gap-2 max-md:gap-y-1.5">
+                    <div className="flex flex-col md:pr-[230px] xl:pr-[390px]" ref={projectListRef}>
+                        <div className="mb-4 md:mb-6 flex flex-wrap items-center gap-2">
                             {categories.map((category) => (
                                 <button
                                     key={category.key}
@@ -374,7 +375,7 @@ const ProjectList = () => {
 
                         {currentProjects.length > 0 ? (
                             <div
-                                className="flex flex-col max-md:-mt-2 max-md:space-y-1"
+                                className="flex flex-col divide-y divide-border/50"
                                 ref={pagePanelRef}
                                 key={`${activeCategory}-${currentPage}`}
                             >

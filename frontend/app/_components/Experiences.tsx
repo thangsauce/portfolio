@@ -48,6 +48,8 @@ const Experiences = () => {
     useGSAP(
         () => {
             if (experiences.length === 0) return;
+            const containerEl = containerRef.current;
+            if (!containerEl) return;
             const isHorizontalMode = window.innerWidth >= 768 && !!document.querySelector('.horizontal-mode');
             if (isHorizontalMode) {
                 gsap.from('.experience-item', {
@@ -61,7 +63,7 @@ const Experiences = () => {
             }
             const tl = gsap.timeline({
                 scrollTrigger: {
-                    trigger: containerRef.current,
+                    trigger: containerEl,
                     start: 'top 60%',
                     end: 'bottom 50%',
                     toggleActions: 'restart none none reverse',
@@ -70,24 +72,26 @@ const Experiences = () => {
             });
             tl.from('.experience-item', { y: 50, opacity: 0, stagger: 0.3 });
         },
-        { scope: containerRef, dependencies: [experiences.length] },
+        { dependencies: [experiences.length] },
     );
 
     useGSAP(
         () => {
+            const containerEl = containerRef.current;
+            if (!containerEl) return;
             const isHorizontalMode = window.innerWidth >= 768 && !!document.querySelector('.horizontal-mode');
             if (isHorizontalMode) return;
             const tl = gsap.timeline({
                 scrollTrigger: {
-                    trigger: containerRef.current,
+                    trigger: containerEl,
                     start: 'bottom 50%',
                     end: 'bottom 20%',
                     scrub: 1,
                 },
             });
-            tl.to(containerRef.current, { y: -150, opacity: 0 });
+            tl.to(containerEl, { y: -150, opacity: 0 });
         },
-        { scope: containerRef },
+        {},
     );
 
     if (visibleExperiences.length === 0) return null;
