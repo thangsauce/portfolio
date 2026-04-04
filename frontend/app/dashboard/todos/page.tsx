@@ -96,6 +96,18 @@ function isOverdue(due: string | null, done: boolean): boolean {
   return new Date(due) < new Date(new Date().toDateString())
 }
 
+function formatDateTime(value: string): string {
+  const d = new Date(value)
+  if (Number.isNaN(d.getTime())) return value
+  return d.toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  })
+}
+
 function InlineAdd({
   onSubmit,
   onCancel,
@@ -389,49 +401,64 @@ function TodoCard({
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-        {editingDate ? (
-          <input
-            ref={dateRef}
-            type="date"
-            defaultValue={todo.due_date ?? ''}
-            onBlur={saveDate}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') dateRef.current?.blur()
-              if (e.key === 'Escape') setEditingDate(false)
-            }}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
+          <span
             style={{
-              background: 'hsl(var(--dash-input))',
-              border: '1px solid hsl(var(--dash-border))',
-              borderRadius: 6,
-              color: 'hsl(var(--dash-fg-muted))',
-              fontSize: 12,
-              padding: '2px 5px',
-              outline: 'none',
-              fontFamily: 'var(--font-roboto-flex)',
-              colorScheme: 'dark',
-              width: 120,
-            }}
-          />
-        ) : (
-          <button
-            onClick={() => setEditingDate(true)}
-            style={{
-              background: 'none',
-              border: 'none',
-              padding: 0,
-              fontSize: 12,
+              fontSize: 10,
               letterSpacing: '0.02em',
-              color: overdue
-                ? 'hsl(0 62% 52%)'
-                : todo.due_date
-                  ? 'hsl(var(--dash-fg-muted))'
-                  : 'hsl(var(--dash-border))',
-              cursor: 'pointer',
+              color: 'hsl(var(--dash-fg-dim))',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
             }}
           >
-            {todo.due_date ?? 'No due date'}
-          </button>
-        )}
+            Created {formatDateTime(todo.created_at)}
+          </span>
+          {editingDate ? (
+            <input
+              ref={dateRef}
+              type="date"
+              defaultValue={todo.due_date ?? ''}
+              onBlur={saveDate}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') dateRef.current?.blur()
+                if (e.key === 'Escape') setEditingDate(false)
+              }}
+              style={{
+                background: 'hsl(var(--dash-input))',
+                border: '1px solid hsl(var(--dash-border))',
+                borderRadius: 6,
+                color: 'hsl(var(--dash-fg-muted))',
+                fontSize: 12,
+                padding: '2px 5px',
+                outline: 'none',
+                fontFamily: 'var(--font-roboto-flex)',
+                colorScheme: 'dark',
+                width: 120,
+              }}
+            />
+          ) : (
+            <button
+              onClick={() => setEditingDate(true)}
+              style={{
+                background: 'none',
+                border: 'none',
+                padding: 0,
+                textAlign: 'left',
+                fontSize: 12,
+                letterSpacing: '0.02em',
+                color: overdue
+                  ? 'hsl(0 62% 52%)'
+                  : todo.due_date
+                    ? 'hsl(var(--dash-fg-muted))'
+                    : 'hsl(var(--dash-border))',
+                cursor: 'pointer',
+              }}
+            >
+              {todo.due_date ?? 'No due date'}
+            </button>
+          )}
+        </div>
 
         {confirmDel ? (
           <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}>

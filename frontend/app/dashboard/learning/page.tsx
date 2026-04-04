@@ -18,6 +18,18 @@ type LearningItem = {
 // ─── Config ───────────────────────────────────────────────────────────────────
 const STATUSES: LStatus[] = ['to_learn', 'learning', 'learned']
 
+function formatDateTime(value: string): string {
+  const d = new Date(value)
+  if (Number.isNaN(d.getTime())) return value
+  return d.toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  })
+}
+
 const COL_CONFIG: Record<
   LStatus,
   { label: string; headerColor: string; bg: string; countColor: string; addColor: string; addHoverColor: string; dropColor: string }
@@ -334,6 +346,16 @@ function LearningCard({
       )}
 
       {/* Footer: arrows + delete */}
+      <div
+        style={{
+          fontSize: 10,
+          letterSpacing: '0.02em',
+          color: 'hsl(var(--dash-fg-dim))',
+          marginBottom: 7,
+        }}
+      >
+        Created {formatDateTime(item.created_at)}
+      </div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 2 }}>
         <div style={{ display: 'flex', gap: 2 }}>
           {canMoveLeft && (

@@ -98,9 +98,14 @@ export default function DashboardPage() {
   const [stats,    setStats]    = useState<Stats | null>(null)
   const [health,   setHealth]   = useState<HealthPayload | null>(null)
   const [hovered,  setHovered]  = useState<string | null>(null)
+  const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
     setMounted(true)
+    const mq = window.matchMedia('(max-width: 768px)')
+    setIsMobile(mq.matches)
+    const onChange = (e: MediaQueryListEvent) => setIsMobile(e.matches)
+    mq.addEventListener('change', onChange)
 
     function tick() {
       const now = new Date()
@@ -130,7 +135,10 @@ export default function DashboardPage() {
       .then((res) => setHealth(res))
       .catch(() => setHealth(null))
 
-    return () => clearInterval(id)
+    return () => {
+      clearInterval(id)
+      mq.removeEventListener('change', onChange)
+    }
   }, [])
 
   const systemRows = health
@@ -172,18 +180,22 @@ export default function DashboardPage() {
     >
       {/* ── Header ────────────────────────────────────────────────────────── */}
       <div style={{
-        display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between',
-        marginBottom: 28,
+        display: 'flex',
+        alignItems: isMobile ? 'flex-start' : 'flex-end',
+        flexDirection: isMobile ? 'column' : 'row',
+        justifyContent: 'space-between',
+        gap: isMobile ? 12 : 0,
+        marginBottom: 20,
       }}>
         <div>
           <h1 style={{
-            fontSize: 24, fontWeight: 600, letterSpacing: '-0.02em',
+            fontSize: isMobile ? 20 : 24, fontWeight: 600, letterSpacing: '-0.02em',
             color: 'hsl(var(--dash-fg))', margin: '0 0 5px',
           }}>
             {greeting || 'Welcome back'}
           </h1>
           <p style={{
-            fontSize: 13, color: 'hsl(var(--dash-fg-muted))', margin: 0,
+            fontSize: isMobile ? 12 : 13, color: 'hsl(var(--dash-fg-muted))', margin: 0,
             letterSpacing: '-0.01em',
           }}>
             {date}
@@ -192,15 +204,15 @@ export default function DashboardPage() {
 
         {/* Clock */}
         <div style={{
-          padding: '10px 18px',
+          padding: isMobile ? '8px 12px' : '10px 18px',
           background: 'hsl(var(--dash-card))',
           border: '1px solid hsl(var(--dash-border))',
           borderRadius: 12,
-          textAlign: 'right',
+          textAlign: isMobile ? 'left' : 'right',
         }}>
           <div style={{
             fontFamily: 'var(--font-anton)',
-            fontSize: 22, letterSpacing: '0.04em',
+            fontSize: isMobile ? 18 : 22, letterSpacing: '0.04em',
             color: 'hsl(var(--dash-fg-muted))',
             fontVariantNumeric: 'tabular-nums', lineHeight: 1,
           }}>
@@ -218,7 +230,7 @@ export default function DashboardPage() {
 
       {/* ── Stats ─────────────────────────────────────────────────────────── */}
       <div style={{
-        display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12,
+        display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12,
         marginBottom: 12,
       }}>
         {([
@@ -239,7 +251,7 @@ export default function DashboardPage() {
       </div>
 
       {/* ── Bottom row ────────────────────────────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 12 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12, marginTop: 12 }}>
 
         {/* System status */}
         <div style={{
@@ -307,7 +319,7 @@ export default function DashboardPage() {
           }}>
             Quick Access
           </h3>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 8 }}>
             {QUICK.map(({ label, sub, href }) => (
               <Link
                 key={href}

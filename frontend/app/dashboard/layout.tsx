@@ -106,6 +106,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const logoEyeRef   = useRef<SVGSVGElement>(null)
   const logoPupilRef = useRef<SVGGElement>(null)
 
@@ -117,12 +118,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    const mobileQuery = window.matchMedia('(max-width: 768px)')
     const saved = window.localStorage.getItem('dashboard-theme') as 'dark' | 'light' | null
     const next = saved ?? (mediaQuery.matches ? 'dark' : 'light')
     setTheme(next)
 
     const savedSidebar = window.localStorage.getItem('dashboard-sidebar-collapsed')
-    setIsSidebarCollapsed(savedSidebar === '1')
+    setIsMobile(mobileQuery.matches)
+    setIsSidebarCollapsed(mobileQuery.matches ? true : savedSidebar === '1')
+
+    const onMobileChange = (e: MediaQueryListEvent) => {
+      setIsMobile(e.matches)
+      if (e.matches) setIsSidebarCollapsed(true)
+    }
+    mobileQuery.addEventListener('change', onMobileChange)
+    return () => mobileQuery.removeEventListener('change', onMobileChange)
   }, [])
 
   useEffect(() => {
@@ -197,7 +207,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         className={`no-dashboard-click-glow transition-opacity duration-500 ${mounted ? 'opacity-100' : 'opacity-0'} fixed inset-0 z-50 flex overflow-hidden font-roboto-flex bg-[hsl(var(--dash-bg))]`}
       >
         {/* ── Sidebar ─────────────────────────────────────────────────────── */}
-        <aside className={`${isSidebarCollapsed ? 'w-[76px] min-w-[76px]' : 'w-60 min-w-[240px]'} flex-shrink-0 flex flex-col bg-[hsl(var(--dash-sidebar))] border-r border-border transition-all duration-200`}>
+        <aside className={`${isSidebarCollapsed ? (isMobile ? 'w-[60px] min-w-[60px]' : 'w-[76px] min-w-[76px]') : 'w-60 min-w-[240px]'} flex-shrink-0 flex flex-col bg-[hsl(var(--dash-sidebar))] border-r border-border transition-all duration-200`}>
 
           {/* Logo */}
           <Link
@@ -333,15 +343,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </aside>
 
         {/* ── Content ─────────────────────────────────────────────────────── */}
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col overflow-hidden min-w-0">
 
           {/* Topbar */}
-          <header className="h-11 min-h-[44px] flex-shrink-0 bg-[hsl(var(--dash-sidebar))] border-b border-border flex items-center justify-between px-7">
+          <header className={`${isMobile ? 'h-10 min-h-[40px] px-3' : 'h-11 min-h-[44px] px-7'} flex-shrink-0 bg-[hsl(var(--dash-sidebar))] border-b border-border flex items-center justify-between`}>
             <div className="flex items-center gap-2">
-              <span className={`text-[13px] tracking-tight ${isLight ? 'text-foreground/80' : 'text-muted-foreground'}`}>
+              <span className={`${isMobile ? 'text-[12px]' : 'text-[13px]'} tracking-tight ${isLight ? 'text-foreground/80' : 'text-muted-foreground'}`}>
                 Dashboard
               </span>
-              {segments.map((seg, i) => (
+              {!isMobile && segments.map((seg, i) => (
                 <span key={i} className="flex items-center gap-2">
                   <span className={`text-base leading-none font-light ${isLight ? 'text-foreground/70' : 'text-muted-foreground'}`}>›</span>
                   <span className={[
@@ -359,14 +369,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="flex items-center gap-2">
               <button
                 onClick={toggleTheme}
-                className="mr-2.5 px-3 py-[5px] rounded-full border border-border bg-muted text-muted-foreground text-xs tracking-tight cursor-pointer inline-flex items-center gap-1.5"
+                className={`${isMobile ? 'px-2.5 py-[4px]' : 'mr-2.5 px-3 py-[5px]'} rounded-full border border-border bg-muted text-muted-foreground text-xs tracking-tight cursor-pointer inline-flex items-center gap-1.5`}
               >
                 {isLight ? (
                   <>
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                       <path d="M12 3a7 7 0 1 0 9 9 9 9 0 1 1-9-9z" />
                     </svg>
-                    <span>Dark</span>
+                    {!isMobile && <span>Dark</span>}
                   </>
                 ) : (
                   <>
@@ -381,7 +391,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       <line x1="17" y1="7" x2="19.1" y2="4.9" />
                       <line x1="4.9" y1="19.1" x2="7" y2="17" />
                     </svg>
-                    <span>Light</span>
+                    {!isMobile && <span>Light</span>}
                   </>
                 )}
               </button>
@@ -389,12 +399,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 className="w-[7px] h-[7px] rounded-full bg-emerald-400 animate-pulse"
                 style={{ boxShadow: '0 0 0 2px rgba(16, 185, 129, 0.22), 0 0 10px rgba(16, 185, 129, 0.35)' }}
               />
-              <span className="text-xs tracking-tight text-emerald-400">Online</span>
+              {!isMobile && <span className="text-xs tracking-tight text-emerald-400">Online</span>}
             </div>
           </header>
 
           {/* Main */}
-          <main data-lenis-prevent className="flex-1 overflow-y-auto py-8 px-7">
+          <main data-lenis-prevent className={`flex-1 overflow-y-auto ${isMobile ? 'py-4 px-3' : 'py-8 px-7'}`}>
             {children}
           </main>
         </div>
