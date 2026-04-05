@@ -88,7 +88,7 @@ export function ContactSection() {
                             className="order-2 relative flex flex-col gap-3 px-4 py-4 rounded-xl border border-border [[data-theme='light']_&]:border-foreground/30 bg-background-light"
                         >
                             <p className="text-xs text-muted-foreground/60 uppercase tracking-widest text-center">
-                                Questions or contact
+                                questions or contact
                             </p>
 
                             <label htmlFor="contact-name" className="sr-only">
@@ -98,7 +98,7 @@ export function ContactSection() {
                                 id="contact-name"
                                 name="name"
                                 type="text"
-                                placeholder="Name"
+                                placeholder="name"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                                 autoComplete="name"
@@ -114,7 +114,7 @@ export function ContactSection() {
                                 id="contact-email"
                                 name="email"
                                 type="email"
-                                placeholder="Root@email.com"
+                                placeholder="root@email.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 autoComplete="email"
@@ -130,7 +130,7 @@ export function ContactSection() {
                             <textarea
                                 id="contact-message"
                                 name="message"
-                                placeholder="Leave a message..."
+                                placeholder="leave a message..."
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
                                 rows={4}
