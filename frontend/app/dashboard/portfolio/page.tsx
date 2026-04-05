@@ -459,7 +459,7 @@ export default function PortfolioPage() {
           <div style={{ marginTop: 8 }}>
             <input
               type="file"
-              accept="image/*,video/mp4,video/webm"
+              accept="image/*,video/mp4,video/webm,.mp4,.webm"
               disabled={uploadingProjectImage.thumbnail}
               onChange={async (e) => {
                 await handleSingleProjectImageUpload('thumbnail', e.target.files?.[0] ?? null)
@@ -478,7 +478,7 @@ export default function PortfolioPage() {
           <div style={{ marginTop: 8 }}>
             <input
               type="file"
-              accept="image/*,video/mp4,video/webm"
+              accept="image/*,video/mp4,video/webm,.mp4,.webm"
               disabled={uploadingProjectImage.long}
               onChange={async (e) => {
                 await handleSingleProjectImageUpload('long', e.target.files?.[0] ?? null)
