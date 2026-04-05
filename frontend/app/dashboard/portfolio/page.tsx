@@ -462,7 +462,7 @@ export default function PortfolioPage() {
             </div>
           </div>
         </Fld>
-        <Fld label="image_long (url/path)">
+        <Fld label="image_long (url/path) 900x1200">
           <input style={iSt} value={pf.image_long} placeholder="/projects/long/portfolio-long.jpg"
             onChange={e => setPf(p => ({ ...p, image_long: e.target.value }))} />
           <div style={{ marginTop: 8 }}>
