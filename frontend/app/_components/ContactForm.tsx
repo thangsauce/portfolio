@@ -74,7 +74,7 @@ export function ContactSection() {
 
     return (
         <>
-            <section className="relative pt-16 pb-24 md:pt-28 md:pb-24" id="contact" ref={containerRef}>
+            <section className="relative pt-16 pb-24 md:pt-0 md:pb-24" id="contact" ref={containerRef}>
             <div className="container">
                 <div className="max-w-2xl">
                     <div className="flex items-center gap-3 mb-10">
