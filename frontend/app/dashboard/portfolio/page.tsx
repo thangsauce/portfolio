@@ -443,7 +443,7 @@ export default function PortfolioPage() {
           <input style={iSt} value={pf.live_url} placeholder="https://example.com"
             onChange={e => setPf(p => ({ ...p, live_url: e.target.value }))} />
         </Fld>
-        <Fld label="image_thumbnail (url/path/gif)">
+        <Fld label="image_thumbnail (url/path/gif) 1200x800">
           <input style={iSt} value={pf.image_thumbnail} placeholder="/projects/thumbnail/portfolio-thumbnail.jpg or .gif"
             onChange={e => setPf(p => ({ ...p, image_thumbnail: e.target.value }))} />
           <div style={{ marginTop: 8 }}>
@@ -481,7 +481,7 @@ export default function PortfolioPage() {
             </div>
           </div>
         </Fld>
-        <Fld label="image_gallery (comma-separated)">
+        <Fld label="image_gallery (comma-separated) 1500x800">
           <input style={iSt} value={pf.image_gallery} placeholder="/projects/images/p1.jpg, /projects/images/p2.jpg"
             onChange={e => setPf(p => ({ ...p, image_gallery: e.target.value }))} />
           <div style={{ marginTop: 8 }}>
