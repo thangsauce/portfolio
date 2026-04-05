@@ -73,7 +73,7 @@ const ProjectList = () => {
     const containerRef    = useRef<HTMLDivElement>(null);
     const projectListRef  = useRef<HTMLDivElement>(null);
     const imageContainer  = useRef<HTMLDivElement>(null);
-    const imageRef        = useRef<HTMLImageElement>(null);
+    const imageRef        = useRef<HTMLImageElement | HTMLVideoElement>(null);
     const pagePanelRef    = useRef<HTMLDivElement>(null);
     const hasAnimatedPage = useRef(false);
     const fallbackPreview = '/projects/thumbnail/portfolio-thumbnail.jpg';
@@ -300,27 +300,43 @@ const ProjectList = () => {
                         >
                             {projects
                                 .filter((project) => project.thumbnail || project.longThumbnail)
-                                .map((project) => (
-                                <img
-                                    src={project.longThumbnail ?? project.thumbnail ?? ''}
-                                    alt="Project"
-                                    className={cn(
+                                .map((project) => {
+                                    const src = project.longThumbnail ?? project.thumbnail ?? ''
+                                    const isVid = /\.(mp4|webm)$/i.test(src)
+                                    const cls = cn(
                                         'absolute inset-0 transition-all duration-500 w-full h-full object-cover',
                                         { 'opacity-0': project.slug !== selectedProject },
-                                    )}
-                                    key={project.slug}
-                                    ref={project.slug === selectedProject ? imageRef : undefined}
-                                    onError={(e) => {
-                                        const img = e.currentTarget;
-                                        if (img.dataset.fallbackApplied === '1') {
-                                            img.style.opacity = '0';
-                                            return;
-                                        }
-                                        img.dataset.fallbackApplied = '1';
-                                        img.src = fallbackPreview;
-                                    }}
-                                />
-                            ))}
+                                    )
+                                    return isVid ? (
+                                        <video
+                                            key={project.slug}
+                                            src={src}
+                                            className={cls}
+                                            autoPlay
+                                            loop
+                                            muted
+                                            playsInline
+                                            ref={project.slug === selectedProject ? imageRef as React.RefObject<HTMLVideoElement> : undefined}
+                                        />
+                                    ) : (
+                                        <img
+                                            key={project.slug}
+                                            src={src}
+                                            alt="Project"
+                                            className={cls}
+                                            ref={project.slug === selectedProject ? imageRef as React.RefObject<HTMLImageElement> : undefined}
+                                            onError={(e) => {
+                                                const img = e.currentTarget;
+                                                if (img.dataset.fallbackApplied === '1') {
+                                                    img.style.opacity = '0';
+                                                    return;
+                                                }
+                                                img.dataset.fallbackApplied = '1';
+                                                img.src = fallbackPreview;
+                                            }}
+                                        />
+                                    )
+                                })}
                         </div>
                     )}
 

@@ -318,13 +318,15 @@ r.post('/project-images', async (c) => {
     arrayBuffer: () => Promise<ArrayBuffer>
   }
 
-  if (!uploaded.type || !uploaded.type.startsWith('image/')) {
-    return c.json({ error: 'Only image files are allowed' }, 400)
+  const isImage = uploaded.type?.startsWith('image/')
+  const isVideo = uploaded.type === 'video/mp4' || uploaded.type === 'video/webm'
+  if (!uploaded.type || (!isImage && !isVideo)) {
+    return c.json({ error: 'Only images and mp4/webm videos are allowed' }, 400)
   }
 
-  const maxSizeBytes = 10 * 1024 * 1024
+  const maxSizeBytes = isVideo ? 50 * 1024 * 1024 : 10 * 1024 * 1024
   if ((uploaded.size ?? 0) > maxSizeBytes) {
-    return c.json({ error: 'Image must be 10MB or smaller' }, 400)
+    return c.json({ error: isVideo ? 'Video must be 50MB or smaller' : 'Image must be 10MB or smaller' }, 400)
   }
 
   const byName = uploaded.name?.split('.').pop()?.toLowerCase() ?? ''

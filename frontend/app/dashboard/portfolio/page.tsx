@@ -57,6 +57,16 @@ function parseCsvUrls(csv: string) {
   return csv.split(',').map((s) => s.trim()).filter(Boolean)
 }
 
+function isVideo(url: string) {
+  return /\.(mp4|webm)$/i.test(url)
+}
+
+function MediaPreview({ src, style }: { src: string; style: React.CSSProperties }) {
+  return isVideo(src)
+    ? <video src={src} autoPlay loop muted playsInline style={{ ...style, display: 'block' }} />
+    : <img src={src} alt="" style={style} />
+}
+
 const PROJECT_CATEGORIES: ProjectCategory[] = ['web_development', 'cybersecurity', 'network']
 const PROJECT_CATEGORY_LABELS: Record<ProjectCategory, string> = {
   web_development: 'Web Development',
@@ -449,7 +459,7 @@ export default function PortfolioPage() {
           <div style={{ marginTop: 8 }}>
             <input
               type="file"
-              accept="image/*,.gif,image/gif"
+              accept="image/*,video/mp4,video/webm"
               disabled={uploadingProjectImage.thumbnail}
               onChange={async (e) => {
                 await handleSingleProjectImageUpload('thumbnail', e.target.files?.[0] ?? null)
@@ -458,7 +468,7 @@ export default function PortfolioPage() {
               style={{ ...iSt, padding: '6px 11px' }}
             />
             <div style={{ fontSize: 10, letterSpacing: '0.08em', color: 'hsl(var(--dash-fg-dim))', marginTop: 6 }}>
-              {uploadingProjectImage.thumbnail ? 'uploading_thumbnail...' : 'upload thumbnail (jpg/png/webp/gif) from computer'}
+              {uploadingProjectImage.thumbnail ? 'uploading_thumbnail...' : 'upload thumbnail (jpg/png/webp/mp4/webm) from computer'}
             </div>
           </div>
         </Fld>
@@ -468,7 +478,7 @@ export default function PortfolioPage() {
           <div style={{ marginTop: 8 }}>
             <input
               type="file"
-              accept="image/*,.gif,image/gif"
+              accept="image/*,video/mp4,video/webm"
               disabled={uploadingProjectImage.long}
               onChange={async (e) => {
                 await handleSingleProjectImageUpload('long', e.target.files?.[0] ?? null)
@@ -477,7 +487,7 @@ export default function PortfolioPage() {
               style={{ ...iSt, padding: '6px 11px' }}
             />
             <div style={{ fontSize: 10, letterSpacing: '0.08em', color: 'hsl(var(--dash-fg-dim))', marginTop: 6 }}>
-              {uploadingProjectImage.long ? 'uploading_long...' : 'upload long image from computer'}
+              {uploadingProjectImage.long ? 'uploading_long...' : 'upload long (jpg/png/webp/mp4/webm) from computer'}
             </div>
           </div>
         </Fld>
@@ -512,11 +522,7 @@ export default function PortfolioPage() {
                   <div style={{ fontSize: 9, letterSpacing: '0.12em', color: 'hsl(var(--dash-fg-dim))', marginBottom: 4 }}>
                     thumbnail (recommended 400x500, ratio 4:5)
                   </div>
-                  <img
-                    src={pf.image_thumbnail}
-                    alt="Thumbnail preview"
-                    style={{ width: '100%', maxHeight: 120, objectFit: 'cover', border: '1px solid hsl(var(--dash-border))', borderRadius: 6 }}
-                  />
+                  <MediaPreview src={pf.image_thumbnail} style={{ width: '100%', maxHeight: 120, objectFit: 'cover', border: '1px solid hsl(var(--dash-border))', borderRadius: 6 }} />
                 </div>
               )}
               {pf.image_long && (
@@ -524,11 +530,7 @@ export default function PortfolioPage() {
                   <div style={{ fontSize: 9, letterSpacing: '0.12em', color: 'hsl(var(--dash-fg-dim))', marginBottom: 4 }}>
                     long (recommended 800x1000, ratio 4:5)
                   </div>
-                  <img
-                    src={pf.image_long}
-                    alt="Long image preview"
-                    style={{ width: '100%', maxHeight: 120, objectFit: 'cover', border: '1px solid hsl(var(--dash-border))', borderRadius: 6 }}
-                  />
+                  <MediaPreview src={pf.image_long} style={{ width: '100%', maxHeight: 120, objectFit: 'cover', border: '1px solid hsl(var(--dash-border))', borderRadius: 6 }} />
                 </div>
               )}
               {parseCsvUrls(pf.image_gallery).length > 0 && (
@@ -716,22 +718,12 @@ export default function PortfolioPage() {
           )}
         </span>,
         p.images?.thumbnail ? (
-          <img
-            key="thumb"
-            src={p.images.thumbnail}
-            alt={`${p.title} thumbnail`}
-            style={{ width: 64, height: 42, objectFit: 'cover', borderRadius: 4, border: '1px solid hsl(var(--dash-border))' }}
-          />
+          <MediaPreview key="thumb" src={p.images.thumbnail} style={{ width: 64, height: 42, objectFit: 'cover', borderRadius: 4, border: '1px solid hsl(var(--dash-border))' }} />
         ) : (
           <span key="thumb-empty" style={{ color: 'hsl(var(--dash-fg-dim))', fontSize: 10 }}>—</span>
         ),
         p.images?.long ? (
-          <img
-            key="long"
-            src={p.images.long}
-            alt={`${p.title} long`}
-            style={{ width: 44, height: 56, objectFit: 'cover', borderRadius: 4, border: '1px solid hsl(var(--dash-border))' }}
-          />
+          <MediaPreview key="long" src={p.images.long} style={{ width: 44, height: 56, objectFit: 'cover', borderRadius: 4, border: '1px solid hsl(var(--dash-border))' }} />
         ) : (
           <span key="long-empty" style={{ color: 'hsl(var(--dash-fg-dim))', fontSize: 10 }}>—</span>
         ),
