@@ -241,7 +241,7 @@ const ProjectList = () => {
             );
             setSelectedProject(firstWithImage ? firstWithImage.slug : null);
         }
-    }, [currentProject?.slug, currentProjects]);
+    }, [currentProject?.slug]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useGSAP(
         () => {
