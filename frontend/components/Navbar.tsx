@@ -5,6 +5,7 @@ import { useLenis } from 'lenis/react';
 import gsap from 'gsap';
 import { useRouter, usePathname } from 'next/navigation';
 import { SOCIAL_LINKS } from '@/lib/data';
+import { apiFetch } from '@/lib/api';
 
 const MENU_LINKS = [
     {
@@ -51,6 +52,7 @@ const Navbar = () => {
     const [topStarHovered, setTopStarHovered] = useState(false);
     const [theme, setTheme] = useState<'light' | 'dark'>('dark');
     const [showThemeToggle, setShowThemeToggle] = useState(true);
+    const [resumeUrl, setResumeUrl] = useState('/resume.pdf');
     const router = useRouter();
     const pathname = usePathname();
     const lenis = useLenis();
@@ -209,6 +211,16 @@ const Navbar = () => {
 
         mediaQuery.addEventListener('change', handleChange);
         return () => mediaQuery.removeEventListener('change', handleChange);
+    }, []);
+
+    useEffect(() => {
+        let mounted = true;
+        apiFetch<{ url: string }>('/api/portfolio/resume')
+            .then((r) => {
+                if (mounted && r?.url) setResumeUrl(r.url);
+            })
+            .catch(() => {});
+        return () => { mounted = false; };
     }, []);
 
     const toggleTheme = () => {
@@ -494,6 +506,21 @@ const Navbar = () => {
                                         )}
                                     </li>
                                 ))}
+                                <li key="resume">
+                                    <a
+                                        href={resumeUrl}
+                                        download="Thang_Le_Resume.pdf"
+                                        className="nav-shake group flex items-center gap-2 md:gap-2.5 text-base md:text-[15px] capitalize text-foreground transition-colors duration-200 hover:text-white [[data-theme='light']_&]:text-zinc-900 [[data-theme='light']_&]:hover:text-zinc-700"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-foreground/75 transition-all duration-200 group-hover:text-white [[data-theme='light']_&]:text-zinc-800 [[data-theme='light']_&]:group-hover:text-zinc-700">
+                                            <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z" />
+                                            <path d="M14 2v5h5" />
+                                            <path d="M12 11v6" />
+                                            <path d="m9.5 14.5 2.5 2.5 2.5-2.5" />
+                                        </svg>
+                                        resume
+                                    </a>
+                                </li>
                             </ul>
                         </div>
                         <div className="order-1 md:hidden">

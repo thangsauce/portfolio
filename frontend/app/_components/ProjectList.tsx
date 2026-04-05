@@ -223,7 +223,7 @@ const ProjectList = () => {
     ];
     const currentCategoryIndex = categories.findIndex((c) => c.key === activeCategory);
     const activeProjects = grouped[activeCategory];
-    const itemsPerPage = isMobile ? Math.max(1, activeProjects.length) : 2;
+    const itemsPerPage = isMobile ? Math.max(1, activeProjects.length) : 3;
     const totalPages = Math.max(1, Math.ceil(activeProjects.length / itemsPerPage));
     const currentPage = Math.min(activePage[activeCategory], totalPages - 1);
     const startIndex = currentPage * itemsPerPage;
