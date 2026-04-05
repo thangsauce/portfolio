@@ -4,8 +4,15 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL!
 
 async function parseApiError(res: Response): Promise<string> {
   try {
-    const data = await res.json() as { error?: string; message?: string }
-    return data.error || data.message || `API error ${res.status}`
+    const data = await res.json() as { error?: unknown; message?: unknown }
+    if (typeof data.error === 'string') return data.error
+    if (typeof data.message === 'string') return data.message
+    if (data.error != null) {
+      const zod = data.error as { issues?: Array<{ message: string }> }
+      if (zod.issues?.[0]?.message) return zod.issues[0].message
+      return JSON.stringify(data.error)
+    }
+    return `API error ${res.status}`
   } catch {
     return `API error ${res.status}`
   }
