@@ -443,7 +443,7 @@ export default function PortfolioPage() {
           <input style={iSt} value={pf.live_url} placeholder="https://example.com"
             onChange={e => setPf(p => ({ ...p, live_url: e.target.value }))} />
         </Fld>
-        <Fld label="image_thumbnail (url/path/gif) 1200x800">
+        <Fld label="image_thumbnail (url/path/gif) 400x500">
           <input style={iSt} value={pf.image_thumbnail} placeholder="/projects/thumbnail/portfolio-thumbnail.jpg or .gif"
             onChange={e => setPf(p => ({ ...p, image_thumbnail: e.target.value }))} />
           <div style={{ marginTop: 8 }}>
@@ -462,7 +462,7 @@ export default function PortfolioPage() {
             </div>
           </div>
         </Fld>
-        <Fld label="image_long (url/path) 900x1200">
+        <Fld label="image_long (url/path) 800x1000">
           <input style={iSt} value={pf.image_long} placeholder="/projects/long/portfolio-long.jpg"
             onChange={e => setPf(p => ({ ...p, image_long: e.target.value }))} />
           <div style={{ marginTop: 8 }}>
@@ -481,7 +481,7 @@ export default function PortfolioPage() {
             </div>
           </div>
         </Fld>
-        <Fld label="image_gallery (comma-separated) 1500x800">
+        <Fld label="image_gallery (comma-separated) 1000x873">
           <input style={iSt} value={pf.image_gallery} placeholder="/projects/images/p1.jpg, /projects/images/p2.jpg"
             onChange={e => setPf(p => ({ ...p, image_gallery: e.target.value }))} />
           <div style={{ marginTop: 8 }}>
@@ -510,7 +510,7 @@ export default function PortfolioPage() {
               {pf.image_thumbnail && (
                 <div>
                   <div style={{ fontSize: 9, letterSpacing: '0.12em', color: 'hsl(var(--dash-fg-dim))', marginBottom: 4 }}>
-                    thumbnail (recommended 1200x800, ratio 3:2)
+                    thumbnail (recommended 400x500, ratio 4:5)
                   </div>
                   <img
                     src={pf.image_thumbnail}
@@ -522,7 +522,7 @@ export default function PortfolioPage() {
               {pf.image_long && (
                 <div>
                   <div style={{ fontSize: 9, letterSpacing: '0.12em', color: 'hsl(var(--dash-fg-dim))', marginBottom: 4 }}>
-                    long (recommended 900x1200, ratio 3:4 portrait)
+                    long (recommended 800x1000, ratio 4:5)
                   </div>
                   <img
                     src={pf.image_long}
@@ -534,7 +534,7 @@ export default function PortfolioPage() {
               {parseCsvUrls(pf.image_gallery).length > 0 && (
                 <div>
                   <div style={{ fontSize: 9, letterSpacing: '0.12em', color: 'hsl(var(--dash-fg-dim))', marginBottom: 4 }}>
-                    gallery (recommended 1500x800, ratio 15:8)
+                    gallery (recommended 1000x873)
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 6 }}>
                     {parseCsvUrls(pf.image_gallery).slice(0, 6).map((url) => (
