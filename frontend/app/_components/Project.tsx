@@ -133,26 +133,39 @@ const Project = ({
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
             >
-            {selectedProject === null && project.thumbnail && (
-                <img
-                    src={project.thumbnail}
-                    alt="Project"
-                    className={cn(
-                        'w-full object-cover mb-4 md:mb-6 aspect-[16/7] md:aspect-[3/2] object-top',
-                    )}
-                    key={project.slug}
-                    loading="lazy"
-                    onError={(e) => {
-                        const img = e.currentTarget;
-                        if (img.dataset.fallbackApplied === '1') {
-                            img.style.display = 'none';
-                            return;
-                        }
-                        img.dataset.fallbackApplied = '1';
-                        img.src = fallbackThumbnail;
-                    }}
-                />
-            )}
+            {selectedProject === null && project.thumbnail && (() => {
+                const src = project.thumbnail
+                const isVid = /\.(mp4|webm)$/i.test(src)
+                const cls = cn('w-full object-cover mb-4 md:mb-6 aspect-[16/7] md:aspect-[3/2] object-top')
+                return isVid ? (
+                    <video
+                        key={project.slug}
+                        src={src}
+                        className={cls}
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                    />
+                ) : (
+                    <img
+                        src={src}
+                        alt="Project"
+                        className={cls}
+                        key={project.slug}
+                        loading="lazy"
+                        onError={(e) => {
+                            const img = e.currentTarget;
+                            if (img.dataset.fallbackApplied === '1') {
+                                img.style.display = 'none';
+                                return;
+                            }
+                            img.dataset.fallbackApplied = '1';
+                            img.src = fallbackThumbnail;
+                        }}
+                    />
+                )
+            })()}
             <div className="flex gap-2 md:gap-5">
                 <div className="font-anton text-muted-foreground">
                     _{(index + 1).toString().padStart(2, '0')}.

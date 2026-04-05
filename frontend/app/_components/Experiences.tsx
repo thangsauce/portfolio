@@ -64,13 +64,11 @@ const Experiences = () => {
             const tl = gsap.timeline({
                 scrollTrigger: {
                     trigger: containerEl,
-                    start: 'top 60%',
-                    end: 'bottom 50%',
-                    toggleActions: 'restart none none reverse',
-                    scrub: 1,
+                    start: 'top 85%',
+                    toggleActions: 'play none none reverse',
                 },
             });
-            tl.from('.experience-item', { y: 50, opacity: 0, stagger: 0.3 });
+            tl.from('.experience-item', { y: 50, opacity: 0, stagger: 0.15, duration: 0.6, ease: 'power2.out' });
         },
         { dependencies: [experiences.length] },
     );
