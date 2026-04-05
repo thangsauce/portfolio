@@ -18,13 +18,13 @@ const projectCategorySchema = z.preprocess(
 const projectSchema = z.object({
   title: z.string().min(1),
   slug: z.string().regex(/^[a-z0-9-]+$/, 'Slug must be lowercase letters, numbers, and hyphens only'),
-  description: z.string().optional(),
-  long_description: z.string().optional(),
-  done_for: z.string().optional(),
+  description: z.string().nullish(),
+  long_description: z.string().nullish(),
+  done_for: z.string().nullish(),
   category: projectCategorySchema.default('web_development'),
   tech_stack: z.array(z.string()).default([]),
-  source_code_url: z.string().url().optional().or(z.literal('')),
-  live_url: z.string().url().optional().or(z.literal('')),
+  source_code_url: z.string().url().or(z.literal('')).nullish(),
+  live_url: z.string().url().or(z.literal('')).nullish(),
   images: z.object({
     thumbnail: z.string().default(''),
     long: z.string().default(''),
